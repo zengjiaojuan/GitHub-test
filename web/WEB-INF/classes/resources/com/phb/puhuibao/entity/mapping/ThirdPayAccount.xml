@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.phb.puhuibao.entity.ThirdPayAccount">
+  <!-- RESOURCE RESULTMAP -->
+  <resultMap id="resourceResultMap" type="com.phb.puhuibao.entity.ThirdPayAccount">
+    <result property="ybOrderId" column="yb_order_id" jdbcType="CHAR" />
+    <result property="orderId" column="order_id" jdbcType="CHAR" />
+    <result property="amount" column="amount" jdbcType="DECIMAL" />
+    <result property="fee" column="fee" jdbcType="DECIMAL" />
+    <result property="type" column="type" jdbcType="VARCHAR" />
+    <result property="payDate" column="pay_date" jdbcType="VARCHAR" />
+  </resultMap>
+  
+  <!-- RESOURCE INSERT -->
+  <insert id="insert" useGeneratedKeys="true" keyProperty="ybOrderId" parameterType="com.phb.puhuibao.entity.ThirdPayAccount">
+    insert into phb_third_pay_account (<include refid="allapplColumn"/>) <include refid="allapplColumnVar"/>
+  </insert>
+  <!-- RESOURCE DELETE -->
+  <delete id="delete" parameterType="java.util.Map">
+    delete from phb_third_pay_account where yb_order_id=#{ybOrderId}
+  </delete>
+  
+  <!-- RESOURCE SELECT -->
+  <select id="query" parameterType="java.util.Map" resultMap="resourceResultMap">
+    select <include refid="allColumn" /> from phb_third_pay_account <include refid="dynamicWhere" />
+  </select>
+  <select id="findByPager" parameterType="java.util.Map" resultMap="resourceResultMap">
+    <include refid="queryBody" />
+  </select>
+  <select id="findByPagerCount" parameterType="java.util.Map" resultType="int" >
+	select count(1) from phb_third_pay_account <include refid="dynamicWhere" />
+  </select>
+  <select id="unique" parameterType="java.util.Map" resultMap="resourceResultMap" >
+	select <include refid="allColumn" /> from phb_third_pay_account <include refid="dynamicWhere" /> <include refid="dynamicOrderBy" /> limit 1
+  </select>
+  <select id="getById" parameterType="java.util.Map" resultMap="resourceResultMap">
+	select * from phb_third_pay_account where yb_order_id=#{ybOrderId}
+  </select>
+
+  <!-- MySQL specific -->
+  <sql id="allapplColumn">
+	yb_order_id,
+	order_id,
+	amount,
+	fee,
+	pay_date,
+	type
+  </sql>
+  <sql id="allapplColumnVar">
+	values(
+			#{ybOrderId,jdbcType=CHAR},
+			#{orderId,jdbcType=CHAR},
+			#{amount,jdbcType=DECIMAL},
+			#{fee,jdbcType=DECIMAL},
+			#{payDate,jdbcType=VARCHAR},
+			#{type,jdbcType=VARCHAR}
+	)
+  </sql>
+  <sql id="allColumn">
+	yb_order_id,
+	order_id,
+	amount,
+	fee,
+	pay_date,
+	type
+  </sql>
+  <sql id="dynamicWhere">
+	<trim prefix="WHERE" prefixOverrides="AND|OR">
+		<if test="ybOrderId != null">
+			AND yb_order_id = #{ybOrderId}
+		</if>
+	</trim>
+  </sql>
+  <sql id="dynamicOrderBy">
+	<if test="orderBy!=null">
+		order by ${orderBy}
+		<if test="order!=null">
+			${order}
+		</if>
+	</if>
+  </sql>
+
+  <sql id="queryBody">
+	<if test="sno!=null and eno!=null and orderBy!=null">
+		select <include refid="allColumn" /> from phb_third_pay_account
+		<include refid="dynamicWhere" />
+		<include refid="dynamicOrderBy" />
+		limit ${sno-1},${eno}
+	</if>
+  	<!-- 无orderby -->
+	<if test="sno!=null and eno!=null and orderBy==null">
+		select <include refid="allColumn" /> from phb_third_pay_account
+		<include refid="dynamicWhere" />
+		limit ${sno-1},${eno}
+	</if>
+  </sql>
+</mapper>

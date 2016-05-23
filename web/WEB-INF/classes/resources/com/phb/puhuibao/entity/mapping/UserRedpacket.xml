@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.phb.puhuibao.entity.UserRedpacket">
+
+  <!-- RESOURCE RESULTMAP -->
+
+  <resultMap id="resourceResultMap" type="com.phb.puhuibao.entity.UserRedpacket">
+    <result property="redpacketId" column="redpacket_id" jdbcType="INTEGER" />
+    <result property="mUserId" column="m_user_id" jdbcType="INTEGER" />
+    <result property="redpacketAmount" column="redpacket_amount" jdbcType="INTEGER" />
+    <result property="deductionRate" column="deduction_rate" jdbcType="DECIMAL" />
+    <result property="status" column="status" jdbcType="TINYINT" />
+    <result property="lastDate" column="last_date" jdbcType="TIMESTAMP"/>
+  </resultMap>
+
+  <!-- RESOURCE INSERT -->
+  <insert id="insert" parameterType="com.phb.puhuibao.entity.UserRedpacket">
+    insert into phb_muser_redpacket (<include refid="allapplColumn"/>) <include refid="allapplColumnVar"/>
+  </insert>
+  <!-- RESOURCE UPDATE -->
+  <update id="update" parameterType="com.phb.puhuibao.entity.UserRedpacket">
+		update phb_muser_redpacket
+		<trim prefix=" SET " prefixOverrides=",">
+				  ,status=#{status,jdbcType=TINYINT}
+		</trim>
+		where redpacket_id=#{redpacketId}
+  </update>
+
+  <!-- RESOURCE DELETE -->
+  <delete id="delete" parameterType="com.phb.puhuibao.entity.UserRedpacket">
+    delete from phb_muser_redpacket where redpacket_id = #{redpacketId}
+  </delete>
+  
+  <!-- RESOURCE SELECT -->
+  <select id="query" parameterType="java.util.Map" resultMap="resourceResultMap">
+    select <include refid="allColumn" /> from phb_muser_redpacket <include refid="dynamicWhere" />
+  </select>
+  <select id="findByPager" parameterType="java.util.Map" resultMap="resourceResultMap">
+    <include refid="queryBody" />
+  </select>
+  <select id="findByPagerCount" parameterType="java.util.Map" resultType="int" >
+	select count(1) from phb_muser_redpacket <include refid="dynamicWhere" />
+  </select>
+  <select id="unique" parameterType="java.util.Map" resultMap="resourceResultMap" >
+	select <include refid="allColumn" /> from phb_muser_redpacket <include refid="dynamicWhere" /> limit 1
+  </select>
+  <select id="getById" parameterType="java.util.Map" resultMap="resourceResultMap">
+	select <include refid="allColumn" /> from phb_muser_redpacket where redpacket_id=#{redpacketId}
+  </select>
+
+  <!-- MySQL specific -->
+  <sql id="allapplColumn">
+    m_user_id,
+    redpacket_amount,
+    deduction_rate,
+    status,
+    last_date
+  </sql>
+  <sql id="allapplColumnVar">
+	values(
+			#{mUserId,jdbcType=INTEGER},
+			#{redpacketAmount,jdbcType=INTEGER},
+			#{deductionRate,jdbcType=DECIMAL},
+			#{status,jdbcType=TINYINT},
+			#{lastDate,jdbcType=TIMESTAMP}
+	)
+  </sql>
+  <sql id="allColumn">
+    redpacket_id,
+    m_user_id,
+    redpacket_amount,
+    deduction_rate,
+    status,
+    last_date
+  </sql>
+  <sql id="dynamicWhere">
+	<trim prefix="WHERE" prefixOverrides="AND|OR">
+		<if test="glastDate != null">
+			AND last_date <![CDATA[>]]> #{glastDate}
+		</if>
+		<if test="lastDate != null">
+			AND last_date = #{lastDate}
+		</if>
+		<if test="mUserId != null">
+			AND m_user_id = #{mUserId}
+		</if>
+		<if test="status != null">
+			AND status = #{status}
+		</if>
+		<if test="lelastDate != null">
+			AND (last_date <![CDATA[<]]>= #{lelastDate} OR status = 0)
+		</if>
+	</trim>
+  </sql>
+  <sql id="dynamicOrderBy">
+	<if test="orderBy!=null">
+		order by ${orderBy}
+		<if test="order!=null">
+			${order}
+		</if>
+	</if>
+  </sql>
+
+  <sql id="queryBody">
+	<if test="sno!=null and eno!=null and orderBy!=null">
+		select <include refid="allColumn" /> from phb_muser_redpacket
+		<include refid="dynamicWhere" />
+		<include refid="dynamicOrderBy" />
+		limit ${sno-1},${eno}
+	</if>
+	<!-- 无orderby -->
+	<if test="sno!=null and eno!=null and orderBy==null">
+		select <include refid="allColumn" /> from phb_muser_redpacket
+		<include refid="dynamicWhere" />
+		limit ${sno-1},${eno}
+	</if>
+  </sql>	
+  
+</mapper>

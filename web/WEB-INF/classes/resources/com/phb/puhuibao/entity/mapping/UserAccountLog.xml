@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.phb.puhuibao.entity.UserAccountLog">
+
+  <!-- RESOURCE RESULTMAP -->
+
+  <resultMap id="resourceResultMap" type="com.phb.puhuibao.entity.UserAccountLog">
+    <id property="logId" column="log_id" jdbcType="INTEGER" />
+    <result property="mUserId" column="M_USER_ID" jdbcType="INTEGER" />
+	<result property="changeType" column="change_type" jdbcType="VARCHAR" />
+	<result property="changeDesc" column="change_desc" jdbcType="VARCHAR" />
+    <result property="amount" column="amount" jdbcType="DECIMAL" />
+    <result property="balanceAmount" column="balance_amount" jdbcType="DECIMAL" />
+    <result property="createTime" column="create_time" jdbcType="TIMESTAMP" />
+    <result property="accountType" column="account_type" jdbcType="TINYINT" />
+    <result property="fromUser" column="from_user" jdbcType="INTEGER" />
+  </resultMap>
+
+  <!-- RESOURCE INSERT -->
+  <insert id="insert" parameterType="com.phb.puhuibao.entity.UserAccountLog">
+    insert into phb_muser_account_log (<include refid="allapplColumn"/>) <include refid="allapplColumnVar"/>
+  </insert>
+
+  <!-- RESOURCE SELECT -->
+  <select id="query" parameterType="java.util.Map" resultMap="resourceResultMap">
+    select <include refid="allColumn" /> from phb_muser_account_log <include refid="dynamicWhere" />
+  </select>
+  <select id="findByPager" parameterType="java.util.Map" resultMap="resourceResultMap">
+    <include refid="queryBody" />
+  </select>
+  <select id="findByPagerCount" parameterType="java.util.Map" resultType="int" >
+	select count(1) from phb_muser_account_log <include refid="dynamicWhere" />
+  </select>
+
+  <!-- MySQL specific -->
+  <sql id="allapplColumn">
+    m_user_id,
+    change_type,
+    change_desc,
+    amount,
+    balance_amount,
+    account_type,
+    from_user
+  </sql>
+  <sql id="allapplColumnVar">
+	values(
+			#{mUserId,jdbcType=INTEGER},
+			#{changeType,jdbcType=VARCHAR},
+			#{changeDesc,jdbcType=VARCHAR},
+			#{amount,jdbcType=DECIMAL},
+			#{balanceAmount,jdbcType=DECIMAL},
+			#{accountType,jdbcType=TINYINT},
+			#{fromUser,jdbcType=INTEGER}
+	)
+  </sql>
+  <sql id="allColumn">
+    log_id,
+    m_user_id,
+    change_type,
+    change_desc,
+    amount,
+    balance_amount,
+    create_time,
+    account_type,
+    from_user
+  </sql>
+  <sql id="dynamicWhere">
+	<trim prefix="WHERE" prefixOverrides="AND|OR">
+		<if test="mUserId != null">
+			AND m_user_id = #{mUserId}
+		</if>
+		<if test="logId != null">
+			AND log_id = #{logId}
+		</if>
+		<if test="changeType != null">
+			AND change_type = #{changeType}
+		</if>
+		<if test="accountType != null">
+			AND account_type = #{accountType}
+		</if>
+		<if test="gecreateTime != null">
+			AND create_time <![CDATA[>=]]> #{gecreateTime}
+		</if>
+		<if test="lcreateTime != null">
+			AND create_time <![CDATA[<]]> #{lcreateTime}
+		</if>
+	</trim>
+  </sql>
+  <sql id="dynamicOrderBy">
+	<if test="orderBy!=null">
+		order by ${orderBy}
+		<if test="order!=null">
+			${order}
+		</if>
+	</if>
+  </sql>
+
+  <sql id="queryBody">
+	<if test="sno!=null and eno!=null and orderBy!=null">
+		select <include refid="allColumn" /> from phb_muser_account_log
+		<include refid="dynamicWhere" />
+		<include refid="dynamicOrderBy" />
+		limit ${sno-1},${eno}
+	</if>
+	<!-- 无orderby -->
+	<if test="sno!=null and eno!=null and orderBy==null">
+		select <include refid="allColumn" /> from phb_muser_account_log
+		<include refid="dynamicWhere" />
+		limit ${sno-1},${eno}
+	</if>
+  </sql>	
+</mapper>

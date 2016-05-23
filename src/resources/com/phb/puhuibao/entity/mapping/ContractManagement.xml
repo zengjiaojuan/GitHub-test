@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="UTF-8" ?>   
+<!DOCTYPE mapper   
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"   
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">   
+    
+<mapper namespace="com.phb.puhuibao.entity.ContractManagement" >
+    <resultMap id="ContractManagement" type="com.phb.puhuibao.entity.ContractManagement">
+    	    <result property="contractId"          column="contract_id"         jdbcType="VARCHAR" />
+    	    <result property="userName"            column="user_name"           jdbcType="VARCHAR" />	    	    	    
+    	    <result property="userTel"             column="user_tel"            jdbcType="VARCHAR" />
+    	    <result property="userId"              column="user_id"             jdbcType="VARCHAR" />
+    	    <result property="bankName"            column="bank_name"           jdbcType="VARCHAR" />
+    	    <result property="bankId"              column="bank_id"             jdbcType="VARCHAR" />
+    	    <result property="bankAccountid"       column="bank_accountid"      jdbcType="VARCHAR" />
+    	    <result property="returnBankname"      column="return_bankname"     jdbcType="VARCHAR" />
+    	    <result property="returnBankid"        column="return_bankid"       jdbcType="VARCHAR" />
+    	    <result property="returnBankaccount"   column="return_bankaccount"  jdbcType="VARCHAR" />
+    	    <result property="userMail"            column="user_mail"           jdbcType="VARCHAR" />
+			<result property="userAddress"         column="user_address"        jdbcType="VARCHAR" />
+			<result property="userPost"            column="user_post"           jdbcType="VARCHAR" />
+			<result property="userManager"         column="user_manager"        jdbcType="VARCHAR" />
+			<result property="userTeammanager"     column="user_teammanager"    jdbcType="VARCHAR" />
+			<result property="contractIsarchived"  column="contract_isarchived" jdbcType="INTEGER" />
+			<result property="investType"          column="invest_type"         jdbcType="INTEGER" />
+			<result property="userGender"          column="user_gender"         jdbcType="INTEGER" />
+			<result property="productType"         column="product_type"        jdbcType="INTEGER" />
+			<result property="obligatoryRight"     column="obligatory_right"    jdbcType="INTEGER" />
+			<result property="managerDep"          column="manager_dep"         jdbcType="INTEGER" />
+			<result property="contractAmount"      column="contract_amount"     jdbcType="DECIMAL" />
+			<result property="contractDate"        column="contract_date"       jdbcType="VARCHAR"    />
+			<result property="contractExpiredate"  column="contract_expiredate" jdbcType="VARCHAR"    />
+			<result property="contractStartdate"   column="contract_startdate" jdbcType="VARCHAR"    />
+			<result property="useridExdate"  column="userid_exdate" jdbcType="VARCHAR"    />
+			<result property="useridDep"  column="userid_dep" jdbcType="VARCHAR"    />
+			<result property="emergencyContact"  column="emergency_contact" jdbcType="VARCHAR"    />
+			<result property="emergencyContactid"  column="emergency_contactid" jdbcType="VARCHAR"    />
+			<result property="emergencyContacttel"  column="emergency_contacttel" jdbcType="VARCHAR"    />
+			
+			
+ 
+			
+			
+	</resultMap>
+	<sql id="allColumn">
+	      co.contract_id,        
+          cu.user_name,                        
+          cu.user_tel,           
+          co.user_id,            
+          co.bank_name,          
+          co.bank_id,            
+          co.bank_accountid,     
+          cu.user_mail,          
+          cu.user_address,       
+          cu.user_post,          
+          co.user_manager,       
+          co.user_teammanager,   
+          co.contract_isarchived,
+          co.invest_type,        
+          cu.user_gender,        
+          co.product_type,       
+          co.obligatory_right,   
+          co.manager_dep,        
+          co.contract_amount,    
+          co.contract_date,
+          co.contract_startdate,      
+          co.contract_expiredate,
+          cu.userid_exdate,
+          cu.userid_dep,
+          cu.emergency_contact,
+          cu.emergency_contactid,
+          cu.emergency_contacttel,
+          co.return_bankname, 
+          co.return_bankid,
+          co.return_bankaccount
+	</sql>
+ 
+	<select id="findByPager" parameterType="java.util.Map" resultMap="ContractManagement">
+		<include refid="queryBody" />
+	</select>
+	
+	<select id="ContractManagementquery" parameterType="java.util.Map" resultMap="ContractManagement">
+		<include refid="queryBody" />
+	</select>
+	
+	<select id="query" parameterType="java.util.Map" resultMap="ContractManagement">
+		select
+			<include refid="allColumn" />
+			 from
+			 crm_contract co
+			  left join crm_customer cu  on(co.user_id = cu.user_id)
+			<include refid="dynamicWhere" />
+		 
+	</select>
+	
+		<!-- 3.1.根据对像条件查询记录数 MAP参数 -->
+	<select id="findByPagerCount" parameterType="java.util.Map" resultType="int" >
+		select
+		count(1)
+		from
+		crm_contract co
+		<include refid="dynamicWhere" />
+		    
+	</select>
+	<select id="getById" parameterType="java.util.Map" resultMap="ContractManagement">
+			select
+			<include refid="allColumn" />
+			 from
+			 crm_contract  co
+	</select>
+	<select id="unique" parameterType="java.util.Map" resultMap="ContractManagement" >
+			select
+			<include refid="allColumn" />
+			 from
+			 crm_contract co
+			<include refid="dynamicWhere" />
+			limit 1
+	</select>
+
+	<sql id="dynamicWhere">
+			<trim prefix="WHERE" prefixOverrides="AND|OR">
+			    co.is_deleted = 0   
+			    <if test="contractId!=null">
+					AND co.contract_id = #{contractId}
+				</if>
+				<if test="userTel!=null">
+					AND cu.user_tel = #{userTel}
+				</if>
+				<if test="keyword!=null">
+					AND (cu.user_tel like concat('%',#{keyword},'%') 
+					OR   cu.user_name like concat('%',#{keyword},'%')  )
+				</if>
+
+			</trim>
+	</sql>
+	
+ 	<!-- order by 排序 -->
+	<sql id="dynamicOrderBy">
+		<if test="orderBy!=null">
+			order by ${orderBy}
+			<if test="order!=null">
+				${order}
+		</if>
+		</if>
+	</sql>
+	
+
+	<insert id="insert" parameterType="com.phb.puhuibao.entity.ContractManagement" >
+	    INSERT INTO 
+	    crm_contract(<include refid="allapplColumn"/>	)
+		<include refid="allapplColumnVar"/>
+	</insert>
+	
+	<sql id="allapplColumn">
+		  contract_id,  
+		  user_id,      
+          bank_name,          
+          bank_id,            
+          bank_accountid,    
+          return_bankname, 
+          return_bankid,
+          return_bankaccount,
+          user_manager,       
+          user_teammanager,   
+          invest_type,        
+          product_type,       
+          obligatory_right,   
+          manager_dep,        
+          contract_amount,    
+          contract_date,   
+          contract_expiredate,
+          contract_startdate  
+         
+	</sql>
+	
+	
+ 
+	
+	<sql id="allapplColumnVar">
+		values(
+				#{contractId,        jdbcType=VARCHAR},
+				#{userId,            jdbcType=VARCHAR},
+				#{bankName,          jdbcType=VARCHAR},
+				#{bankId,            jdbcType=VARCHAR},
+				#{bankAccountid,     jdbcType=VARCHAR},
+				#{returnBankname,        jdbcType=VARCHAR},
+				#{returnBankid,          jdbcType=VARCHAR},
+				#{returnBankaccount,     jdbcType=VARCHAR},
+				#{userManager,       jdbcType=VARCHAR},
+				#{userTeammanager,   jdbcType=VARCHAR},
+		 
+				#{investType,        jdbcType=INTEGER},
+				#{productType,       jdbcType=INTEGER},
+				#{obligatoryRight,   jdbcType=INTEGER},
+				#{managerDep,        jdbcType=INTEGER},
+				#{contractAmount,    jdbcType=DECIMAL},
+				#{contractDate,      jdbcType=VARCHAR},
+				#{contractExpiredate,jdbcType=VARCHAR},
+				#{contractStartdate,jdbcType=VARCHAR}
+		     )
+	</sql>
+	
+	<update id="update" parameterType="com.phb.puhuibao.entity.ContractManagement">
+			update crm_contract
+			<trim prefix=" SET " prefixOverrides=",">
+				<if test="isDeleted!=null">
+					  ,is_deleted=#{isDeleted,jdbcType=INTEGER}
+				</if>
+				<if test="contractIsarchived!=null">
+					  ,contract_isarchived=#{contractIsarchived,jdbcType=INTEGER}
+				</if>
+				
+				
+			</trim>
+			WHERE 
+				contract_id=#{contractId}
+	</update>
+
+	<delete id="delete" parameterType="java.util.Map">
+		DELETE FROM crm_contract 
+		where contract_id =#{contractId}
+	</delete>	
+	
+	<sql id="queryBody">
+		<if test="sno!=null and eno!=null and orderBy!=null">
+			select
+			<include refid="allColumn" />
+			 from
+			  crm_contract  co
+			  left join crm_customer cu  on(co.user_id = cu.user_id)
+			<include refid="dynamicWhere" />
+			<include refid="dynamicOrderBy" />
+			limit ${sno-1},${eno}
+		</if>
+		<!-- 无orderby -->
+		<if test="sno!=null and eno!=null and orderBy==null">
+			select
+			<include refid="allColumn" />
+			 from
+			crm_contract  co
+			left join crm_customer cu  on(co.user_id = cu.user_id)
+			<include refid="dynamicWhere" />
+			limit ${sno-1},${eno}
+		</if>
+	</sql>	
+
+</mapper>
+
+
+
+

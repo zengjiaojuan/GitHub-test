@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper 
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.idap.clinic.entity.EveryPic">
+    <resultMap id="everyPic" type="com.idap.clinic.entity.EveryPic">
+		<result property="everyPicId" column="every_pic_id" jdbcType="VARCHAR" />
+		<result property="everyWeight" column="every_weight" jdbcType="INTEGER" />
+		<result property="everyTitle" column="every_title" jdbcType="VARCHAR" />
+		<result property="everyContent" column="every_content" jdbcType="VARCHAR" />
+		<result property="everyPic" column="every_pic" jdbcType="VARCHAR" />
+	</resultMap>
+
+	<sql id="allColumn">
+	    every_pic_id,every_weight,every_title,every_content,every_pic
+	</sql>
+	<sql id="queryBody">
+	    select
+	    <include refid="allColumn" />
+	    from every_pic
+		<include refid="dynamicWhere" />
+		<include refid="dynamicOrderBy" />
+		limit ${sno-1},${eno}
+	</sql>	
+	<select id="findByPager" parameterType="java.util.Map" resultMap="everyPic">
+		<include refid="queryBody" />
+	</select>
+	
+	<select id="query" parameterType="java.util.Map" resultMap="everyPic">
+		<include refid="queryBody" />
+	</select>
+	<select id="findByPagerCount" parameterType="java.util.Map" resultType="int" >
+		select count(1) from every_pic
+		<include refid="dynamicWhere" />		    
+	</select>
+	<sql id="dynamicWhere">
+			<trim prefix="WHERE" prefixOverrides="AND|OR">
+				<if test="querykeyword!=null">
+					AND (every_title like concat('%',#{querykeyword},'%') 
+					OR every_content like concat('%',#{querykeyword},'%')  )
+				</if>
+				<if test="everyPicId!=null">
+					AND every_pic_id = #{everyPicId}
+				</if>
+			</trim>
+	</sql>
+	
+ 	<!-- order by 排序 -->
+	<sql id="dynamicOrderBy">
+		<if test="orderBy!=null">
+			order by ${orderBy}
+			<if test="order!=null">
+				${order}
+		</if>
+		</if>
+	</sql>
+</mapper>
+
+
+
+

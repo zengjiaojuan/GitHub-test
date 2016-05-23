@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.phb.puhuibao.entity.ItemInvestment">
+  <!-- RESOURCE RESULTMAP -->
+  <resultMap id="resourceResultMap" type="com.phb.puhuibao.entity.ItemInvestment">
+    <id property="investmentId" column="investment_id" jdbcType="INTEGER" />
+    <result property="mUserId" column="M_USER_ID" jdbcType="INTEGER" />
+	<result property="itemSN" column="item_sn" jdbcType="VARCHAR" />
+    <result property="investmentAmount" column="investment_amount" jdbcType="BIGINT" />
+    <result property="createTime" column="create_time" jdbcType="TIMESTAMP" />
+    <result property="incomeDate" column="income_date" jdbcType="DATE" />
+    <result property="lastIncome" column="last_income" jdbcType="DECIMAL" />
+    <result property="guaranteeMethod" column="guarantee_method" jdbcType="VARCHAR"/>
+    <result property="lastDate" column="last_date" jdbcType="DATE" />
+  </resultMap>
+
+  <!-- RESOURCE INSERT -->
+  <insert id="insert" useGeneratedKeys="true" keyProperty="investmentId" parameterType="com.phb.puhuibao.entity.ItemInvestment">
+    insert into phb_item_investment (<include refid="allapplColumn"/>) <include refid="allapplColumnVar"/>
+  </insert>
+  <!-- RESOURCE UPDATE -->
+  <update id="update" parameterType="com.phb.puhuibao.entity.ItemInvestment">
+		update phb_item_investment
+		<trim prefix=" SET " prefixOverrides=",">
+			<if test="investmentAmount != null">
+				  ,investment_amount=#{investmentAmount,jdbcType=BIGINT}
+			</if>
+			<if test="lastIncome != null">
+				  ,last_income=#{lastIncome,jdbcType=DECIMAL}
+			</if>
+			<if test="status != null">
+				  ,status=#{status,jdbcType=TINYINT}
+			</if>
+			<if test="lastDate != null">
+				  ,last_date=#{lastDate,jdbcType=DATE}
+			</if>
+		</trim>
+		where investment_id=#{investmentId}
+  </update>
+
+  <!-- RESOURCE DELETE -->
+  <delete id="delete" parameterType="com.phb.puhuibao.entity.ItemInvestment">
+    delete from phb_item_investment <include refid="dynamicWhere" />
+  </delete>
+  
+  <!-- RESOURCE SELECT -->
+  <select id="query" parameterType="java.util.Map" resultMap="resourceResultMap">
+    select <include refid="allColumn" /> from phb_item_investment a left join phb_loan_item b on a.item_sn= b.item_sn left join phb_muser_loan c on b.loan_id=c.loan_id <include refid="dynamicWhere" />
+  </select>
+  <select id="findByPager" parameterType="java.util.Map" resultMap="resourceResultMap">
+    <include refid="queryBody" />
+  </select>
+  <select id="findByPagerCount" parameterType="java.util.Map" resultType="int" >
+	select count(1) from phb_item_investment a left join phb_loan_item b on a.item_sn= b.item_sn left join phb_muser_loan c on b.loan_id=c.loan_id <include refid="dynamicWhere" />
+  </select>
+  <select id="unique" parameterType="java.util.Map" resultMap="resourceResultMap" >
+	select <include refid="allColumn" /> from phb_item_investment a left join phb_loan_item b on a.item_sn= b.item_sn left join phb_muser_loan c on b.loan_id=c.loan_id <include refid="dynamicWhere" /> limit 1
+  </select>
+  <select id="getById" parameterType="java.util.Map" resultMap="resourceResultMap">
+	select <include refid="allColumn" /> from phb_item_investment a left join phb_loan_item b on a.item_sn= b.item_sn left join phb_muser_loan c on b.loan_id=c.loan_id where investment_id=#{investmentId}
+  </select>
+
+  <!-- MySQL specific -->
+  <sql id="allapplColumn">
+    M_USER_ID,
+	item_sn,
+	investment_amount,
+	create_time,
+	status,
+	income_date
+  </sql>
+  <sql id="allapplColumnVar">
+	values(
+			#{mUserId,jdbcType=INTEGER},
+			#{itemSN,jdbcType=VARCHAR},
+			#{investmentAmount,jdbcType=BIGINT},
+			#{createTime,jdbcType=TIMESTAMP},
+			#{status,jdbcType=TINYINT},
+			#{incomeDate,jdbcType=DATE}
+	)
+  </sql>
+  <sql id="allColumn">
+    a.investment_id,
+    a.m_user_id,
+	a.item_sn,
+	a.investment_amount,
+	a.income_date,
+	a.last_income,
+	a.status,
+	b.guarantee_method,
+	b.period,
+	a.create_time,
+	a.last_date,
+	case c.useage
+     when 0 then '项目贷款'
+     when 1 then '消费贷款'
+     when 2 then '企业贷款'
+     when 3 then '购车贷款'
+     when 4 then '购房贷款'
+     when 5 then '教育贷款'
+     when 6 then '装修贷款'
+     when 7 then '旅游贷款'
+     when 8 then '生意贷款'
+	 end useage
+  </sql>
+  <sql id="dynamicWhere">
+	<trim prefix="WHERE" prefixOverrides="AND|OR">
+		<if test="mUserId != null">
+			AND a.m_user_id = #{mUserId}
+		</if>
+		<if test="status != null">
+			AND a.status = #{status}
+		</if>
+		<if test="lestatus != null">
+			AND a.status <![CDATA[<]]>= #{lestatus}
+		</if>
+		<if test="itemSN != null">
+			AND a.item_sn = #{itemSN}
+		</if>
+	</trim>
+  </sql>
+  <sql id="dynamicOrderBy">
+	<if test="orderBy!=null">
+		order by a.${orderBy}
+		<if test="order!=null">
+			${order}
+		</if>
+	</if>
+  </sql>
+
+  <sql id="queryBody">
+	<if test="sno!=null and eno!=null and orderBy!=null">
+		select <include refid="allColumn" /> from phb_item_investment a left join phb_loan_item b on a.item_sn= b.item_sn left join phb_muser_loan c on b.loan_id=c.loan_id
+		<include refid="dynamicWhere" />
+		<include refid="dynamicOrderBy" />
+		limit ${sno-1},${eno}
+	</if>
+	<!-- 无orderby -->
+	<if test="sno!=null and eno!=null and orderBy==null">
+		select <include refid="allColumn" /> from phb_item_investment a left join phb_loan_item b on a.item_sn= b.item_sn left join phb_muser_loan c on b.loan_id=c.loan_id
+		<include refid="dynamicWhere" />
+		limit ${sno-1},${eno}
+	</if>
+  </sql>	
+  
+</mapper>

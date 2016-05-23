@@ -1,0 +1,455 @@
+<div class="col-sm-12 col-md-12">
+
+<div class="row">
+        <div class="col-sm-12 col-md-12">
+            <form class="form-custom clearfix">
+	        <div class="col-sm-2 col-md-2">
+	            <input class="form-control"  type="text" placeholder="手机号或姓名" ng-model="params.keyword"/>       
+	        </div>   
+                <div class="col-sm-3 col-md-3">
+                    <button class="btn btn-custom" type="button" data-toggle="modal" data-target="#addandedit" on-click="clearForm()"  upload-refresh>新增</button>
+	                <button class="btn btn-custom" type="submit" ng-click="refresh('first',true)">查询</button>            
+                </div>
+            </form>
+        </div>
+     </div>   
+
+    <table class="table table-striped table-bordered table-condensed index-center  table-costom">
+        <thead>
+        <tr>
+            <th >序号</th>
+            <th width="80" >姓名</th>
+            <th width="40">性别</th>
+            <th width="160">电话</th>
+            <th width="160">身份证</th>
+            <th>邮箱</th>
+            <th>地址</th>
+            <th width="100">邮编</th>
+            <th>操作</th>
+ 
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="rowlink" ng-repeat="item in limitArr">
+            <td>{{current*limit+$index+1}}</td>
+            <td>{{item.userName}}</td>
+            <td>{{item.userGender | DSL_humangender}}</td>
+            <td>{{item.userTel}}</td>
+            <td>{{item.userId}}</td>
+            <td>{{item.userMail}}</td>
+            <td>{{item.userAddress}}</td>
+            <td>{{item.userPost}}</td>
+ 
+            <td>
+                <a href="javascript:" data-toggle="modal" data-target="#addcontract" ng-click="newcontract(item.userId)"><font color="#FF0000">开户</font></a>
+                <a href="javascript:" data-toggle="modal" data-target="#preview" ng-click="preview(item)">更多信息</a>
+                <a href="javascript:" data-toggle="modal" data-target="#removeDialog" ng-click="todelete(item.userId)">删除</a>
+            </td>
+             
+        </tr>
+        </tbody>
+    </table>
+            <div data-remote-paging="pager" 
+					data-refresh="refresh" 
+					data-current="current" 
+					data-total="total" 
+					data-data="limitArr"
+					data-limit="limit"
+					data-params="params"
+			></div>
+</div>
+ 
+ 
+ <div class="modal fade" id="addcontract" tabindex="-1" role="dialog" aria-hidden="true">
+<form class="form-horizontal" name="addContractForm" novalidate="novalidate"    >
+    <div class="modal-dialog" style="width: 1040px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4  class="modal-title">新增</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-12 col-md-12">
+             <h6 class="modal-title">合同信息</h6>
+                        <div class="form-group">
+			                <label class="col-lg-2 control-label">合同编号</label>
+			                <div class="col-lg-3">
+			                    <input type="text" class="form-control" required ng-model="item.contractId" ng-maxlength="50" ng-trim maxlength="50" />
+			                </div>
+			                 <span class="mustItem">*</span>
+			                 <label class="col-lg-2 control-label">投资类型</label>
+			                <div class="col-lg-3">
+			                    <select   id="selectedinvest" ng-init="item.investType = '1'" ng-model="item.investType"  
+			                           required select2 
+			                          ng-options="item.investid as item.investname for item  in investtype"
+							    ></select>
+			                </div>
+			                <span class="mustItem">*</span>
+		 
+                        </div>
+                        
+                       <div class="form-group">
+			                <label class="col-lg-2 control-label">金额产品</label>
+			                <div class="col-lg-3">
+			                    <select   id="selectedproduct" ng-model="item.productType"   ng-init="item.productType = '1'"
+			                           required select2 
+			                          ng-options="item.productid as item.productname for item  in producttype"
+							    ></select>
+			                </div>
+			                 <span class="mustItem">*</span>
+			                 <label class="col-lg-2 control-label">投资金额</label>
+			                <div class="col-lg-2">
+			                    <input type="number" class="form-control" required ng-model="item.contractAmount" ng-maxlength="50" ng-trim maxlength="50" />
+			                </div>
+			                <span class="mustItem">*</span>
+		 
+                        </div>
+                        
+                      <div class="form-group">
+			                <label class="col-lg-2 control-label">债权接受</label>
+			                <div class="col-lg-3">
+			                    <select   id="selectedobli" ng-init="item.obligatoryRight = '1'" ng-model="item.obligatoryRight"  
+			                           required select2 
+			                          ng-options="item.acceptid as item.acceptname for item  in obligatoryright"
+							    ></select>
+			                </div>
+			                 <span class="mustItem">*</span>
+			                 <label class="col-lg-2 control-label">划扣日期</label>
+			                <div class="col-lg-3">
+			                    <div data-datetimepicker="item.contractDate"></div>
+			                </div>
+			                 <span class="mustItem">*</span>
+			                 
+<!-- 			                 <label class="col-lg-2 control-label">是否归档</label> -->
+<!-- 			                <div class="col-lg-3"> -->
+<!-- 			                    <select   id="selectedac" ng-init="item.contractIsarchived = '0'" ng-model="item.contractIsarchived"   -->
+<!-- 			                           required select2  -->
+<!-- 			                          ng-options="item.archivedid as item.archivedname for item  in contractIsarchived" -->
+<!-- 							    ></select> -->
+<!-- 			                </div> -->
+<!-- 			                <span class="mustItem">*</span> -->
+		 
+                      </div>
+                        
+                       <div class="form-group">
+                       
+                       		<label class="col-lg-2 control-label">计息开始日期</label>
+			                <div class="col-lg-3">
+			                   <div data-datetimepicker="item.contractStartdate"></div>
+			                </div>
+			                <span class="mustItem">*</span>
+
+			                 <label class="col-lg-2 control-label">计息结束日期</label>
+			                <div class="col-lg-3">
+			                   <div data-datetimepicker="item.contractExpiredate"></div>
+			                </div>
+			                <span class="mustItem">*</span>
+                      </div>
+                      
+                      
+
+                      
+  
+             <h6 class="modal-title">其他信息</h6>    
+             
+                        <div class="form-group">
+			                <label class="col-lg-2 control-label">开户银行名</label>
+			                <div class="col-lg-2">
+			                    <input type="text" class="form-control"   ng-model="item.bankName" ng-maxlength="30" ng-trim maxlength="30" />
+			                </div>
+			                 <label class="col-lg-2 control-label">银行id</label>
+			                <div class="col-lg-2">
+			                     <input type="text" class="form-control"   ng-model="item.bankId" ng-maxlength="10" ng-trim maxlength="10" />
+			                </div>
+			                
+			                <label class="col-lg-2 control-label">银行账户</label>
+			                <div class="col-lg-2">
+			                    <input type="text" class="form-control"   ng-model="item.bankAccountid" ng-maxlength="30" ng-trim maxlength="30" />
+			                </div>
+			                
+		 
+                        </div>    
+           
+                        
+                        
+                        <div class="form-group">
+			                <label class="col-lg-2 control-label">回款银行名</label>
+			                <div class="col-lg-2">
+			                    <input type="text" class="form-control"  ng-model="item.returnBankname" ng-maxlength="30" ng-trim maxlength="30" />
+			                </div>
+			                 <label class="col-lg-2 control-label">回款银行id</label>
+			                <div class="col-lg-2">
+			                     <input type="text" class="form-control"  ng-model="item.returnBankid" ng-maxlength="10" ng-trim maxlength="10" />
+			                </div>
+			                
+			                <label class="col-lg-2 control-label">回款银行账户</label>
+			                <div class="col-lg-2">
+			                    <input type="text" class="form-control"  ng-model="item.returnBankaccount" ng-maxlength="30" ng-trim maxlength="30" />
+			                </div>
+			                
+		 
+                        </div>    
+   
+                        
+                        
+                        
+                        
+                        
+                       <div class="form-group">
+			                 
+			                 <label class="col-lg-2 control-label">客户经理</label>
+			                <div class="col-lg-2">
+			                     <input type="text" class="form-control" required ng-model="item.userManager" ng-maxlength="10" ng-trim maxlength="10" />
+			                </div>
+			                
+			              <label class="col-lg-2 control-label">团队经理</label>
+			                <div class="col-lg-2">
+			                    <input type="text" class="form-control" required ng-model="item.userTeammanager" ng-maxlength="30" ng-trim maxlength="30" />
+			                </div>
+			                 <label class="col-lg-2 control-label">营业部</label>
+			                <div class="col-lg-2">
+			                      <select   id="selecteddep" ng-init="item.managerDep = '2'" ng-model="item.managerDep"  
+			                           required select2 
+			                          ng-options="item.depid as item.depname for item  in managerdep"
+							    ></select>
+			                     
+			                </div>
+			                <span class="mustItem"></span>
+ 
+                        </div>   
+                        
+                        
+                         <div class="form-group">
+
+ 
+                        </div>                   
+                        
+ 
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-primary"     ng-disabled="addContractForm.$invalid" ng-click="savecontract(item)">保存</button>
+                <button type="button" class="btn btn-danger"     ng-click="clearForm()">重置</button>
+                <button type="button" class="btn btn-default"    data-dismiss="modal">取消</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    </form>
+    <!-- /.modal-dialog -->
+</div>
+ 
+ 
+ 
+ 
+ 
+<div class="modal fade" id="addandedit" tabindex="-1" role="dialog" aria-hidden="true">
+<form class="form-horizontal" name="addSyncApplForm" novalidate="novalidate"    ng-submit="create(pageitem)" >
+    <div class="modal-dialog" style="width: 830px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4  class="modal-title">新增/修改</h4>
+            </div>
+            <div class="modal-body">
+               <div class="row">
+                    <div class="col-sm-12 col-md-12">
+             <h6 class="modal-title">客户信息</h6>
+ 
+                        <div class="form-group">
+			                <label class="col-lg-2 control-label">客户姓名</label>
+			                <div class="col-lg-3">
+			                    <input type="text" class="form-control" required ng-model="pageitem.userName" ng-maxlength="30" ng-trim maxlength="30" />
+			                </div>
+			                 <span class="mustItem">*</span>
+			                 <label class="col-lg-2 control-label">性别</label>
+			                <div class="col-lg-3">
+			                    <select   id="selectedgender" ng-init="pageitem.userGender = '1'" ng-model="pageitem.userGender"  
+			                           required select2 
+			                          ng-options="pageitem.genderid as pageitem.gendername for pageitem  in usergender"
+							    ></select>
+			                </div>
+			                <span class="mustItem">*</span>
+		 
+                        </div>
+                        
+ 
+                        
+
+                        
+                        <div class="form-group">
+                       		 
+			               <label class="col-lg-2 control-label">电话</label>
+			                <div class="col-lg-3">
+			                    <input type="text" class="form-control" required ng-model="pageitem.userTel" ng-maxlength="30" ng-trim maxlength="30" />
+			                </div>
+			                 <span class="mustItem">*</span>
+                           <label class="col-lg-2 control-label">身份证号</label>
+			                <div class="col-lg-3">
+			                     <input type="text" class="form-control" required ng-model="pageitem.userId" ng-maxlength="19" ng-trim maxlength="19" />
+			                </div>
+			                <span class="mustItem">*</span>
+		 
+                        </div>
+                        
+                       <div class="form-group">
+                       		
+			                <label class="col-lg-2 control-label">身份证失效日</label>
+			                <div class="col-lg-3">
+			                    <div data-datetimepicker="pageitem.useridExdate"></div>
+			                </div>
+			                 <span class="mustItem">*</span>
+ 
+		 
+                        </div>
+                        
+                       <div class="form-group">
+                       		 <label class="col-lg-2 control-label">身份证颁发机关</label>
+			                <div class="col-lg-9">
+			                     <input type="text" class="form-control" required ng-model="pageitem.useridDep" ng-maxlength="100" ng-trim maxlength="100" />
+			                </div>
+			                <span class="mustItem"></span>
+ 
+ 
+		 
+                        </div>
+                        
+                       <div class="form-group">
+
+			                 
+			                <label class="col-lg-2 control-label">邮箱</label>
+			                <div class="col-lg-3">
+			                    <input type="text" class="form-control"  ng-model="pageitem.userMail" ng-maxlength="30" ng-trim maxlength="30" />
+			                </div>
+			                <span class="mustItem"></span>
+			                 <label class="col-lg-2 control-label">邮编</label>
+			                <div class="col-lg-3">
+			                     <input type="text" class="form-control"  ng-model="pageitem.userPost" ng-maxlength="10" ng-trim maxlength="10" />
+			                </div>
+                             <span class="mustItem"></span>
+                        </div>
+                        
+
+                        
+                       <div class="form-group">
+                       
+			                <label class="col-lg-2 control-label">地址</label>
+			                <div class="col-lg-9">
+			                    <input type="text" class="form-control"  ng-model="pageitem.userAddress" ng-maxlength="100" ng-trim maxlength="100" />
+			                </div>
+ 
+                        </div>
+                        
+          
+
+          
+          
+                   <h6 class="modal-title">紧急联系人信息</h6>       
+                        <div class="form-group">
+			                <label class="col-lg-2 control-label">联系人名</label>
+			                <div class="col-lg-3">
+			                    <input type="text" class="form-control" required ng-model="pageitem.emergencyContact" ng-maxlength="30" ng-trim maxlength="30" />
+			                </div>
+			                 <span class="mustItem">*</span>
+			                 <label class="col-lg-2 control-label">身份证</label>
+			                <div class="col-lg-3">
+			                     <input type="text" class="form-control" required ng-model="pageitem.emergencyContactid" ng-maxlength="18" ng-trim maxlength="18" />
+			                </div>
+			                <span class="mustItem">*</span>
+			                
+		 
+                        </div>    
+                        <div class="form-group">
+			                <label class="col-lg-2 control-label">电话</label>
+			                <div class="col-lg-3">
+			                    <input type="text" class="form-control" required ng-model="pageitem.emergencyContacttel" ng-maxlength="30" ng-trim maxlength="30" />
+			                </div>
+			                 <span class="mustItem">*</span>
+                        </div>    
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-primary"     ng-disabled="addSyncApplForm.$invalid" ng-click="save(pageitem)">保存</button>
+                <button type="button" class="btn btn-danger"     ng-click="clearForm()">重置</button>
+                <button type="button" class="btn btn-default"    data-dismiss="modal">取消</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    </form>
+    <!-- /.modal-dialog -->
+</div>
+ 
+
+<!-- 预览 -->
+<div class="modal fade" id="preview" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" style="width: 800px;height:392px; ">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">{{key.userName}}</h4>
+            </div>
+            <div class="modal-body">
+            	<div class="col-sm-12 col-md-12">
+	            <form role="form" class="form-horizontal">
+	    
+	        
+           		 
+           			
+           		<div class="row">
+                     
+                        <table class="table table-striped table-bordered table-condensed index-center  table-costom">
+                           
+                            <tbody>
+								 
+								 
+								<tr class="rowlink"><td>身份证发证机关:</td><td>{{key.useridDep}}</td></tr>
+								<tr class="rowlink"><td>身份证到期日:</td><td>{{key.useridExdate}}</td></tr>
+								<tr class="rowlink"><td>紧急联系人:</td><td>{{key.emergencyContact}}</td></tr>
+								<tr class="rowlink"><td>紧急联系人身份证:</td><td>{{key.emergencyContactid}}</td></tr>
+								<tr class="rowlink"><td>紧急联系人电话:</td><td>{{key.emergencyContacttel}}</td></tr>
+ 
+                            </tbody>
+                        </table>
+                     
+                </div>
+ 
+   
+  
+	            </form>
+	            </div> <!-- col-sm-12 col-md-12 end -->
+            </div><!-- modal-conteng end -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<!-- 删除对话框 -->
+<div class="modal fade" id="removeDialog" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">删除</h4>
+            </div>
+            <div class="modal-body">
+                                                     确认要删除么？
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" ng-click="comfirmDelete()" data-dismiss="modal">确认删除</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div><!-- /.modal -->
+ 
+ 

@@ -1,0 +1,194 @@
+<div class="col-sm-12 col-md-12">
+            <form class="form-custom clearfix">
+               <div class="col-sm-4 col-md-4">
+                    <label>交易日期</label>
+                    <div data-datetimepicker range start="params.startdate" end="params.enddate"></div>
+                </div>
+                <div>
+                    <label>&nbsp;</label>
+                    <button class="btn btn-custom" type="submit" ng-click="check(params)">下载易宝充值对账文件</button>
+                    <button class="btn btn-custom" type="submit" ng-click="checkRefund(params)">下载易宝退款对账文件</button>
+                    <button class="btn btn-custom" type="submit" ng-click="refresh('first',true)">下载后，刷新页面</button>
+                </div>
+            </form>
+
+    <table class="table table-striped table-bordered table-condensed index-center  table-costom">
+        <thead>
+        <tr>
+            <th>序号</th>
+            <th>交易流水号</th>
+            <th width="230">客户订单号</th>
+            <th>金额</th>
+            <th>手续费</th>
+            <th>交易时间</th>
+            <th>种类</th>
+            <!-- th>操作</th-->
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="rowlink" ng-repeat="item in limitArr">
+            <td>{{current*limit+$index+1}}</td>
+            <td>{{item.ybOrderId}}</td>
+            <td>{{item.orderId}}</td>
+            <td>{{item.amount}}</td>
+            <td>{{item.fee}}</td>
+            <td>{{item.payDate}}</td>
+            <td>{{item.type}}</td>
+            <!-- td>
+                <a ng-if="item.status==0" href="javascript:" data-toggle="modal" data-target="#refundDialog" ng-click="refund(item)">退款</a>
+                <a href="javascript:" data-toggle="modal" data-target="#preview" ng-click="preview(item)">预览</a>
+            </td-->
+        </tr>
+        </tbody>
+    </table>
+            <div data-remote-paging="pager" 
+					data-refresh="refresh" 
+					data-current="current" 
+					data-total="total" 
+					data-data="limitArr"
+					data-limit="limit"
+					data-params="params"
+			></div>
+</div>
+
+<!-- 新增修改对话框 -->
+<div class="modal fade" id="addandedit" tabindex="-1" role="dialog" aria-hidden="true">
+<form class="form-horizontal" name="addSyncApplForm" novalidate="novalidate" ng-submit="create(pageitem)" >
+    <div class="modal-dialog" style="width: 800px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4  class="modal-title">确认</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-12 col-md-12">
+                        <div class="form-group">
+用户名称：{{pageitem.mUserName}}<br />
+操作时间：{{pageitem.createTime|date:'yyyy-MM-dd HH:mm'}}<br />
+类型：<span ng-if="pageitem.processType==0">充值</span><span ng-if="pageitem.processType==1">提现</span><br />
+金额：{{pageitem.amount}}<br />
+                        </div>
+                        <div class="form-group">
+			                <label class="col-lg-2 control-label">管理员备注：</label>
+			                <div class="col-lg-9">
+			                    <input type="text" class="form-control" ng-model="pageitem.adminNote" ng-maxlength="50" ng-trim maxlength="50" />
+			                </div>
+                        </div>
+	                    <div class="form-group">
+	                        <label class="col-lg-2 control-label">到款状态：</label>
+	                        <div class="col-lg-9">
+	                            <label class="radio-inline"><input type="radio" class="" ng-model="pageitem.isPaid" value="0" name="state"/>未确认</label>
+	                            <label class="radio-inline"><input type="radio" class="" ng-model="pageitem.isPaid" value="1" name="state"/>已完成</label>
+	                        </div>
+	                    </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-primary" ng-disabled="addSyncApplForm.$invalid">保存</button>
+                <button type="button" class="btn btn-danger" ng-click="clearForm()">重置</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    </form>
+    <!-- /.modal-dialog -->
+</div>
+
+<!-- 新增对话框 -->
+<div class="modal fade" id="add" tabindex="-1" role="dialog" aria-hidden="true">
+<form class="form-horizontal" name="addSyncApplForm" novalidate="novalidate" ng-submit="create(key)" >
+    <div class="modal-dialog" style="width: 800px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4  class="modal-title">新增</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-12 col-md-12">
+                        <div class="form-group">
+			                <label class="col-lg-2 control-label">移动用户id：</label>
+			                <div class="col-lg-9">
+			                    <input type="text" class="form-control" ng-model="key.mUserId" ng-maxlength="50" ng-trim maxlength="50" />
+			                </div>
+                        </div>
+                        <div class="form-group">
+			                <label class="col-lg-2 control-label">金额：</label>
+			                <div class="col-lg-9">
+			                    <input type="text" class="form-control" ng-model="key.amount" ng-maxlength="50" ng-trim maxlength="50" />
+			                </div>
+                        </div>
+	                    <div class="form-group">
+	                        <label class="col-lg-2 control-label">类型：</label>
+	                        <div class="col-lg-9">
+	                            <label class="radio-inline"><input type="radio" class="" ng-model="key.processType" value="0" name="state"/>充值</label>
+	                            <label class="radio-inline"><input type="radio" class="" ng-model="key.processType" value="1" name="state"/>提现</label>
+	                        </div>
+	                    </div>
+                        <div class="form-group">
+			                <label class="col-lg-2 control-label">管理员备注：</label>
+			                <div class="col-lg-9">
+			                    <input type="text" class="form-control" ng-model="key.adminNote" ng-maxlength="50" ng-trim maxlength="50" />
+			                </div>
+                        </div>
+	                    <div class="form-group">
+	                        <label class="col-lg-2 control-label">到款状态：</label>
+	                        <div class="col-lg-9">
+	                            <label class="radio-inline"><input type="radio" class="" ng-model="key.isPaid" value="0" name="state"/>未确认</label>
+	                            <label class="radio-inline"><input type="radio" class="" ng-model="key.isPaid" value="1" name="state"/>已完成</label>
+	                        </div>
+	                    </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-primary" ng-disabled="addSyncApplForm.$invalid">保存</button>
+                <button type="button" class="btn btn-danger" ng-click="clearForm()">重置</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    </form>
+    <!-- /.modal-dialog -->
+</div>
+
+<!-- 预览 -->
+<div class="modal fade" id="preview" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" style="width: 800px;height:392px; ">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">预览</h4>
+            </div>
+            <div class="modal-body">
+            	<div class="col-sm-12 col-md-12">
+	            <form role="form" class="form-horizontal">
+	                <h4 class="heading">产品名称： {{keyv.productName}}</h4>
+	                <div class="form-group">&nbsp;</div>
+           			<div class="form-group"  style=" height:332px; ">
+                        <p class="col-lg-6">
+用户名称：{{keyv.mUserName}}<br />
+操作时间：{{keyv.createTime|date:'yyyy-MM-dd HH:mm'}}<br />
+类型：<span ng-if="keyv.processType==0">充值</span><span ng-if="keyv.processType==1">提现</span><br />
+金额：{{keyv.amount}}<br />
+操作员：{{keyv.adminUser}}<br />
+管理员备注：{{keyv.adminNote}}<br />
+                        </p>  
+                  	</div>
+                   <div class="form-group">&nbsp;</div>
+	            </form>
+	            </div> <!-- col-sm-12 col-md-12 end -->
+            </div><!-- modal-conteng end -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div><!-- /.modal -->
+ 

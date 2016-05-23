@@ -1,0 +1,416 @@
+<div class="col-sm-12 col-md-12">
+
+<div class="row">
+        <div class="col-sm-12 col-md-12">
+            <form class="form-custom clearfix">
+	        <div class="col-sm-2 col-md-2">
+	            <input class="form-control"  type="text" placeholder="手机号" ng-model="params.mUserTel"/>       
+	        </div>   
+                <div class="col-sm-3 col-md-3">
+	                <button class="btn btn-custom" type="submit" ng-click="refresh('first',true)">查询</button>
+                    <button class="btn btn-custom" type="button" data-toggle="modal" data-target="#addandedit" ng-click="clearForm()" upload-refresh>开户</button>
+                </div>
+            </form>
+        </div>
+     </div>   
+
+    <table class="table table-striped table-bordered table-condensed index-center table-costom">
+        <thead>
+        <tr>
+            <th width="40">序号</th>
+            <th style="width:60px">用户id</th>
+            <th>用户名</th>
+            <th>手机号</th>
+            <th>职业</th>
+            <th width="40">年龄</th>
+            <th width="40">性别</th>
+            <th>身份证号</th>
+            <th>账户总额</th>
+            <th>冻结资金</th>
+            <th>紧急联系人</th>
+            <th width="80">审核状态</th>
+            <th>注册时间</th>
+            <th width="170">操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="rowlink" ng-repeat="item in limitArr">
+            <td>{{current*limit+$index+1}}</td>
+            <td>{{item.mUserId}}</td>
+            <td>{{item.mUserName}}</td>
+            <td>{{item.mUserTel}}</td>
+            <td>{{item.occupation}}</td>
+            <td>{{item.age}}</td>
+            <td>{{item.sex}}</td>
+            <td>{{item.idNumber}}</td>
+            <td>{{item.mUserMoney}}</td>
+            <td>{{item.frozenMoney}}</td>
+            <td>{{item.emergencyName}}</td>
+            <td ng-if="item.isAudit==0">未认证</td><td ng-if="item.isAudit==1">已认证</td><td ng-if="item.isAudit==10">审核中</td><td ng-if="item.isAudit==11">审核不通过</td>
+            <td>{{item.createTime|date:'yyyy-MM-dd'}}</td>
+            <td>
+                <a href="javascript:" data-toggle="modal" data-target="#preview" ng-click="preview(item)">预览</a>
+                <a ng-if="item.isAudit==10" href="javascript:" data-toggle="modal" data-target="#audit" ng-click="edit(item)">审核</a>
+                <a ng-if="item.mUserMoney!=item.frozenMoney && item.mUserMoney>0" href="javascript:void(0)" data-toggle="modal" ng-click="frozen(item)">冻结</a>
+                <a ng-if="item.mUserMoney==item.frozenMoney && item.mUserMoney>0" href="javascript:void(0)" data-toggle="modal" ng-click="unfrozen(item.mUserId)">解冻</a>
+                <a href="javascript:void(0)" data-toggle="modal" data-target="#invitelist" ng-click="getChildren(item.mUserId)">被邀请人</a>
+                <a href="javascript:" data-toggle="modal" data-target="#addandedit" ng-click="edit(item)">修改</a>
+                <a href="javascript:" data-toggle="modal" data-target="#investment" ng-click="investment(item.mUserId)">理财</a>
+                <a href="javascript:" data-toggle="modal" data-target="#investmentList" ng-click="investmentList(item.mUserId)">理财清单</a>
+                <a href="javascript:" data-toggle="modal" data-target="#itemInvestment" ng-click="itemInvestment(item.mUserId)">投资</a>
+                <a href="javascript:" data-toggle="modal" data-target="#itemInvestmentList" ng-click="itemInvestmentList(item.mUserId)">投资清单</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+            <div data-remote-paging="pager" 
+					data-refresh="refresh" 
+					data-current="current" 
+					data-total="total" 
+					data-data="limitArr"
+					data-limit="limit"
+					data-params="params"
+			></div>
+</div>
+
+<!-- 增加/修改对话框 -->
+<div class="modal fade" id="addandedit" tabindex="-1" role="dialog" aria-hidden="true">
+<form class="form-horizontal" name="addSyncApplForm" novalidate="novalidate" ng-submit="adminCreate(pageitem)" >
+    <div class="modal-dialog" style="width: 800px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4  class="modal-title">增加/修改</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-12 col-md-12">
+						<div class="form-group">
+			                <label class="col-lg-2 control-label">推荐人id：</label>
+			                <div class="col-lg-9">
+			                    <input type="number" class="form-control" ng-model="pageitem.parentId" ng-maxlength="50" ng-trim maxlength="50" />
+			                </div>
+			                <label class="col-lg-2 control-label">姓名：</label>
+			                <div class="col-lg-9">
+			                    <input type="text" class="form-control" required ng-model="pageitem.mUserName" ng-maxlength="50" ng-trim maxlength="50" />
+			                </div>
+			                <span class="mustItem">*</span>
+				        </div>
+						<div class="form-group">
+			                <label class="col-lg-2 control-label">昵称：</label>
+			                <div class="col-lg-9">
+			                    <input type="text" class="form-control" ng-model="pageitem.nickname" ng-maxlength="50" ng-trim maxlength="50" />
+			                </div>
+			                <label class="col-lg-2 control-label">手机号：</label>
+			                <div class="col-lg-9">
+			                    <input type="text" class="form-control" required ng-model="pageitem.mUserTel" ng-maxlength="50" ng-trim maxlength="50" />
+			                </div>
+			                <span class="mustItem">*</span>
+				        </div>
+						<div class="form-group">
+			                <label class="col-lg-2 control-label">登录密码：</label>
+			                <div class="col-lg-9">
+			                    <input type="text" class="form-control" required ng-model="pageitem.mUserPwd" ng-maxlength="50" ng-trim maxlength="50" />
+			                </div>
+			                <span class="mustItem">*</span>
+			                <label class="col-lg-2 control-label">支付密码：</label>
+			                <div class="col-lg-9">
+			                    <input type="text" class="form-control" required ng-model="pageitem.payPassword" ng-maxlength="50" ng-trim maxlength="50" />
+			                </div>
+			                <span class="mustItem">*</span>
+				        </div>
+						<div class="form-group">
+			                <label class="col-lg-2 control-label">年龄：</label>
+			                <div class="col-lg-9">
+			                    <input type="number" class="form-control" ng-model="pageitem.age" ng-maxlength="50" ng-trim maxlength="50" />
+			                </div>
+			                <label class="col-lg-2 control-label">性别：</label>
+				            <div class="col-sm-2 col-md-2">
+				                <select ng-model="pageitem.sex" select2 class="form-control">
+				                    <option value="0">未确认</option>
+				                    <option value="1">男</option>
+				                    <option value="2">女</option>
+				                </select>
+				            </div>
+				        </div>
+						<div class="form-group">
+			                <label class="col-lg-2 control-label">星座：</label>
+			                <div class="col-lg-9">
+			                    <input type="text" class="form-control" ng-model="pageitem.constellation" ng-maxlength="50" ng-trim maxlength="50" />
+			                </div>
+			                <label class="col-lg-2 control-label">职业：</label>
+			                <div class="col-lg-9">
+			                    <input type="text" class="form-control" ng-model="pageitem.occupation" ng-maxlength="50" ng-trim maxlength="50" />
+			                </div>
+				        </div>
+						<div class="form-group">
+			                <label class="col-lg-2 control-label">Email：</label>
+			                <div class="col-lg-9">
+			                    <input type="text" class="form-control" ng-model="pageitem.mUserEmail" ng-maxlength="50" ng-trim maxlength="50" />
+			                </div>
+			                <label class="col-lg-2 control-label">身份证号：</label>
+			                <div class="col-lg-9">
+			                    <input type="text" class="form-control" required ng-model="pageitem.idNumber" ng-maxlength="50" ng-trim maxlength="50" />
+			                </div>
+			                <span class="mustItem">*</span>
+				        </div>
+						<div class="form-group">
+			                <label class="col-lg-2 control-label">紧急联系人：</label>
+			                <div class="col-lg-9">
+			                    <input type="text" class="form-control" ng-model="pageitem.emergencyName" ng-maxlength="50" ng-trim maxlength="50" />
+			                </div>
+			                <label class="col-lg-2 control-label">联系人手机号：</label>
+			                <div class="col-lg-9">
+			                    <input type="text" class="form-control" ng-model="pageitem.emergencyPhone" ng-maxlength="50" ng-trim maxlength="50" />
+			                </div>
+				        </div>
+						<div class="form-group">
+			                <label class="col-lg-2 control-label">联系人关系：</label>
+			                <div class="col-lg-9">
+			                    <input type="text" class="form-control" ng-model="pageitem.emergencyRelation" ng-maxlength="50" ng-trim maxlength="50" />
+			                </div>
+				        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-primary" ng-disabled="addSyncApplForm.$invalid">保存</button>
+                <button type="button" class="btn btn-danger" ng-click="clearForm()">重置</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    </form>
+    <!-- /.modal-dialog -->
+</div>
+
+<!-- 审核对话框 -->
+<div class="modal fade" id="audit" tabindex="-1" role="dialog" aria-hidden="true">
+<form class="form-horizontal" name="auditForm" novalidate="novalidate" ng-submit="create(pageitem)" >
+    <div class="modal-dialog" style="width: 800px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4  class="modal-title">审核</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-12 col-md-12">
+						<div class="form-group">
+				                <label class="col-lg-2 control-label" title="">身份证正面: </label>
+				                <div class="col-lg-4">
+										<img class="img-thumbnail" ng-src="{{imgShow(pageitem.idPhoto)}}" style="width: 150px; height:149px;"/>
+				                </div>
+				                <label class="col-lg-2 control-label" title="">身份证背面: </label>
+				                <div class="col-lg-3">
+										<img class="img-thumbnail" ng-src="{{imgShow(pageitem.idPhotoBack)}}" style="width: 150px; height:149px;"/>
+				                </div>
+				        </div>
+						<div class="form-group">
+				                <label class="col-lg-2 control-label" title="">手持身份证正面: </label>
+				                <div class="col-lg-3">
+										<img class="img-thumbnail" ng-src="{{imgShow(pageitem.idPhotoHand)}}" style="width: 150px; height:149px;"/>
+				                </div>
+				        </div>
+	                    <div class="form-group">
+	                        <label class="col-lg-2 control-label">审核：</label>
+	                        <div class="col-lg-9">
+	                            <label class="radio-inline"><input type="radio" class="" ng-model="pageitem.isAudit" value="11" name="state"/>未通过</label>
+	                            <label class="radio-inline"><input type="radio" class="" ng-model="pageitem.isAudit" value="1" name="state"/>通过</label>
+	                        </div>
+	                    </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-primary" ng-disabled="auditForm.$invalid">保存</button>
+                <button type="button" class="btn btn-danger" ng-click="clearForm()">重置</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    </form>
+    <!-- /.modal-dialog -->
+</div>
+
+<!-- 预览 -->
+<div class="modal fade" id="preview" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" style="width: 800px;height:392px; ">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">预览</h4>
+            </div>
+            <div class="modal-body">
+            	<div class="col-sm-12 col-md-12">
+	            <form role="form" class="form-horizontal">
+	                <h4 class="heading">产品名称： {{keyv.productName}}</h4>
+	                <div class="form-group">&nbsp;</div>
+           			<div class="form-group"  style=" height:332px; ">
+                        <p class="col-lg-6">
+用户名：{{keyv.mUserName}}<br />
+手机号：{{keyv.mUserTel}}<br />
+职业：{{keyv.occupation}}<br />
+年龄：{{keyv.age}}<br />
+性别：{{keyv.sex}}<br />
+身份证号：{{keyv.idNumber}}<br />
+余额：{{keyv.mUserMoney}}<br />
+冻结资金：{{keyv.frozenMoney}}<br />
+紧急联系人：{{keyv.emergencyName}}<br />
+审核状态：{{keyv.isAudit}}<br />
+注册时间：{{keyv.createTime|date:'yyyy-MM-dd'}}<br />
+                        </p>  
+                  	</div>
+                   <div class="form-group">&nbsp;</div>
+	            </form>
+	            </div> <!-- col-sm-12 col-md-12 end -->
+            </div><!-- modal-conteng end -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<!-- 被邀请人列表 -->
+<div class="modal fade" id="invitelist" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" style="width: 800px;height:392px; ">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">被邀请人列表</h4>
+            </div>
+            <div class="modal-body">
+				<div class="col-sm-12 col-md-12">
+				    <table class="table table-striped table-bordered table-condensed index-center  table-costom">
+				        <thead>
+				        <tr>
+				            <th>序号</th>
+				            <th>用户名</th>
+				            <th>手机号</th>
+				        </tr>
+				        </thead>
+				        <tbody>
+				        <tr class="rowlink" ng-repeat="item in limitArrParent">
+				            <td>{{current*limit+$index+1}}</td>
+				            <td>{{item.mUserName}}</td>
+				            <td>{{item.mUserTel}}</td>
+				        </tr>
+				        </tbody>
+				    </table>
+				</div>
+            </div><!-- modal-conteng end -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<!-- 理财 -->
+<div class="modal fade" id="investment" tabindex="-1" role="dialog" aria-hidden="true">
+<form class="form-horizontal" name="investmentForm" novalidate="novalidate" ng-submit="saveInvestment(key)" >
+    <div class="modal-dialog" style="width: 800px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">理财 </h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-12 col-md-12">
+                        <div class="form-group">
+	                        <label class="col-lg-2 control-label">选择标</label>
+			                <div class="col-lg-9">
+			                    <select class="form-control" ng-model="key.bid" select2 data-live-search="true"
+			                     ng-options="item.bidSN for item in bids track by item.bidSN">
+									<option value=""></option>
+			                    </select>
+			                </div>
+                        </div> 
+                        <div class="form-group">
+	                        <label class="col-lg-2 control-label">选择红包</label>
+			                <div class="col-lg-9">
+			                    <select class="form-control" ng-model="key.redpacket" select2 data-live-search="true"
+			                     ng-options="item.redpacketAmount for item in redpackets track by item.redpacketId">
+									<option value=""></option>
+			                    </select>
+			                </div>
+                        </div> 
+                        <div class="form-group">
+			                <label class="col-lg-2 control-label">理财金额</label>
+			                <div class="col-lg-9">
+			                    <input type="text" class="form-control" ng-model="key.investmentAmount" ng-maxlength="50" ng-trim maxlength="50" />
+			                </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-primary" ng-disabled="investmentForm.$invalid">保存</button>
+                <button type="button" class="btn btn-danger" ng-click="clearForm()">重置</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    </form>
+    <!-- /.modal-dialog -->
+</div>
+
+<!-- 投资 -->
+<div class="modal fade" id="itemInvestment" tabindex="-1" role="dialog" aria-hidden="true">
+<form class="form-horizontal" name="itemInvestmentForm" novalidate="novalidate" ng-submit="saveItemInvestment(key)" >
+    <div class="modal-dialog" style="width: 800px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">投资</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-12 col-md-12">
+                        <div class="form-group">
+	                        <label class="col-lg-2 control-label">选择项目</label>
+			                <div class="col-lg-9">
+			                    <select class="form-control" ng-model="key.item" select2 data-live-search="true"
+			                     ng-options="item.itemSN for item in items track by item.loanId">
+									<option value=""></option>
+			                    </select>
+			                </div>
+                        </div> 
+                        <div class="form-group">
+	                        <label class="col-lg-2 control-label">选择红包</label>
+			                <div class="col-lg-9">
+			                    <select class="form-control" ng-model="key.redpacket" select2 data-live-search="true"
+			                     ng-options="item.redpacketAmount for item in redpackets track by item.redpacketId">
+									<option value=""></option>
+			                    </select>
+			                </div>
+                        </div> 
+                        <div class="form-group">
+			                <label class="col-lg-2 control-label">投资金额</label>
+			                <div class="col-lg-9">
+			                    <input type="text" class="form-control" ng-model="key.investmentAmount" ng-maxlength="50" ng-trim maxlength="50" />
+			                </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-primary" ng-disabled="itemInvestmentForm.$invalid">保存</button>
+                <button type="button" class="btn btn-danger" ng-click="clearForm()">重置</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    </form>
+    <!-- /.modal-dialog -->
+</div>

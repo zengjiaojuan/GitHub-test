@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta charset="UTF-8">
+<title>金朗理财产品详情</title>
+<meta name="author" content="金朗理财">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="format-detection" content="telephone=no">
+<link href="js/global.css" type="text/css" rel="stylesheet">
+<link href="js/global-min.css" type="text/css" rel="stylesheet">
+<script src="js/jquery-1.10.2.min.js" type="text/javascript"></script>
+<script src="js/global.js" type="text/javascript"></script>
+<link href="js/protocol.css" type="text/css" rel="stylesheet">
+</head>
+<body>
+<div class="wrap">
+    <div class="desc-items">
+        <h2>概要</h2>
+        <div id="summaryInfo">
+        	<table class="desc-table">
+			<tbody>
+			<tr><th>编号</th><td>$productSN$</td></tr>
+			<tr><th>期限</th><td>$period$</td></tr>
+		    <tr><th>年化收益率</th><td>$annualizedRate$</td></tr>
+			<tr><th>还款方式</th><td>$paymentMethod$</td></tr>
+			<tr><th>认购期</th><td>$joinPeriod$</td></tr>
+			<tr><th>到期日</th><td>$endDate$</td></tr>
+			<tr><th>保障方式</th><td><i class="icon ltd-green"></i>$guaranteeMethod$</td></tr>
+			</tbody>
+			</table>
+        </div>
+    </div>
+    <div class="desc-items">
+        <h2>加入</h2>
+        <table class="desc-table">
+            <tbody><tr>
+                <th>加入条件</th>
+                <td>加入金额 $investmentAmountMin$ 元起，且以 $investmentAmountMultiple$ 元的倍数递增</td>
+            </tr>
+            <tr>
+                <th>单笔额度上限</th>
+                <td>$investmentAmountUpper$ 元</td>
+            </tr>
+        </tbody></table>
+    </div>
+    <div class="desc-items">
+        <h2>费用</h2>
+        <table class="desc-table">
+            <tbody><tr>
+                <th>加入费率</th>
+                <td>$joinRate$ %</td>
+            </tr>
+            <tr>
+                <th>管理费率</th>
+                <td>参见<a href="$agreement$" class="protocol">金朗理财投资协议</a></td>
+            </tr>
+            <tr>
+                <th>到期赎回费率</th>
+                <td>$redemptionDueRate$ %</td>
+            </tr>
+            <tr>
+                <th>提前赎回费率</th>
+                <td>加入金额的 $redemptionEarlyRate$参见<a href="$agreement$" class="protocol">金朗理财投资协议</a></td>
+            </tr>
+        </tbody></table>
+    </div>
+    <div class="desc-items">
+        <h2>赎回</h2>
+        <table class="desc-table">
+            <tbody><tr>
+                <th>到期赎回方式</th>
+                <td>平台统筹赎回</td>
+            </tr>
+            <tr>
+                <th>提前赎回方式</th>
+                <td>期限内支持提前赎回参见<a href="$agreement$" class="protocol">金朗理财投资协议</a></td>
+            </tr>
+        </tbody></table>
+    </div>
+</div>
+</body>
+</html>

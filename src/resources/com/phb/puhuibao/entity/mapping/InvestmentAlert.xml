@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.phb.puhuibao.entity.InvestmentAlert">
+  <resultMap id="resourceResultMap" type="com.phb.puhuibao.entity.InvestmentAlert">
+    <result property="alertId" column="alert_id" jdbcType="INTEGER" />
+    <result property="alertTitle" column="alert_title" jdbcType="VARCHAR" />
+    <result property="alertProduct" column="alert_product" jdbcType="VARCHAR" />
+	<result property="alertContent" column="alert_content" jdbcType="VARCHAR" />
+	<result property="alertStatus" column="alert_status" jdbcType="TINYINT" />
+	<result property="alertDeviceid" column="alert_deviceid" jdbcType="VARCHAR" />
+	<result property="alertDevicetype" column="alert_devicetype" jdbcType="TINYINT" />
+    <result property="pushTime" column="push_time" jdbcType="TIMESTAMP"/>
+  </resultMap>
+  
+  <!-- RESOURCE INSERT -->
+  <insert id="insert" useGeneratedKeys="true" keyProperty="alertId" parameterType="com.phb.puhuibao.entity.InvestmentAlert">
+    insert into phb_investment_alert (<include refid="allapplColumn"/>) <include refid="allapplColumnVar"/>
+  </insert>
+  
+   
+  
+  <!-- RESOURCE DELETE -->
+  <delete id="delete" parameterType="java.util.Map">
+    delete from phb_investment_alert <include refid="dynamicWhere" />
+  </delete>
+  
+  <!-- RESOURCE SELECT -->
+  <select id="query" parameterType="java.util.Map" resultMap="resourceResultMap">
+    select <include refid="allColumn" /> from phb_investment_alert <include refid="dynamicWhere" />
+  </select>
+  <select id="findByPager" parameterType="java.util.Map" resultMap="resourceResultMap">
+    <include refid="queryBody" />
+  </select>
+  <select id="findByPagerCount" parameterType="java.util.Map" resultType="int" >
+	select count(1) from phb_investment_alert <include refid="dynamicWhere" />
+  </select>
+  <select id="unique" parameterType="java.util.Map" resultMap="resourceResultMap" >
+	select <include refid="allColumn" /> from phb_investment_alert <include refid="dynamicWhere" /> <include refid="dynamicOrderBy" /> limit 1
+  </select>
+  <select id="getById" parameterType="java.util.Map" resultMap="resourceResultMap">
+	select * from phb_investment_alert where version_id=#{versionId}
+  </select>
+
+  <!-- MySQL specific -->
+  <sql id="allapplColumn">
+	alert_title,
+	alert_product,
+	alert_content,
+	alert_deviceid,
+    alert_devicetype,
+	push_time
+  </sql>
+  <sql id="allapplColumnVar">
+	values(
+			#{alertTitle,   jdbcType=VARCHAR},
+			#{alertProduct, jdbcType=VARCHAR},
+			#{alertContent, jdbcType=VARCHAR},
+			#{alertDeviceid,jdbcType=VARCHAR},
+			#{alertDevicetype,jdbcType=TINYINT},
+			#{pushTime,     jdbcType=TIMESTAMP}
+	      )
+  </sql>
+  <sql id="allColumn">
+    alert_id,
+	alert_title,
+	alert_product,
+	alert_content,
+	alert_status,
+    push_time,
+    alert_deviceid,
+    alert_devicetype
+  </sql>
+  <sql id="dynamicWhere">
+	<trim prefix="WHERE" prefixOverrides="AND|OR">
+		<if test="alertId != null">
+			AND alert_id = #{alertId}
+		</if>
+		<if test="alertProduct != null">
+			AND alert_product = #{alertProduct}
+		</if>
+		<if test="alertDeviceid != null">
+			AND alert_deviceid = #{alertDeviceid}
+		</if>
+		
+ 
+		
+		<if test="status != null">
+			AND alert_status = #{status}
+		</if>
+	</trim>
+  </sql>
+  <sql id="dynamicOrderBy">
+	<if test="orderBy!=null">
+		order by ${orderBy}
+		<if test="order!=null">
+			${order}
+		</if>
+	</if>
+  </sql>
+
+  <sql id="queryBody">
+	<if test="sno!=null and eno!=null and orderBy!=null">
+		select <include refid="allColumn" /> from phb_investment_alert
+		<include refid="dynamicWhere" />
+		<include refid="dynamicOrderBy" />
+		limit ${sno-1},${eno}
+	</if>
+  	<!-- 无orderby -->
+	<if test="sno!=null and eno!=null and orderBy==null">
+		select <include refid="allColumn" /> from phb_investment_alert
+		<include refid="dynamicWhere" />
+		limit ${sno-1},${eno}
+	</if>
+  </sql>
+</mapper>

@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.phb.puhuibao.entity.UserLoan">
+
+  <!-- RESOURCE RESULTMAP -->
+
+  <resultMap id="resourceResultMap" type="com.phb.puhuibao.entity.UserLoan">
+    <id property="loanId" column="loan_id" jdbcType="INTEGER" />
+    <result property="mUserId" column="M_USER_ID" jdbcType="INTEGER" />
+    <result property="lastReturn" column="last_return" jdbcType="DECIMAL" />
+    <result property="giveDate" column="give_date" jdbcType="DATE" />
+    <result property="createTime" column="create_time" jdbcType="TIMESTAMP" />
+    <result property="lastDate" column="last_date" jdbcType="DATE" />
+  </resultMap>
+
+  <!-- RESOURCE INSERT -->
+  <insert id="insert" useGeneratedKeys="true" keyProperty="loanId" parameterType="com.phb.puhuibao.entity.UserLoan">
+    insert into phb_muser_loan (<include refid="allapplColumn"/>) <include refid="allapplColumnVar"/>
+  </insert>
+  <!-- RESOURCE UPDATE -->
+  <update id="update" parameterType="com.phb.puhuibao.entity.UserLoan">
+		update phb_muser_loan
+		<trim prefix=" SET " prefixOverrides=",">
+			<if test="amount != null">
+				  ,amount=#{amount,jdbcType=BIGINT}
+			</if>
+			<if test="rate != null">
+				  ,rate=#{rate,jdbcType=DECIMAL}
+			</if>
+			<if test="period != null">
+				  ,period=#{period,jdbcType=TINYINT}
+			</if>
+			<if test="giveDate != null">
+				  ,give_date=#{giveDate,jdbcType=DATE}
+			</if>
+			<if test="status != null">
+				  ,status=#{status,jdbcType=TINYINT}
+			</if>
+			<if test="useage != null">
+				  ,useage=#{useage,jdbcType=TINYINT}
+			</if>
+			<if test="type != null">
+				  ,type=#{type,jdbcType=TINYINT}
+			</if>
+			<if test="lastReturn != null">
+				  ,last_return=#{lastReturn,jdbcType=DECIMAL}
+			</if>
+			<if test="repayment != null">
+				  ,repayment=#{repayment,jdbcType=INTEGER}
+			</if>
+			<if test="lastDate != null">
+				  ,last_date=#{lastDate,jdbcType=DATE}
+			</if>
+		</trim>
+		where loan_id=#{loanId}
+  </update>
+
+  <!-- RESOURCE DELETE -->
+  <delete id="delete" parameterType="com.phb.puhuibao.entity.UserLoan">
+    delete from phb_muser_loan where loan_id=#{loanId}
+  </delete>
+  
+  <!-- RESOURCE SELECT -->
+  <select id="query" parameterType="java.util.Map" resultMap="resourceResultMap">
+    select <include refid="allColumn" /> from phb_muser_loan <include refid="dynamicWhere" />
+  </select>
+  <select id="findByPager" parameterType="java.util.Map" resultMap="resourceResultMap">
+    <include refid="queryBody" />
+  </select>
+  <select id="findByPagerCount" parameterType="java.util.Map" resultType="int" >
+	select count(1) from phb_muser_loan <include refid="dynamicWhere" />
+  </select>
+  <select id="unique" parameterType="java.util.Map" resultMap="resourceResultMap" >
+	select <include refid="allColumn" /> from phb_muser_loan <include refid="dynamicWhere" /> limit 1
+  </select>
+  <select id="getById" parameterType="java.util.Map" resultMap="resourceResultMap">
+	select <include refid="allColumn" /> from phb_muser_loan where loan_id=#{loanId}
+  </select>
+
+  <!-- MySQL specific -->
+  <sql id="allapplColumn">
+    m_user_id,
+    useage,
+	amount,
+	period,
+	create_time,
+	repayment,
+	status,
+	rate,
+	type
+  </sql>
+  <sql id="allapplColumnVar">
+	values(
+			#{mUserId,jdbcType=INTEGER},
+			#{useage,jdbcType=TINYINT},
+			#{amount,jdbcType=BIGINT},
+			#{period,jdbcType=TINYINT},
+			#{createTime,jdbcType=TIMESTAMP},
+			#{repayment,jdbcType=INTEGER},
+			#{status,jdbcType=TINYINT},
+			#{rate,jdbcType=DECIMAL},
+			#{type,jdbcType=TINYINT}
+	)
+  </sql>
+  <sql id="allColumn">
+    loan_id,
+    m_user_id,
+    useage,
+    amount,
+    period,
+	type,
+	status,
+	last_return,
+	rate,
+	create_time,
+	repayment,
+	give_date,
+	last_date
+  </sql>
+  <sql id="dynamicWhere">
+	<trim prefix="WHERE" prefixOverrides="AND|OR">
+		<if test="mUserId != null">
+			AND m_user_id = #{mUserId}
+		</if>
+		<if test="lstatus != null">
+			AND status <![CDATA[<]]> #{lstatus}
+		</if>
+		<if test="gstatus != null">
+			AND status <![CDATA[>]]> #{gstatus}
+		</if>
+		<if test="status != null">
+			AND status = #{status}
+		</if>
+		<if test="type != null">
+			AND type = #{type}
+		</if>
+	</trim>
+  </sql>
+  <sql id="dynamicOrderBy">
+	<if test="orderBy!=null">
+		order by ${orderBy}
+		<if test="order!=null">
+			${order}
+		</if>
+	</if>
+  </sql>
+
+  <sql id="queryBody">
+	<if test="sno!=null and eno!=null and orderBy!=null">
+		select <include refid="allColumn" /> from phb_muser_loan
+		<include refid="dynamicWhere" />
+		<include refid="dynamicOrderBy" />
+		limit ${sno-1},${eno}
+	</if>
+	<!-- 无orderby -->
+	<if test="sno!=null and eno!=null and orderBy==null">
+		select <include refid="allColumn" /> from phb_muser_loan
+		<include refid="dynamicWhere" />
+		limit ${sno-1},${eno}
+	</if>
+  </sql>	
+  
+</mapper>

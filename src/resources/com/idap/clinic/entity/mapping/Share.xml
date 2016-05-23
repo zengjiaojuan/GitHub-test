@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper 
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.idap.clinic.entity.Share">
+    <resultMap id="Share" type="com.idap.clinic.entity.Share">
+    	    <result property="shareDatetime" column="share_datetime" jdbcType="DATE"/>
+	</resultMap>
+
+	<sql id="queryBody">
+		<if test="sno!=null and eno!=null and orderBy!=null">
+ 	    	select <include refid="allColumn"/> from share <include refid="dynamicWhere"/>
+			<include refid="dynamicOrderBy" />
+			limit ${sno-1},${eno}
+		</if>
+	</sql>	
+	<select id="findByPager" parameterType="java.util.Map" resultMap="Share">
+		<include refid="queryBody" />
+	</select>
+	<select id="findByPagerCount" parameterType="java.util.Map" resultType="int" >
+		select count(1) from share
+		<include refid="dynamicWhere" />
+	</select>
+
+ 	<sql id="dynamicWhere">
+		<trim prefix="WHERE" prefixOverrides="AND|OR">
+			<if test="id!=null">
+				and id = #{id}
+			</if>
+			<if test="type!=null">
+				and type = #{type}
+			</if>
+			<if test="muid!=null">
+				and muid = #{muid}
+			</if>
+		</trim>
+	</sql>
+
+	<sql id="allColumn">
+	    id,title,content,type,share_datetime,muid
+	</sql> 
+	<sql id="dynamicOrderBy">
+		<if test="orderBy!=null">
+			order by ${orderBy}
+			<if test="order!=null">
+				${order}
+		</if>
+		</if>
+	</sql>
+	<sql id="allapplColumn">
+	    title,content,type,muid
+	</sql>
+	<sql id="allapplColumnVar">
+		values(
+			#{title,jdbcType=VARCHAR},
+			#{content,jdbcType=VARCHAR},
+			#{type,jdbcType=VARCHAR},
+			#{muid,jdbcType=VARCHAR}
+	     )
+	</sql>
+
+	<insert id="insert" parameterType="com.idap.clinic.entity.Share" >
+	    insert into share(<include refid="allapplColumn"/>) <include refid="allapplColumnVar"/>
+	</insert>
+	<delete id="delete" parameterType="java.util.Map">
+		delete from share where id in (${id})
+	</delete>
+</mapper>

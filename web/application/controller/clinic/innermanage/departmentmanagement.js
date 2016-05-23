@@ -1,0 +1,53 @@
+define(function (require, exports, module) {
+    return function setApp(app) {
+        app.controller('ClinicInnermanageDepartmentmanagementCtrl', ['$scope','DepartmentManagement',function ($scope,DepartmentManagement) { 
+     //------------------gridlist--------- 	 
+       	 $scope.pager =  DepartmentManagement;
+ 
+     //------------reset botton---------------------
+            $scope.clearForm = function(){//reset botton
+                $scope.pageitem="";
+            }
+            
+     //------------------add/edit--------- ----------- 	
+            $scope.edit =function(tobeedit){ //click on edit link
+              	$scope.pageitem= tobeedit;
+               };     
+               
+             $scope.create = function(key) {//add and edit
+                   if(key.departmentId){
+                	   DepartmentManagement.save(key,function(){
+                       	$scope.refresh('current',true);//refresh listgrid
+                        //$scope.clearForm();
+                      	$('#addandedit').modal('hide');
+                      });
+               	}else{ 
+               		DepartmentManagement.put(key,function(){
+                       	$scope.refresh('current',true);//refresh listgrid
+                       	//$scope.clearForm();
+                        $('#addandedit').modal('hide');
+                       });
+               	}
+               }
+ 
+            
+    //-------------delete----------        
+            $scope.todelete = function(hid) {//click on DELETE link
+                $scope.tobedeleteId = hid;
+            };
+
+            $scope.comfirmDelete = function() {//confirm to delete on dialog
+	            var params = {
+	            		departmentId : $scope.tobedeleteId
+	            };
+	            DepartmentManagement.remove({
+	                params : angular.toJson(params)
+	            }, function(jsonData) {
+	                $scope.refresh('current', true);
+	            });
+            }; 
+ 
+        }]);
+    }
+
+});

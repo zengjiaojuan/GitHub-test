@@ -1,0 +1,23 @@
+.desc-box h2,.desc-items h2,.title{color:#15456f}
+.desc-box h4,.desc-box h3,.desc-items h3{font-weight:normal}
+.desc-box,.desc-items h2,.title,.title-sub,.desc-box .items,.desc-box .items dd{ margin-bottom:10px}
+.desc-table{border-left:1px solid #D0D7DB; border-top:1px solid #D0D7DB; width:100%; margin-bottom:10px}
+.desc-table td,.desc-table th{ border-right:1px solid #D0D7DB; border-bottom:1px solid #D0D7DB; padding:5px 3px; height:30px; vertical-align:middle; width:46%; text-align:left}
+.desc-table th{background:#f0f5f7; font-weight:normal}
+.desc-table .score{ font-size:16px; font-family:Tahoma; color:#1BB05F; padding-right:5px; font-weight:bolder; vertical-align:middle}
+.desc-table a.protocol{ color:#3399d8; text-decoration:none}
+.desc-table-dcb th{ width:27%}
+.desc-table-dcb td{ width:65%}
+#descriptionYxt{color:#677279}
+.font-bold{font-weight:bold}
+.font-line{text-decoration:underline}
+.font-bl{font-weight:bold;text-decoration:underline }
+
+
+
+
+
+
+
+
+

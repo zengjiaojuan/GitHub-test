@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.phb.puhuibao.entity.LoanItem">
+  <!-- RESOURCE RESULTMAP -->
+  <resultMap id="resourceResultMap" type="com.phb.puhuibao.entity.LoanItem">
+    <result property="itemId" column="item_id" jdbcType="INTEGER"/>
+    <result property="loanId" column="loan_id" jdbcType="INTEGER"/>
+    <result property="itemSN" column="item_sn" jdbcType="VARCHAR"/>
+    <result property="currentAmount" column="current_amount" jdbcType="BIGINT"/>
+    <result property="totalAmount" column="total_amount" jdbcType="BIGINT"/>
+    <result property="paymentMethod" column="payment_method" jdbcType="VARCHAR"/>
+    <result property="guaranteeMethod" column="guarantee_method" jdbcType="VARCHAR"/>
+    <result property="investmentAmountMin" column="investment_amount_min" jdbcType="INTEGER"/>
+    <result property="annualizedRate" column="annualized_rate" jdbcType="DECIMAL"/>
+    <result property="period" column="period" jdbcType="TINYINT"/>
+    <result property="itemDesc" column="item_desc" jdbcType="LONGVARCHAR"/>
+    <result property="status" column="status" jdbcType="TINYINT"/>
+    <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+    <result property="guaranteeMethod" column="guarantee_method" jdbcType="VARCHAR"/>
+    <result property="startDate" column="start_date" jdbcType="DATE"/>
+    <result property="endDate" column="end_date" jdbcType="DATE"/>
+  </resultMap>
+
+  <!-- RESOURCE INSERT -->
+  <insert id="insert" useGeneratedKeys="true" keyProperty="id" parameterType="com.phb.puhuibao.entity.LoanItem">
+    insert into phb_loan_item (<include refid="allapplColumn"/>) <include refid="allapplColumnVar"/>
+  </insert>
+  <!-- RESOURCE UPDATE -->
+  <update id="update" parameterType="com.phb.puhuibao.entity.LoanItem">
+		update phb_loan_item
+		<trim prefix=" SET " prefixOverrides=",">
+			<if test="itemSN != null">
+				  ,item_sn=#{itemSN,jdbcType=VARCHAR}
+			</if>
+			<if test="currentAmount != null">
+				  ,current_amount=#{currentAmount,jdbcType=BIGINT}
+			</if>
+			<if test="totalAmount != null">
+				  ,total_amount=#{totalAmount,jdbcType=BIGINT}
+			</if>
+			<if test="paymentMethod != null">
+				  ,payment_method=#{paymentMethod,jdbcType=VARCHAR}
+			</if>
+			<if test="guaranteeMethod != null">
+				  ,guarantee_method=#{guaranteeMethod,jdbcType=VARCHAR}
+			</if>
+			<if test="investmentAmountMin != null">
+				  ,investment_amount_min=#{investmentAmountMin,jdbcType=INTEGER}
+			</if>
+			<if test="annualizedRate != null">
+				  ,annualized_rate=#{annualizedRate,jdbcType=DECIMAL}
+			</if>
+			<if test="period != null">
+				  ,period=#{period,jdbcType=TINYINT}
+			</if>
+			<if test="itemDesc != null">
+				  ,item_desc=#{itemDesc,jdbcType=LONGVARCHAR}
+			</if>
+			<if test="status != null">
+				  ,status=#{status,jdbcType=DATE}
+			</if>
+			<if test="startDate != null">
+				  ,start_date=#{startDate,jdbcType=DATE}
+			</if>
+			<if test="endDate != null">
+				  ,end_date=#{endDate,jdbcType=DATE}
+			</if>
+		</trim>
+		where item_id=#{itemId}
+  </update>
+
+  <!-- RESOURCE DELETE -->
+  <delete id="delete" parameterType="com.phb.puhuibao.entity.LoanItem">
+    delete from phb_loan_item where item_id=#{itemId}
+  </delete>
+  
+  <!-- RESOURCE SELECT -->
+  <select id="query" parameterType="java.util.Map" resultMap="resourceResultMap">
+    select <include refid="allColumn" /> from phb_loan_item a left join phb_muser_loan b on a.loan_id=b.loan_id <include refid="dynamicWhere" />
+  </select>
+  <select id="findByPager" parameterType="java.util.Map" resultMap="resourceResultMap">
+    <include refid="queryBody" />
+  </select>
+  <select id="findByPagerCount" parameterType="java.util.Map" resultType="int" >
+	select count(1) from phb_loan_item a left join phb_muser_loan b on a.loan_id=b.loan_id <include refid="dynamicWhere" />
+  </select>
+  <select id="unique" parameterType="java.util.Map" resultMap="resourceResultMap" >
+	select <include refid="allColumn" /> from phb_loan_item a left join phb_muser_loan b on a.loan_id=b.loan_id <include refid="dynamicWhere" /> limit 1
+  </select>
+  <select id="getById" parameterType="java.util.Map" resultMap="resourceResultMap">
+	select <include refid="allColumn" /> from phb_loan_item a left join phb_muser_loan b on a.loan_id=b.loan_id where item_id=#{itemId}
+  </select>
+
+  <!-- MySQL specific -->
+  <sql id="allapplColumn">
+    loan_id,
+    item_sn,
+    total_amount,
+    payment_method,
+    guarantee_method,
+    investment_amount_min,
+    annualized_rate,
+    period,
+    item_desc,
+    status,
+    start_date,
+    end_date
+  </sql>
+  <sql id="allapplColumnVar">
+	values(
+			#{loanId,jdbcType=INTEGER},
+			#{itemSN,jdbcType=CHAR},
+			#{totalAmount,jdbcType=BIGINT},
+			#{paymentMethod,jdbcType=VARCHAR},
+			#{guaranteeMethod,jdbcType=VARCHAR},
+			#{investmentAmountMin,jdbcType=INTEGER},
+			#{annualizedRate,jdbcType=DECIMAL},
+			#{period,jdbcType=TINYINT},
+			#{itemDesc,jdbcType=LONGVARCHAR},
+			#{status,jdbcType=TINYINT},
+			#{startDate,jdbcType=DATE},
+			#{endDate,jdbcType=DATE}
+	)
+  </sql>
+  <sql id="allColumn">
+    a.item_id,
+    a.loan_id,
+    a.item_sn,
+    a.current_amount,
+    a.total_amount,
+    a.payment_method,
+    a.guarantee_method,
+    a.investment_amount_min,
+    a.annualized_rate,
+    a.period,
+    a.item_desc,
+    a.status,
+    case b.useage
+     when 0 then '项目贷款'
+     when 1 then '消费贷款'
+     when 2 then '企业贷款'
+     when 3 then '购车贷款'
+     when 4 then '购房贷款'
+     when 5 then '教育贷款'
+     when 6 then '装修贷款'
+     when 7 then '旅游贷款'
+     when 8 then '生意贷款'
+	 end useage,
+	b.rate,
+    a.start_date,
+    a.end_date
+  </sql>
+    <sql id="allColumnwithalertflag">
+    a.item_id,
+    a.loan_id,
+    a.item_sn,
+    a.current_amount,
+    a.total_amount,
+    a.payment_method,
+    a.guarantee_method,
+    a.investment_amount_min,
+    a.annualized_rate,
+    a.period,
+    a.item_desc,
+    CASE
+           WHEN alert.alert_deviceid IS NOT NULL THEN 6
+           ELSE a.status
+    END AS status,
+    case b.useage
+     when 0 then '项目贷款'
+     when 1 then '消费贷款'
+     when 2 then '企业贷款'
+     when 3 then '购车贷款'
+     when 4 then '购房贷款'
+     when 5 then '教育贷款'
+     when 6 then '装修贷款'
+     when 7 then '旅游贷款'
+     when 8 then '生意贷款'
+	 end useage,
+	b.rate,
+    a.start_date,
+    a.end_date
+  </sql>
+  <sql id="dynamicWhere">
+	<trim prefix="WHERE" prefixOverrides="AND|OR">
+		<if test="itemSN != null">
+			AND a.item_sn = #{itemSN}
+		</if>
+		<if test="itemId != null">
+			AND a.item_id=#{itemId}
+		</if>
+		<if test="loanId != null">
+			AND a.loan_id=#{loanId}
+		</if>
+		<if test="lstatus != null">
+			AND a.status <![CDATA[<]]> #{lstatus}
+		</if>
+		<if test="status != null">
+			AND a.status=#{status}
+		</if>
+		and b.status=1
+	</trim>
+  </sql>
+  <sql id="dynamicOrderBy">
+	<if test="orderBy!=null">
+		order by ${orderBy}
+		<if test="order!=null">
+			${order}
+		</if>
+	</if>
+  </sql>
+
+  <sql id="queryBody">
+	<if test="sno!=null and eno!=null and orderBy!=null">
+		select <include refid="allColumnwithalertflag" /> from phb_loan_item a left join phb_muser_loan b on a.loan_id=b.loan_id
+		left join (select ia.alert_deviceid, ia.alert_product from phb_investment_alert ia ) alert on(a.item_sn=alert.alert_product)
+		<include refid="dynamicWhere" />
+		<include refid="dynamicOrderBy" />
+		limit ${sno-1},${eno}
+	</if>
+  	<!-- 无orderby -->
+	<if test="sno!=null and eno!=null and orderBy==null">
+		select <include refid="allColumnwithalertflag" /> from phb_loan_item a left join phb_muser_loan b on a.loan_id=b.loan_id
+		left join (select ia.alert_deviceid, ia.alert_product from phb_investment_alert ia   ) alert on(a.item_sn=alert.alert_product)
+		<include refid="dynamicWhere" />
+		limit ${sno-1},${eno}
+	</if>
+  </sql>
+</mapper>

@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.phb.puhuibao.entity.HexagramAbility">
+  <resultMap id="resourceResultMap" type="com.phb.puhuibao.entity.HexagramAbility">
+    <result property="mUserId"                   column="m_user_id"                  jdbcType="INTEGER" />
+    <result property="abilityMumber"               column="ability_number"               jdbcType="DECIMAL" />
+	<result property="specialabilityNumber"                column="specialability_number"                jdbcType="DECIMAL" />
+	<result property="friendsNumber"             column="friends_number"             jdbcType="DECIMAL" />
+	<result property="messioncompliteNumber"                 column="messioncomplite_number"                 jdbcType="DECIMAL" />
+	<result property="userLevel"                 column="user_level"                 jdbcType="DECIMAL" />
+ 
+  </resultMap>
+  
+  <!-- RESOURCE INSERT -->
+  <insert id="insert" useGeneratedKeys="true"   parameterType="com.phb.puhuibao.entity.HexagramAbility">
+    insert into phb_hexagram_ability (<include refid="allapplColumn"/>) <include refid="allapplColumnVar"/>
+  </insert>
+  
+   
+  
+  <!-- RESOURCE DELETE -->
+  <delete id="delete" parameterType="java.util.Map">
+    delete from phb_hexagram_ability <include refid="dynamicWhere" />
+  </delete>
+  
+  <!-- RESOURCE SELECT -->
+  <select id="query" parameterType="java.util.Map" resultMap="resourceResultMap">
+    select <include refid="allColumn" /> 
+    from phb_hexagram_ability 
+     
+    <include refid="dynamicWhere" />
+  </select>
+  <select id="findByPager" parameterType="java.util.Map" resultMap="resourceResultMap">
+    <include refid="queryBody" />
+  </select>
+  <select id="findByPagerCount" parameterType="java.util.Map" resultType="int" >
+	select count(1) from phb_hexagram_ability <include refid="dynamicWhere" />
+  </select>
+  <select id="unique" parameterType="java.util.Map" resultMap="resourceResultMap" >
+	select <include refid="allColumn" /> from phb_hexagram_ability <include refid="dynamicWhere" /> <include refid="dynamicOrderBy" /> limit 1
+  </select>
+   <select id="getById" parameterType="java.util.Map" resultMap="resourceResultMap">
+	select * from phb_hexagram_ability where m_user_id=#{mUserId}
+  </select>
+  
+<update id="update" parameterType="com.phb.puhuibao.entity.HexagramAbility">
+		update phb_hexagram_ability
+		<trim prefix=" SET " prefixOverrides=",">
+			<if test="abilityMumber != null">
+				  ,ability_number=#{abilityMumber,jdbcType=DECIMAL}
+			</if>
+			<if test="specialabilityNumber != null">
+				  ,specialability_number=#{specialabilityNumber,jdbcType=DECIMAL}
+			</if>
+			<if test="friendsNumber != null">
+				  ,friends_number=#{friendsNumber,jdbcType=DECIMAL}
+			</if>
+			<if test="messioncompliteNumber != null">
+				  ,messioncomplite_number=#{messioncompliteNumber,jdbcType=DECIMAL}
+			</if>
+			<if test="userLevel != null">
+				  ,user_level=#{userLevel,jdbcType=DECIMAL}
+			</if>
+			 							 
+		</trim>
+		where m_user_id=#{mUserId} 
+  </update>
+
+  <!-- MySQL specific -->
+  <sql id="allapplColumn">
+	m_user_id 
+  </sql>
+  <sql id="allapplColumnVar">
+	values(
+			#{mUserId,                    jdbcType=INTEGER} 
+	      )
+  </sql>
+  <sql id="allColumn">
+  
+	m_user_id,
+	ability_number,
+	specialability_number,
+	friends_number,
+	messioncomplite_number,
+	user_level
+  </sql>
+  <sql id="dynamicWhere">
+	<trim prefix="WHERE" prefixOverrides="AND|OR">
+		<if test="mUserId != null">
+			AND m_user_id = #{mUserId}
+		</if>
+		 
+ 
+	</trim>
+  </sql>
+  <sql id="dynamicOrderBy">
+	<if test="orderBy!=null">
+		order by ${orderBy}
+		<if test="order!=null">
+			${order}
+		</if>
+	</if>
+  </sql>
+
+  <sql id="queryBody">
+	<if test="sno!=null and eno!=null and orderBy!=null">
+		select <include refid="allColumn" /> from phb_hexagram_ability
+		<include refid="dynamicWhere" />
+		<include refid="dynamicOrderBy" />
+		limit ${sno-1},${eno}
+	</if>
+  	<!-- 无orderby -->
+	<if test="sno!=null and eno!=null and orderBy==null">
+		select <include refid="allColumn" /> from phb_hexagram_ability
+		<include refid="dynamicWhere" />
+		limit ${sno-1},${eno}
+	</if>
+  </sql>
+</mapper>

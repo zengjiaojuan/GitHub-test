@@ -1,0 +1,203 @@
+ <div class="col-sm-12 col-md-12">
+    <div class="row">
+     	<div class="col-sm-12 col-md-12">
+			<form class="form-custom clearfix">
+	        <div class="col-sm-2 col-md-2">
+	            <input class="form-control" type="text" placeholder="产品编号" ng-model="params.querykeyword"/>       
+	        </div>   
+	        <div class="col-sm-4 col-md-4">                 
+	            <button class="btn btn-custom" type="submit" ng-click="refresh('first',true)">查询</button>            
+	            <button class="btn btn-custom" type="button" data-toggle="modal" data-target="#addandedit" upload-refresh="true" ng-click="clearForm()">新增</button> 
+	        </div>
+            </form>
+        </div> 
+    </div>
+    <table class="table table-striped table-bordered table-condensed index-center table-costom">
+        <thead>
+        <tr>
+            <th width="40">序号</th>
+            <th width="100">发标编号</th>
+            <th width="80">产品编号</th>
+            <th>起始日期</th>
+            <th>结束日期</th>
+            <th>已募资金</th>
+            <th>总金额</th>
+            <th>状态</th>
+            <th>操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="rowlink" ng-repeat="item in limitArr">
+            <td>{{current*limit+$index+1}}</td>
+            <td>{{item.bidSN}}</td>
+            <td>{{item.productSN}}</td>
+            <td>{{item.startDate|date:'yyyy-MM-dd'}}</td>
+            <td>{{item.endDate|date:'yyyy-MM-dd'}}</td>
+            <td>{{item.currentAmount}}</td>
+            <td>{{item.totalAmount}}</td>
+            <td ng-if="item.status==0">未开标</td><td ng-if="item.status==1">抢购中</td><td ng-if="item.status==2">收益中</td><td ng-if="item.status==3">到期结清</td>
+            <td>
+                <a href="javascript:" data-toggle="modal" data-target="#" upload-refresh="true" ng-click="edit(item)">修改</a> 
+                <a href="javascript:" data-toggle="modal" data-target="" ng-click="todelete(item)">删除</a>
+                <a ng-if="item.status==1" href="javascript:" data-toggle="modal" data-target="#next" ng-click="investment(item.bidSN)">理财</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <div data-remote-paging="pager" data-refresh="refresh" data-current="current" data-total="total" data-data="limitArr" data-limit="limit" data-params="params"></div>
+</div>
+
+<!-- 删除对话框 -->
+<div class="modal fade" id="removeDialog" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">删除</h4>
+            </div>
+            <div class="modal-body">
+                                                     确认要删除么？
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" ng-click="comfirmDelete()" data-dismiss="modal">确认删除</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<!-- 增加修改  -->
+<div class="modal fade" id="addandedit" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" style="width: 800px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">新增/修改</h4>
+            </div>            
+            <form name="shareFm" class="form-horizontal" ng-submit="create(keye)" novalidate="novalidate">    
+	            <div class="modal-body">
+	                <div class="row">
+	                  <div class="col-sm-12 col-md-12">
+                         <div class="form-group">
+			                <label class="col-lg-2 control-label">选择产品</label>
+			                <div class="col-lg-9">
+			                    <select class="form-control" ng-model="product" required select2 data-live-search="true"
+			                     ng-options="item.productName for item in products track by item.productSN"
+			                     ng-change="createSN(product);">
+									<option value=""></option>
+			                    </select>
+			                </div>
+			                <span class="mustItem">*</span>
+                        </div> 
+                        <div class="form-group">
+			                <label class="col-lg-2 control-label">发标编号</label>
+			                <div class="col-lg-3">
+			                    <input type="text" class="form-control" required ng-model="keye.bidSN" ng-maxlength="50" ng-trim maxlength="50" id="id_bidsn" />
+			                </div>
+                            <span class="mustItem">*</span>
+			                <label class="col-lg-2 control-label">总额度</label>
+			                <div class="col-lg-3">
+			                    <input type="number" class="form-control" required ng-model="keye.totalAmount" ng-maxlength="50" ng-trim maxlength="50" />
+                            </div>
+                            <span class="mustItem">*</span>
+                        </div>
+                        <div class="form-group">
+			                <label class="col-lg-2 control-label">起始日期</label>
+			                <div class="col-lg-3">
+                                <div data-datetimepicker="keye.startDate" ng-model="keye.startDate" required></div>
+                            </div>
+                            <span class="mustItem">*</span>
+			                <label class="col-lg-2 control-label">结束日期</label>
+			                <div class="col-lg-3">
+                                <div data-datetimepicker="keye.endDate" ng-model="keye.endDate" required></div>
+                            </div>
+                            <span class="mustItem">*</span>
+                        </div>
+	                  </div>
+	                </div>
+	            </div>
+	            <div class="modal-footer">
+	              <button type="reset" class="btn btn-default">重置</button>
+	              <button type="submit" class="btn btn-primary" ng-disabled="shareFm.$invalid">保存</button>
+	              <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+	            </div>
+            </form>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<!-- 输入移动用户id -->
+<div class="modal fade" id="next" tabindex="-1" role="dialog" aria-hidden="true">
+<form class="form-horizontal" name="redpacketForm" novalidate="novalidate" ng-submit="next(muid)" >
+    <div class="modal-dialog" style="width: 800px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">输入移动用户id</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-12 col-md-12">
+                        <div class="form-group">
+			                <div class="col-lg-9">
+			                    <input type="text" class="form-control" required ng-model="muid" ng-maxlength="50" ng-trim maxlength="50"/>
+			                </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-primary" ng-disabled="redpacketForm.$invalid">下一步</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    </form>
+    <!-- /.modal-dialog -->
+</div>
+
+<!-- 理财 -->
+<div class="modal fade" id="investment" tabindex="-1" role="dialog" aria-hidden="true">
+<form class="form-horizontal" name="investmentForm" novalidate="novalidate" ng-submit="saveInvestment(key)" >
+    <div class="modal-dialog" style="width: 800px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">理财 </h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-12 col-md-12">
+                        <div class="form-group">
+	                        <label class="col-lg-2 control-label">选择红包</label>
+			                <div class="col-lg-9">
+			                    <select class="form-control" ng-model="key.redpacket" select2 data-live-search="true"
+			                     ng-options="item.redpacketAmount for item in redpackets track by item.redpacketId">
+									<option value=""></option>
+			                    </select>
+			                </div>
+                        </div> 
+                        <div class="form-group">
+			                <label class="col-lg-2 control-label">理财金额</label>
+			                <div class="col-lg-9">
+			                    <input type="text" class="form-control" ng-model="key.investmentAmount" ng-maxlength="50" ng-trim maxlength="50" />
+			                </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-primary" ng-disabled="investmentForm.$invalid">保存</button>
+                <button type="button" class="btn btn-danger" ng-click="clearForm()">重置</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    </form>
+    <!-- /.modal-dialog -->
+</div>

@@ -1,0 +1,64 @@
+@charset "utf-8";
+/* CSS Document */
+
+/*ask detail*/
+#wrap { background: #efefef }
+.main-help { padding-bottom:30px;color: #333}
+.ask-help dt { height: 45px; line-height: 45px; padding-left: 20px; font-size: 14px; background: #fff; border-top: 1px solid #c8c7cc; position: relative}
+.ask-help dt i { position: absolute; top: 50% }
+.ask-help dt.current{ border-bottom:1px solid #c8c7cc}
+.ask-help dt .arrows-right { border-left-color: #f28430; left:8px; margin-top: -5px }
+.ask-help dt .arrows-down { border-top-color: #f28430; left: 5px; margin-top: -4px }
+.ask-help dd {font-size: 14px;line-height: 1.6; padding: 10px 20px; display:none}
+.ask-help:first-child dt{ border-top:0}
+.ask-help:last-child dt{ border-bottom:1px solid #c8c7cc}
+.help-table{ width:100%; border:1px solid #ccc; border-bottom:0; border-left:0}
+.help-table td{ height:30px; border-bottom:1px solid #ccc; border-left:1px solid #ccc; padding:10px}
+
+/*help center index*/
+.help-center{ padding-bottom:30px}
+.help-box{ padding-top:20px; overflow:hidden; zoom:1}
+.help-box h2{ font-size:15px; padding-left:15px; height:35px; line-height:35px; color:#6d6d72; font-weight:normal}
+.help-box .icon-help{width:30px; height:30px; background:url(../img/help.png) 0 0 no-repeat; background-size:50px 360px; position:absolute; left:-40px; top:50%; margin-top:-15px}
+
+.hot-question .items{height:40px; line-height:40px; font-size:16px; background:#fff; border-top:1px solid #c8c7cc; display:-moz-box;display:-webkit-box;display:box; position:relative}
+.hot-question .items:last-child{ border-bottom:1px solid #c8c7cc}
+.hot-question .circle{ width:10px; height:10px; border-radius:25px; background:#fff; display:block; position:absolute; left:50%; margin-left:-5px; bottom:-5px; z-index:999}
+.hot-question h3{-moz-box-flex:1;-webkit-box-flex:1;box-flex:1; width: 0%; border-right:1px solid #c8c7cc}
+.hot-question h3 a{ display:block; padding-left:15px; color:#181818; font-weight:normal}
+.hot-question h3:last-child{ border-right:0} 
+
+.financing,.commonfaq{ border:1px solid #c8c7cc; font-size:16px; color:#181818; border-left:0; margin-bottom:0; border-right:0}
+.financing .items,.commonfaq .items{ padding-left:55px}
+.financing .items a,.commonfaq .items a{ display:block; color:#181818}
+.financing li,.commonfaq li{ border-top:1px solid #c8c7cc; overflow:visible}
+.financing .huoqi{ background-position:0 -330px }
+.financing .loan{ background-position:0 0 }
+.financing .plans{ background-position:0 -30px }
+.financing .planv{ background-position:0 -60px }
+.commonfaq .safety{ background-position:0 -90px}
+.commonfaq .verify{ background-position:0 -120px }
+.commonfaq .invest{ background-position:0 -150px }
+.commonfaq .money{ background-position:0 -180px }
+.commonfaq .password{ background-position:0 -210px }
+.commonfaq .exchange{ background-position:0 -240px }
+.commonfaq .balance{ background-position:0 -300px }
+.commonfaq .licaijin{ background-position:0 -330px }
+.service{ height:43px; padding-left:55px; padding-top:12px; background:#fff; border:1px solid #c8c7cc; border-left:0; border-right:0; position:relative}
+.service .exchange{ background-position:0 -270px; left:15px}
+.service a,.service:visited{ display:block;font-size:16px; color:#181818}
+.service em{ display:block; font-size:12px; color:#bbc0c4}
+
+.desc-table{border-left:1px solid #E3E7E8; border-top:1px solid #E3E7E8; width:100%; margin-bottom:15px; background:#fff}
+.desc-table td,.desc-table th{ width:30%; font-size:12px; border-right:1px solid #E3E7E8; border-bottom:1px solid #E3E7E8; padding:5px 3px; height:30px; vertical-align:middle; text-align:left}
+.desc-table th{background:#BFBFBF}
+
+
+
+
+
+
+
+
+
+

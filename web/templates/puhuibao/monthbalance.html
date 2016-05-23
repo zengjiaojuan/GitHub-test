@@ -1,0 +1,34 @@
+<div class="col-sm-12 col-md-12">
+<div style="color:red">充值+投资收益-贷款月息或本金=月末用户总资产-上月月末用户总资产+提现</div>
+    <table class="table table-striped table-bordered table-condensed index-center table-costom">
+        <thead>
+        <tr>
+            <th>序号</th>
+            <th>年月</th>
+            <th>本月公司账户收入(充值)</th>
+            <th>本月投资收益</th>
+            <th>本月授信贷款月息或本金</th>
+            <th>月末用户总资产</th>
+            <th>上月月末用户总资产</th>
+            <th>本月公司账户支出(提现)</th>
+            <th>账务状态</th>
+            <th>公司账户余额</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="rowlink" ng-repeat="item in limitArr">
+            <td>{{current*limit+$index+1}}</td>
+            <td>{{item.yyyymm}}</td>
+            <td>{{formatNumber(item.payAmount)}}</td>
+            <td>{{formatNumber(item.investmentIncome)}}</td>
+            <td>{{formatNumber(item.loanInterest)}}</td>
+            <td>{{formatNumber(item.totalAsset)}}</td>
+            <td>{{formatNumber(item.totalAssetLast)}}</td>
+            <td>{{formatNumber(item.withdrawAmount)}}</td>
+            <td>{{item.status}}</td>
+            <td>{{formatNumber(item.balance)}}</td>
+        </tr>
+        </tbody>
+    </table>
+    <div data-remote-paging="pager" data-refresh="refresh" data-current="current" data-total="total" data-data="limitArr" data-limit="limit" data-params="params"></div>
+</div>
