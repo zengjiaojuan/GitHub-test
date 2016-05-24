@@ -5,4 +5,5 @@
 *.war
 *.ear
 *.DS_store
-build
+build/
+bin/
