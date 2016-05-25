@@ -91,7 +91,7 @@ public class MobileUserServiceImpl extends DefaultBaseService<MobileUser, String
 		UserMessage message =  new UserMessage();
 		message.setmUserId(entity.getmUserId());
 		message.setTitle("系统消息");
-		message.setContent("金朗理财欢迎您，您于" + new SimpleDateFormat("yyyy年MM月dd日").format(new Date()) + "开启了金朗理财之旅！");
+		message.setContent("启奏陛下，您于" + new SimpleDateFormat("yyyy年MM月dd日").format(new Date()) + "开启了金朗理财之旅！");
 		userMessageDao.save(message);
 
 		return entity;
@@ -249,7 +249,7 @@ public class MobileUserServiceImpl extends DefaultBaseService<MobileUser, String
 				params = new HashMap<String, Object>();
 				params.put("productSN", productSN);
 				AssetProduct product = assetProductDao.unique(params);
-				double rate = product.getAnnualizedRate();
+				double rate = product.getAnnualizedRate();// 年化利率
 				double amount = investment.getInvestmentAmount();
 				double everyIncome = Functions.calEveryIncome(amount, rate);
 				if (currentTime >= investment.getIncomeDate().getTime()) {
