@@ -1,8 +1,6 @@
 package com.phb.puhuibao.web.controller;
 
 import java.io.IOException;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -54,6 +52,7 @@ import com.phb.puhuibao.service.impl.MuserFollowServiceImpl;
 @Controller
 @RequestMapping(value = "/userInformation")
 public class MobileUserController extends BaseController<MobileUser, String> {
+	@Override
 	@Resource(name = "mobileUserService")
 	public void setBaseService(IBaseService<MobileUser, String> baseService) {
 		super.setBaseService(baseService);
@@ -97,7 +96,36 @@ public class MobileUserController extends BaseController<MobileUser, String> {
 	
 	
 	
-	
+	@RequestMapping(value="getUserProfile")
+	@ResponseBody
+	public Map<String, Object> getUserProfile(@RequestParam int muid) {
+		Map<String, Object> data = new HashMap<String, Object>();
+	 
+
+		Map<String,Object> params=new HashMap<String,Object>();
+		Map<String,Object> result=new HashMap<String,Object>();
+		params.put("muid", muid);
+		MobileUser muser = this.getBaseService().unique(params);
+		if (muser == null) {
+			data.put("message", "该用户不存在！");
+			data.put("status", 0);
+		}  else {
+			 
+			if(StringUtil.isEmpty(muser.getmUserName()) ){
+				result.put("name", muser.getmUserTel());
+			}else{
+				result.put("name", muser.getmUserName());
+			}
+			result.put("photo", muser.getPhoto());
+			result.put("mobile", muser.getmUserTel());
+			result.put("id", muser.getIdNumber());
+ 
+			data.put("result", result);
+			data.put("message", "成功");
+			data.put("status", 1);
+		}
+		return data;
+	}
 	
 	
 	
@@ -1695,23 +1723,7 @@ public class MobileUserController extends BaseController<MobileUser, String> {
 		return data;
 	}
 
-	/**
-	 * 读取余额
-	 * @param muid
-	 * @return
-	 */
-	@RequestMapping(value="getBalance")
-	@ResponseBody
-	public Map<String, Object> getBalance(@RequestParam String muid) {
-		MobileUser user = this.getBaseService().getById(muid);
-		BigDecimal balanceBD = new BigDecimal(user.getmUserMoney() - user.getFrozenMoney()).setScale(2, RoundingMode.HALF_UP);
-
-		Map<String, Object> data = new HashMap<String, Object>();
-		data.put("result", balanceBD + "");
-		data.put("message", "");
-		data.put("status", 1);
-		return data;
-	}
+ 
 	
 	 
 	

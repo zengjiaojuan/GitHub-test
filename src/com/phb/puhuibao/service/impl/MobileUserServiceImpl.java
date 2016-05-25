@@ -35,11 +35,13 @@ import com.phb.puhuibao.service.MobileUserService;
 @Transactional
 @Service("mobileUserService")
 public class MobileUserServiceImpl extends DefaultBaseService<MobileUser, String> implements MobileUserService {
+	@Override
 	@Resource(name = "mobileUserDao")
 	public void setBaseDao(IBaseDao<MobileUser, String> baseDao) {
 		super.setBaseDao(baseDao);
 	}
 
+	@Override
 	@Resource(name = "mobileUserDao")
 	public void setPagerDao(IPagerDao<MobileUser> pagerDao) {
 		super.setPagerDao(pagerDao);
@@ -68,6 +70,7 @@ public class MobileUserServiceImpl extends DefaultBaseService<MobileUser, String
 	@Resource(name = "userMessageDao")
 	private IBaseDao<UserMessage, String> userMessageDao;
 
+	@Override
 	public MobileUser save(MobileUser entity) {
 		entity.setCreateTime(new Date());
 		entity = this.getBaseDao().save(entity);
@@ -233,6 +236,7 @@ public class MobileUserServiceImpl extends DefaultBaseService<MobileUser, String
 //		result.put("totalIncome", totalIncomeBD.doubleValue());
 //		return result;
 //	}
+	@Override
 	public Map<String, Object> processFortune(String muid) {
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("mUserId", muid);
@@ -330,13 +334,19 @@ public class MobileUserServiceImpl extends DefaultBaseService<MobileUser, String
 
 		BigDecimal todayIncomeBD = new BigDecimal(todayIncome).setScale(2, RoundingMode.HALF_UP);
 		BigDecimal totalIncomeBD = new BigDecimal(totalIncome).setScale(2, RoundingMode.HALF_UP);
+		
+		MobileUser user =  this.getById(muid);
+		BigDecimal balanceBD = new BigDecimal(user.getmUserMoney() - user.getFrozenMoney()).setScale(2, RoundingMode.HALF_UP);
+		
 		Map<String, Object> result = new HashMap<String, Object>();
+		result.put("balance", balanceBD.toString());
 		result.put("todayIncome", todayIncomeBD.toString());
 		result.put("totalIncome", totalIncomeBD.toString());
 		result.put("investmentAmount", investmentAmount);
 		return result;
 	}
 
+	@Override
 	public Map<String, Object> processmyAsset(String muid) {
 		// 理财投资
 //		String sql = "select c.product_name,sum(a.investment_amount) investment_amount,a.status,a.m_user_id from phb_muser_investment a left join phb_product_bid b on a.bid_sn=b.bid_sn left join phb_asset_product c on b.product_sn=c.product_sn group by c.product_name having a.status<=1 and a.m_user_id=" + muid;
@@ -393,6 +403,7 @@ public class MobileUserServiceImpl extends DefaultBaseService<MobileUser, String
 	 * 后台开户
 	 * @param entity
 	 */
+	@Override
 	public void adminCreate(MobileUser entity) {
 		this.save(entity);
 		MobileUser user = new MobileUser();
