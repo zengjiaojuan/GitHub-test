@@ -601,6 +601,33 @@ public class MobileUserController extends BaseController<MobileUser, String> {
 		data.put("status", 1);
 		return data;
 	}
+	
+	
+	@RequestMapping(value="saveUserPhoto")
+	@ResponseBody
+	public Map<String, Object> saveUserPhoto(
+			@RequestParam int muid, 
+			@RequestParam String fileId ) {
+		Map<String, Object> data = new HashMap<String, Object>();
+		MobileUser entity = new MobileUser();
+	 
+		entity.setmUserId(muid);
+		entity.setPhoto(fileId);
+		try {
+			this.getBaseService().update(entity);
+		} catch (Exception e) {
+			data.put("message", "出错！");
+			data.put("status", 0);			
+			return data;
+		}
+ 
+		data.put("message", "保存成功！");
+		data.put("status", 1);
+		return data;
+	}
+	
+	
+	
 	@RequestMapping(value="saveUserInformationForIOS")
 	@ResponseBody
 	public Map<String, Object> saveUserInformationForIOS(
