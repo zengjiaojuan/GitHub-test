@@ -20,6 +20,7 @@ import com.phb.puhuibao.entity.UserMessage;
 @Controller
 @RequestMapping(value = "/userMessage")
 public class UserMessageController extends BaseController<UserMessage, String> {
+	@Override
 	@Resource(name = "userMessageService")
 	public void setBaseService(IBaseService<UserMessage, String> baseService) {
 		super.setBaseService(baseService);
@@ -47,6 +48,26 @@ public class UserMessageController extends BaseController<UserMessage, String> {
 		data.put("status", 1);
 		return data;
 	}
+	
+	
+	
+	@RequestMapping(value="haveUnreadMsg")
+	@ResponseBody
+	public Map<String, Object> haveUnreadMsg( @RequestParam String muid) {
+		String sql="SELECT count(1) c from  phb_muser_message where  m_user_id = "+muid+" and is_read=0 ";
+		
+		Map<String, Object> data = new HashMap<String, Object>();
+		long msgcount=0;
+		List<Map<String, Object>> l = this.jdbcTemplate.queryForList(sql);
+		for(int i=0;i<l.size();i++){
+			msgcount += (long)l.get(i).get("c");
+		}
+		data.put("count", msgcount);
+		data.put("status", 1);
+		return data;
+	}
+	
+	
 
 	@RequestMapping(value="read")
 	@ResponseBody

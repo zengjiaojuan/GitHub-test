@@ -1,5 +1,6 @@
 package com.phb.puhuibao.web.controller;
 
+import java.io.File;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -23,8 +24,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import com.idap.clinic.entity.UploadFile;
+import com.idap.web.common.controller.Commons;
 import com.idp.pub.constants.Constants;
 import com.idp.pub.context.AppContext;
 import com.idp.pub.service.IBaseService;
@@ -33,16 +37,9 @@ import com.idp.pub.utils.RSAUtils;
 import com.idp.pub.web.controller.BaseController;
 import com.opensymphony.oscache.util.StringUtil;
 import com.phb.puhuibao.common.Functions;
-import com.phb.puhuibao.entity.ExperienceValue;
-import com.phb.puhuibao.entity.HexagramAbility;
-import com.phb.puhuibao.entity.HexagramCharm;
-import com.phb.puhuibao.entity.HexagramCredit;
-import com.phb.puhuibao.entity.HexagramFame;
-import com.phb.puhuibao.entity.HexagramFortune;
 import com.phb.puhuibao.entity.Invite;
 import com.phb.puhuibao.entity.MobileUser;
 import com.phb.puhuibao.entity.MobileUserExtra;
-import com.phb.puhuibao.entity.MobileUserHexagram;
 import com.phb.puhuibao.entity.MobileUserSignin;
 import com.phb.puhuibao.entity.MuserFollow;
 import com.phb.puhuibao.entity.UserCard;
@@ -70,31 +67,10 @@ public class MobileUserController extends BaseController<MobileUser, String> {
 	@Resource(name = "muserFollowService")
 	private MuserFollowServiceImpl muserFollowService;
 	
- 
+  
 	
-	@Resource(name = "hexagramAbilityService")
-	private IBaseService<HexagramAbility, String> hexagramAbilityService;
-	
-	@Resource(name = "hexagramCharmService")
-	private IBaseService<HexagramCharm, String> hexagramCharmService;
-	
-	@Resource(name = "hexagramCreditService")
-	private IBaseService<HexagramCredit, String> hexagramCreditService;
-	
-	@Resource(name = "hexagramFameService")
-	private IBaseService<HexagramFame, String> hexagramFameService;
-	
-	@Resource(name = "hexagramFortuneService")
-	private IBaseService<HexagramFortune, String> hexagramFortuneService;
-	
-	@Resource(name = "mobileUserHexagramService")
-	private IBaseService<MobileUserHexagram, String> mobileUserHexagramService;
-	
-	@Resource(name = "experienceValueService")
-	private IBaseService<ExperienceValue, String> experienceValueService;
-	
-	
-	
+	@Resource(name = "commons")
+	private Commons commons;
 	
 	@RequestMapping(value="getUserProfile")
 	@ResponseBody
@@ -374,36 +350,10 @@ public class MobileUserController extends BaseController<MobileUser, String> {
 			return data;
 		}
 		entity.setmUserPwd("");
+ 
 		
-		//此用户六芒星数据初始化
-		int newuserid = entity.getmUserId();
-		HexagramAbility ha = new HexagramAbility();
-		ha.setmUserId(newuserid);
-				
-		HexagramCharm hc = new HexagramCharm();
-		hc.setmUserId(newuserid);		
-		HexagramCredit hc1 = new HexagramCredit();
-		hc1.setmUserId(newuserid);		
-		HexagramFame hf = new HexagramFame();
-		hf.setmUserId(newuserid);		
-		HexagramFortune hf1= new 	HexagramFortune();
-		hf1.setmUserId(newuserid);		
-		MobileUserHexagram mh = new MobileUserHexagram();
-		mh.setmUserId(newuserid);
-		
-	    hexagramAbilityService.save(ha);	
-	    hexagramCharmService.save(hc);	
-	    hexagramCreditService.save(hc1);	
-	    hexagramFameService.save(hf);	
-	    hexagramFortuneService.save(hf1);	
-	    mobileUserHexagramService.save(mh);
-		
-	    //新用户注册 加入经验
-		ExperienceValue ev = new ExperienceValue();
-		ev.setExperienceType("usersignin");
-		ev.setExperienceValue(5.0);
-		ev.setmUserId(newuserid);
-		experienceValueService.save(ev);//新插入一条经验记录
+	    
+	 
 		
 		
 		data.put("result", entity);
@@ -472,34 +422,8 @@ public class MobileUserController extends BaseController<MobileUser, String> {
 		}
 		entity.setmUserPwd("");
 		
-		//此用户六芒星数据初始化
-		int newuserid = entity.getmUserId();
-		HexagramAbility ha = new HexagramAbility();
-		ha.setmUserId(newuserid);
-		HexagramCharm hc = new HexagramCharm();
-		hc.setmUserId(newuserid);		
-		HexagramCredit hc1 = new HexagramCredit();
-		hc1.setmUserId(newuserid);		
-		HexagramFame hf = new HexagramFame();
-		hf.setmUserId(newuserid);		
-		HexagramFortune hf1= new 	HexagramFortune();
-		hf1.setmUserId(newuserid);		
-		MobileUserHexagram mh = new MobileUserHexagram();
-		mh.setmUserId(newuserid);
-		
-	    hexagramAbilityService.save(ha);	
-	    hexagramCharmService.save(hc);	
-	    hexagramCreditService.save(hc1);	
-	    hexagramFameService.save(hf);	
-	    hexagramFortuneService.save(hf1);	
-	    mobileUserHexagramService.save(mh);
-		
-	    //新用户注册 加入经验
-		ExperienceValue ev = new ExperienceValue();
-		ev.setExperienceType("usersignin");
-		ev.setExperienceValue(5.0);
-		ev.setmUserId(newuserid);
-		experienceValueService.save(ev);//新插入一条经验记录
+ 
+	 
  
 		data.put("result", entity);
 		data.put("message", "注册成功！");
@@ -623,6 +547,53 @@ public class MobileUserController extends BaseController<MobileUser, String> {
  
 		data.put("message", "保存成功！");
 		data.put("status", 1);
+		return data;
+	}
+	
+	/**
+	 * 上传图片
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping(params = "method=uploadPicture", method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String, Object> uploadPicture(HttpServletRequest request) {
+		MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
+		Map<String, MultipartFile> fileMap = multipartRequest.getFileMap();
+		MultipartFile multipartFile = null;
+		for (Map.Entry<String, MultipartFile> set : fileMap.entrySet()) {
+			multipartFile = set.getValue();// 文件名
+		}
+		String orgname = multipartFile.getOriginalFilename();// 获取原始文件名
+		String fileType = orgname.substring(orgname.lastIndexOf(".") + 1, orgname.length());
+		String fileName = System.currentTimeMillis() + "." + fileType;
+		String filePath = commons.getFileUploadPath() + "/" + fileName;
+		String mkpath = commons.getFileUploadPath();
+		File file = new File(filePath);
+		Map<String, Object> data = new HashMap<String, Object>();
+		try {
+			File mkdir = new File(mkpath);
+			if (!mkdir.exists()) {
+				mkdir.mkdirs();
+			}
+			if (!file.exists()) {
+				file.createNewFile();
+			}
+			multipartFile.transferTo(file);
+			
+			UploadFile uploadFile = new UploadFile();
+			uploadFile.setFileName(fileName);
+			uploadFile.setFileType(fileType);
+			uploadFile.setFilePath(filePath);
+			uploadFile.setOrgFileName(orgname);
+			uploadFile = uploadFileService.save(uploadFile);
+			data.put("result", uploadFile.getId());
+			data.put("message", "");
+			data.put("status", 1);
+		} catch (Exception e) {
+			data.put("message", "图片上传失败！");
+			data.put("status", 0);
+		}
 		return data;
 	}
 	
