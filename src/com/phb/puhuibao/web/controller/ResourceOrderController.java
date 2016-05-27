@@ -27,6 +27,7 @@ import com.phb.puhuibao.service.ResourceOrderService;
 @Controller
 @RequestMapping(value = "/resourceOrder")
 public class ResourceOrderController extends BaseController<ResourceOrder, String> {
+	@Override
 	@javax.annotation.Resource(name = "resourceOrderService")
 	public void setBaseService(IBaseService<ResourceOrder, String> baseService) {
 		super.setBaseService(baseService);
@@ -728,61 +729,10 @@ public class ResourceOrderController extends BaseController<ResourceOrder, Strin
 	}
 	
 	//给办事儿人收货支付
-	public void giveThemMoney (Resource resource, ResourceOrder order) { // 需求人给别人收货付款  order状态为2
-		MobileUser u = mobileUserDao.get(resource.getmUserId() + "");
-		MobileUser user = new MobileUser();
-		user.setmUserId(u.getmUserId());
-		user.setmUserMoney(u.getmUserMoney() - resource.getPrice());
-		mobileUserDao.update(user);
-		
-		ResourceOrder entity = new ResourceOrder();
-		entity.setOrderId(order.getOrderId());
-		entity.setStatus(2);
-		update(entity);
-
-		UserAccountLog log = new UserAccountLog();
-		log.setmUserId(resource.getmUserId());
-		log.setAmount(resource.getPrice());
-		log.setBalanceAmount(user.getmUserMoney() - u.getFrozenMoney());
-		log.setChangeType("下单支付");
-		log.setChangeDesc("资源id: " + resource.getResourceId());
-		log.setAccountType(31);
-		userAccountLogDao.save(log);
-	}
+	public void giveThemMoney (Resource resource, ResourceOrder order) { }
 	
 	// 收货后支付给任务提供者
-	public void giveTheResourceOwnerMoney ( String orderid) { // 技能购买人给技能付出人付款  order状态为2
-		
-		ResourceOrder order = this.getBaseService().getById(orderid);
-		Resource resource = resourceService.getById(order.getResourceId() + "");
-		
-		MobileUser u = null;
-		u = mobileUserDao.get(order.getmUserId()+"");
-		MobileUser payer = new MobileUser();
-		payer.setmUserId(u.getmUserId());
-		payer.setmUserMoney(u.getmUserMoney() - resource.getPrice()); //订单拥有者,付款人账户钱减少
-		mobileUserDao.update(payer);
-		
-		u = mobileUserDao.get(resource.getmUserId() + "");
-		MobileUser getter = new MobileUser();
-		getter.setmUserId(u.getmUserId());
-		getter.setmUserMoney(u.getmUserMoney() + resource.getPrice());//任务拥有者,得款人账户钱增加
-		mobileUserDao.update(getter);
-		
-		ResourceOrder entity = new ResourceOrder();
-		entity.setOrderId(order.getOrderId());
-		entity.setStatus(2); //确认收货,订单状态改成2
-		update(entity);
-
-		UserAccountLog log = new UserAccountLog();
-		log.setmUserId(resource.getmUserId());
-		log.setAmount(resource.getPrice());
-		log.setBalanceAmount(payer.getmUserMoney() - u.getFrozenMoney());
-		log.setChangeType("收货支付");
-		log.setChangeDesc("资源id: " + resource.getResourceId());
-		log.setAccountType(31);
-		userAccountLogDao.save(log);
-	}
+	public void giveTheResourceOwnerMoney ( String orderid) { }
 	
 	/**
 	 * 给多人付款或者给任务拥有者付款界面-- 获取这些人的信息  或者  获取任务(单人)拥有者付款

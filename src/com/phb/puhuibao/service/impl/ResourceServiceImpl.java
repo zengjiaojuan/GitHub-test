@@ -14,11 +14,13 @@ import com.phb.puhuibao.service.ResourceService;
 @Transactional
 @Service("resourceService")
 public class ResourceServiceImpl extends DefaultBaseService<Resource, String> implements ResourceService {
+	@Override
 	@javax.annotation.Resource(name = "resourceDao")
 	public void setBaseDao(IBaseDao<Resource, String> baseDao) {
 		super.setBaseDao(baseDao);
 	}
 
+	@Override
 	@javax.annotation.Resource(name = "resourceDao")
 	public void setPagerDao(IPagerDao<Resource> pagerDao) {
 		super.setPagerDao(pagerDao);
@@ -31,26 +33,5 @@ public class ResourceServiceImpl extends DefaultBaseService<Resource, String> im
 	private IBaseDao<UserAccountLog, String> userAccountLogDao;
 
 	@Override
-	public void pay(Resource resource) {
-		double amount = resource.getPrice() * resource.getNumber();
-		MobileUser u = mobileUserDao.get(resource.getmUserId() + "");
-		MobileUser user = new MobileUser();
-		user.setmUserId(u.getmUserId());
-		user.setmUserMoney(u.getmUserMoney() - amount);
-		mobileUserDao.update(user);
-		
-		Resource entity = new Resource();
-		entity.setResourceId(resource.getResourceId());
-		entity.setStatus(1);
-		update(entity);
-
-		UserAccountLog log = new UserAccountLog();
-		log.setmUserId(resource.getmUserId());
-		log.setAmount(-amount);
-		log.setBalanceAmount(user.getmUserMoney() - u.getFrozenMoney());
-		log.setChangeType("需求资源支付");
-		log.setChangeDesc("资源id: " + resource.getResourceId());
-		log.setAccountType(31);
-		userAccountLogDao.save(log);
-	}
+	public void pay(Resource resource) { }
 }

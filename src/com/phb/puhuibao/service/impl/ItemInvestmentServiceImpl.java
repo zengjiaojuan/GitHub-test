@@ -15,11 +15,11 @@ import com.idp.pub.dao.IBaseDao;
 import com.idp.pub.dao.IPagerDao;
 import com.idp.pub.service.impl.DefaultBaseService;
 import com.phb.puhuibao.common.Functions;
+import com.phb.puhuibao.entity.ItemInvestment;
 import com.phb.puhuibao.entity.LoanItem;
 import com.phb.puhuibao.entity.MobileUser;
 import com.phb.puhuibao.entity.MobileUserExtra;
 import com.phb.puhuibao.entity.UserAccountLog;
-import com.phb.puhuibao.entity.ItemInvestment;
 import com.phb.puhuibao.entity.UserInvestment;
 import com.phb.puhuibao.entity.UserLoan;
 import com.phb.puhuibao.entity.UserMessage;
@@ -29,11 +29,13 @@ import com.phb.puhuibao.service.ItemInvestmentService;
 @Transactional
 @Service("itemInvestmentService")
 public class ItemInvestmentServiceImpl extends DefaultBaseService<ItemInvestment, String> implements ItemInvestmentService {
+	@Override
 	@Resource(name = "itemInvestmentDao")
 	public void setBaseDao(IBaseDao<ItemInvestment, String> baseDao) {
 		super.setBaseDao(baseDao);
 	}
 
+	@Override
 	@Resource(name = "itemInvestmentDao")
 	public void setPagerDao(IPagerDao<ItemInvestment> pagerDao) {
 		super.setPagerDao(pagerDao);
@@ -60,6 +62,7 @@ public class ItemInvestmentServiceImpl extends DefaultBaseService<ItemInvestment
 	@Resource(name = "appContext")
 	private AppContext appContext;
 
+	@Override
 	public void processSave(ItemInvestment entity, String redpacketId) {
 		double deductionAmount = 0;
 		
@@ -103,7 +106,7 @@ public class ItemInvestmentServiceImpl extends DefaultBaseService<ItemInvestment
 		log.setBalanceAmount(user.getmUserMoney() - u.getFrozenMoney() - deductionAmount);
 		log.setChangeType("投资");
 		log.setChangeDesc("投资id: " + entity.getInvestmentId());
-		log.setAccountType(0);
+		log.setAccountType(4);
 		userAccountLogDao.save(log);
 
 		if (deductionAmount > 0) {
@@ -118,7 +121,7 @@ public class ItemInvestmentServiceImpl extends DefaultBaseService<ItemInvestment
 			log.setBalanceAmount(user.getmUserMoney() - u.getFrozenMoney());
 			log.setChangeType("红包抵资");
 			log.setChangeDesc("投资id: " + entity.getInvestmentId());
-			log.setAccountType(1);
+			log.setAccountType(5);
 			userAccountLogDao.save(log);
 		}
 		
@@ -131,6 +134,7 @@ public class ItemInvestmentServiceImpl extends DefaultBaseService<ItemInvestment
 		Functions.ProcessUserLevel(u, appContext, this.getBaseDao(), userInvestmentDao, userLoanDao, loanItemDao, mobileUserDao);
 	}
 
+	@Override
 	public ItemInvestment update(ItemInvestment entity) {
 		String sql = "select 1 from phb_mobile_user where m_user_id=" + entity.getmUserId() + " for update";
 		this.jdbcTemplate.execute(sql);
@@ -146,7 +150,7 @@ public class ItemInvestmentServiceImpl extends DefaultBaseService<ItemInvestment
 		log.setBalanceAmount(user.getmUserMoney() - u.getFrozenMoney());
 		log.setChangeType("投资收益");
 		log.setChangeDesc("投资id: " + entity.getInvestmentId());
-		log.setAccountType(1);
+		log.setAccountType(6);
 		userAccountLogDao.save(log);
 
 		log = new UserAccountLog();
@@ -155,7 +159,7 @@ public class ItemInvestmentServiceImpl extends DefaultBaseService<ItemInvestment
 		log.setBalanceAmount(user.getmUserMoney() - u.getFrozenMoney() - entity.getLastIncome());
 		log.setChangeType("投资赎回");
 		log.setChangeDesc("投资id: " + entity.getInvestmentId());
-		log.setAccountType(0);
+		log.setAccountType(7);
 		userAccountLogDao.save(log);
 		
 		entity.setmUserId(null);

@@ -1,6 +1,7 @@
 package com.phb.puhuibao.web.controller;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
@@ -18,6 +19,7 @@ import com.phb.puhuibao.entity.UserAccountLog;
 @Controller
 @RequestMapping(value = "/userAccountLog")
 public class UserAccountLogController extends BaseController<UserAccountLog, String> {
+	@Override
 	@Resource(name = "userAccountLogService")
 	public void setBaseService(IBaseService<UserAccountLog, String> baseService) {
 		super.setBaseService(baseService);
@@ -29,19 +31,32 @@ public class UserAccountLogController extends BaseController<UserAccountLog, Str
 	 * @param muid
 	 * @return
 	 */
-	@RequestMapping(value="query")
+	@RequestMapping(value="pageQuery")
 	@ResponseBody
-	public Map<String, Object> query(@RequestParam int pageno, @RequestParam String muid) {
+	public Map<String, Object> pageQuery(@RequestParam int pageno, @RequestParam String muid) {
 		Pager<UserAccountLog> pager = new Pager<UserAccountLog>();
 		pager.setReload(true);
 		pager.setCurrent(pageno);
-		pager.setLimit(10);
+		pager.setLimit(30);
 		Map<String,Object> map=new HashMap<String,Object>();
 		map.put("mUserId", muid);
 		map.put("orderBy", "create_time");
 		map.put("order", "desc");
 		Pager<UserAccountLog> p=this.getBaseService().findByPager(pager, map);
 		Map<String, Object> data = new HashMap<String, Object>();
+		
+		List<UserAccountLog> result = p.getData();
+		for(UserAccountLog log:result){
+			if(log.getAccountType() == 1 || log.getAccountType() == 2 || log.getAccountType() ==  3 || log.getAccountType() == 6 || log.getAccountType() == 9 || log.getAccountType() == 14){
+				log.setFlagAmount("+"+log.getAmount());
+			}else if(log.getAccountType() == 0 || log.getAccountType() == 4 || log.getAccountType() == 10 || log.getAccountType() == 11 || log.getAccountType() == 12 || log.getAccountType() == 13 || log.getAccountType() == 15 || log.getAccountType() == 8){
+				log.setFlagAmount("-"+log.getAmount());
+			}else if(log.getAccountType() ==  5 || log.getAccountType() == 7){
+				log.setFlagAmount(""+log.getAmount());
+			}
+		}
+		
+		
 		data.put("result", p.getData());
 		data.put("count", p.getTotal());
 		data.put("message", "");

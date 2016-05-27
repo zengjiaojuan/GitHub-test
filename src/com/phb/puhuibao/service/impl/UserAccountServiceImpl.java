@@ -26,11 +26,13 @@ public class UserAccountServiceImpl extends DefaultBaseService<UserAccount, Stri
 	@javax.annotation.Resource(name = "appContext")
 	private AppContext appContext;
 
+	@Override
 	@javax.annotation.Resource(name = "userAccountDao")
 	public void setBaseDao(IBaseDao<UserAccount, String> baseDao) {
 		super.setBaseDao(baseDao);
 	}
 
+	@Override
 	@javax.annotation.Resource(name = "userAccountDao")
 	public void setPagerDao(IPagerDao<UserAccount> pagerDao) {
 		super.setPagerDao(pagerDao);
@@ -48,6 +50,7 @@ public class UserAccountServiceImpl extends DefaultBaseService<UserAccount, Stri
 	@javax.annotation.Resource(name = "resourceOrderDao")
 	private IBaseDao<ResourceOrder, String> resourceOrderDao;
 
+	@Override
 	public UserAccount save(UserAccount entity) {
 		entity.setCreateTime(new Date());
 		return this.getBaseDao().save(entity);
@@ -55,6 +58,7 @@ public class UserAccountServiceImpl extends DefaultBaseService<UserAccount, Stri
 
 	@javax.annotation.Resource(name = "mobileUserDao")
 	IBaseDao<MobileUser, String> mobileUserDao;
+	@Override
 	public void confirm(UserAccount entity) {
 		if (entity.getIsPaid() == 1) {
 			String sql = "select 1 from phb_mobile_user where m_user_id=" + entity.getmUserId() + " for update";
@@ -71,6 +75,7 @@ public class UserAccountServiceImpl extends DefaultBaseService<UserAccount, Stri
 				log.setBalanceAmount(user.getmUserMoney() - u.getFrozenMoney());
 				log.setAmount(entity.getAmount());
 				log.setChangeType("充值完成");
+				log.setAccountType(1);
 			} else {
 //				Map<String, Object> params = new HashMap<String, Object>();
 //				params.put("mUserId", entity.getmUserId());
@@ -92,9 +97,10 @@ public class UserAccountServiceImpl extends DefaultBaseService<UserAccount, Stri
 				log.setBalanceAmount(user.getmUserMoney() - user.getFrozenMoney());
 				log.setAmount(- entity.getAmount());
 				log.setChangeType("提现完成");
+				log.setAccountType(0);
 			}
 			log.setChangeDesc(entity.getUserNote());
-			log.setAccountType(0);
+			
 
 			UserAccount userAccount = new UserAccount();
 			userAccount.setAccountId(entity.getAccountId());
@@ -107,6 +113,7 @@ public class UserAccountServiceImpl extends DefaultBaseService<UserAccount, Stri
 		this.update(entity);
 	}
 
+	@Override
 	public UserAccount processSave(UserAccount entity) {
 		if (entity.getProcessType() == 1) {
 			String sql = "select 1 from phb_mobile_user where m_user_id=" + entity.getmUserId() + " for update";
@@ -133,7 +140,7 @@ public class UserAccountServiceImpl extends DefaultBaseService<UserAccount, Stri
 			log.setBalanceAmount(u.getmUserMoney() - user.getFrozenMoney());
 			log.setChangeType("提现冻结");
 			log.setChangeDesc(entity.getUserNote());
-			log.setAccountType(0);
+			log.setAccountType(8);
 			userAccountLogDao.save(log);
 		}
 		
@@ -165,6 +172,7 @@ public class UserAccountServiceImpl extends DefaultBaseService<UserAccount, Stri
 		return entity;
 	}
 
+	@Override
 	public int processDelete(int accountId) {
 		UserAccount entity = this.getBaseDao().get("" + accountId);
 		if (entity.getProcessType() == 1) {
@@ -183,7 +191,7 @@ public class UserAccountServiceImpl extends DefaultBaseService<UserAccount, Stri
 			log.setBalanceAmount(u.getmUserMoney() - user.getFrozenMoney());
 			log.setChangeType("提现取消");
 			log.setChangeDesc(entity.getUserNote());
-			log.setAccountType(0);
+			log.setAccountType(9);
 			userAccountLogDao.save(log);
 		}
 		Map<String, Object> params = new HashMap<String, Object>();
@@ -212,7 +220,7 @@ public class UserAccountServiceImpl extends DefaultBaseService<UserAccount, Stri
 		log.setBalanceAmount(u.getmUserMoney() - u.getFrozenMoney());
 		log.setChangeType("退款完成，等待银行入账");
 		log.setChangeDesc(entity.getUserNote());
-		log.setAccountType(0);
+		log.setAccountType(10);
 		userAccountLogDao.save(log);
 		
 		UserAccount account = new UserAccount();
@@ -224,6 +232,7 @@ public class UserAccountServiceImpl extends DefaultBaseService<UserAccount, Stri
 	/**
 	 * 申请
 	 */
+	@Override
 	public void adminCreate(UserAccount entity) {
 		String sql = "select 1 from phb_mobile_user where m_user_id=" + entity.getmUserId() + " for update";
 		this.jdbcTemplate.execute(sql);
@@ -239,14 +248,16 @@ public class UserAccountServiceImpl extends DefaultBaseService<UserAccount, Stri
 			log.setBalanceAmount(user.getmUserMoney() - u.getFrozenMoney());
 			log.setAmount(entity.getAmount());
 			log.setChangeType("充值完成");
+			log.setAccountType(1);
 		} else {
 			user.setmUserMoney(u.getmUserMoney() - entity.getAmount());
 			log.setBalanceAmount(user.getmUserMoney() - u.getFrozenMoney());
 			log.setAmount(- entity.getAmount());
 			log.setChangeType("提现完成");
+			log.setAccountType(0);
 		}
 		log.setChangeDesc(entity.getUserNote());
-		log.setAccountType(0);
+		
 
 		userAccountLogDao.save(log);
 		mobileUserDao.update(user);
@@ -259,6 +270,7 @@ public class UserAccountServiceImpl extends DefaultBaseService<UserAccount, Stri
 		this.update(account);
 	}
 
+	@Override
 	public void processSave(UserAccount entity, ResourceOrder order, int accountType) {
 		save(entity);
 		if (appContext.getPayOnline() == 1) {
@@ -270,41 +282,9 @@ public class UserAccountServiceImpl extends DefaultBaseService<UserAccount, Stri
 		resourceOrderDao.update(order);
 	}
 
-	private void confirmPay(UserAccount entity, int accountType, ResourceOrder order) {
-		MobileUser u = mobileUserDao.get("" + entity.getmUserId());
-		UserAccountLog log = new UserAccountLog();
-		log.setmUserId(entity.getmUserId());
-		log.setBalanceAmount(u.getmUserMoney() + entity.getAmount() - u.getFrozenMoney());
-		log.setAmount(entity.getAmount());
-		if (accountType == 32) {
-			log.setChangeType("支付宝支付");
-		} else if (accountType == 32) {
-			log.setChangeType("微信支付");
-		} else {
-			log.setChangeType("其他支付");
-		}
-		log.setChangeDesc(entity.getUserNote());
-		log.setAccountType(accountType);
+	private void confirmPay(UserAccount entity, int accountType, ResourceOrder order) { }
 
-		UserAccount userAccount = new UserAccount();
-		userAccount.setAccountId(entity.getAccountId());
-		userAccount.setIsPaid(1);
-		update(userAccount);
-		
-		userAccountLogDao.save(log);
-		
-		Resource resource = resourceDao.get(order.getResourceId() + "");
-		log = new UserAccountLog();
-		log.setmUserId(order.getmUserId());
-		log.setAmount(-resource.getPrice());
-		log.setBalanceAmount(u.getmUserMoney()- entity.getAmount() - u.getFrozenMoney());
-		log.setChangeType("下单支付");
-		log.setChangeDesc("资源id: " + resource.getResourceId());
-		log.setAccountType(31);
-		userAccountLogDao.save(log);
-		this.update(entity);
-	}
-
+	@Override
 	public void processSave(UserAccount entity, Resource resource, int accountType) {
 		save(entity);
 		if (appContext.getPayOnline() == 1) {
@@ -316,37 +296,5 @@ public class UserAccountServiceImpl extends DefaultBaseService<UserAccount, Stri
 		resourceDao.update(resource);
 	}
 
-	private void confirmPay(UserAccount entity, int accountType, Resource resource) {
-		MobileUser u = mobileUserDao.get("" + entity.getmUserId());
-		UserAccountLog log = new UserAccountLog();
-		log.setmUserId(entity.getmUserId());
-		log.setBalanceAmount(u.getmUserMoney() + entity.getAmount() - u.getFrozenMoney());
-		log.setAmount(entity.getAmount());
-		if (accountType == 32) {
-			log.setChangeType("支付宝支付");
-		} else if (accountType == 32) {
-			log.setChangeType("微信支付");
-		} else {
-			log.setChangeType("其他支付");
-		}
-		log.setChangeDesc(entity.getUserNote());
-		log.setAccountType(accountType);
-
-		UserAccount userAccount = new UserAccount();
-		userAccount.setAccountId(entity.getAccountId());
-		userAccount.setIsPaid(1);
-		update(userAccount);
-		
-		userAccountLogDao.save(log);
-		
-		log = new UserAccountLog();
-		log.setmUserId(resource.getmUserId());
-		log.setAmount(-entity.getAmount());
-		log.setBalanceAmount(u.getmUserMoney()- entity.getAmount() - u.getFrozenMoney());
-		log.setChangeType("需求资源支付");
-		log.setChangeDesc("资源id: " + resource.getResourceId());
-		log.setAccountType(31);
-		userAccountLogDao.save(log);
-		this.update(entity);
-	}
+	private void confirmPay(UserAccount entity, int accountType, Resource resource) { }
 }

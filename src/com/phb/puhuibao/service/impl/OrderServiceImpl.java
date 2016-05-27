@@ -20,11 +20,13 @@ import com.phb.puhuibao.service.OrderService;
 @Transactional
 @Service("orderService")
 public class OrderServiceImpl extends DefaultBaseService<Order, String> implements OrderService {
+	@Override
 	@Resource(name = "orderDao")
 	public void setBaseDao(IBaseDao<Order, String> baseDao) {
 		super.setBaseDao(baseDao);
 	}
 
+	@Override
 	@Resource(name = "orderDao")
 	public void setPagerDao(IPagerDao<Order> pagerDao) {
 		super.setPagerDao(pagerDao);
@@ -42,52 +44,13 @@ public class OrderServiceImpl extends DefaultBaseService<Order, String> implemen
 	@Resource(name = "jdbcTemplate")
 	private JdbcTemplate jdbcTemplate;
 
+	@Override
 	public Order save(Order entity) {
 		entity.setCreateTime(new Date());
 		return this.getBaseDao().save(entity);
 	}
 
-	public void processUpdate(Order order) {
-		Order entity = this.getBaseDao().get("" + order.getOrderId());
-		String sql = "select 1 from phb_mobile_user where m_user_id=" + entity.getmUserId() + " for update";
-		this.jdbcTemplate.execute(sql);
-		
-		double amount = entity.getMemberPrice() * entity.getNumber();
-		MobileUser u = mobileUserDao.get("" + entity.getmUserId());
-		MobileUser user = new MobileUser();
-		user.setmUserId(entity.getmUserId());
-		user.setmUserMoney(u.getmUserMoney() - amount);
-		//user.setFrozenMoney(u.getFrozenMoney());
-		mobileUserDao.update(user);
-
-		Appreciation appreciation = appreciationDao.get("" + entity.getAppreciationId());
-
-		UserAccountLog log = new UserAccountLog();
-		log.setmUserId(user.getmUserId());
-		log.setAmount(-amount);
-		log.setBalanceAmount(user.getmUserMoney() - u.getFrozenMoney());
-		log.setChangeType("消费支出");
-		log.setChangeDesc("增值服务：" + appreciation.getAppreciationName());
-		log.setAccountType(0);
-		userAccountLogDao.save(log);
-		
-		u = mobileUserDao.get("" + appreciation.getmUserId());
-		user = new MobileUser();
-		user.setmUserId(entity.getmUserId());
-		user.setmUserMoney(u.getmUserMoney() + amount - order.getBrokerage());
-		//user.setFrozenMoney(u.getFrozenMoney());
-		mobileUserDao.update(user);
-
-		log = new UserAccountLog();
-		log.setmUserId(user.getmUserId());
-		log.setAmount(amount - order.getBrokerage());
-		log.setBalanceAmount(user.getmUserMoney() - u.getFrozenMoney());
-		log.setChangeType("增值服务收入");
-		log.setChangeDesc("增值服务：" + appreciation.getAppreciationName());
-		log.setAccountType(0);
-		userAccountLogDao.save(log);
-
-		this.getBaseDao().update(order);
-	}
+	@Override
+	public void processUpdate(Order order) { }
 
 }

@@ -17,8 +17,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.SortedMap;
 import java.util.Map.Entry;
+import java.util.SortedMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -45,8 +45,6 @@ import com.phb.puhuibao.entity.AssetProduct;
 import com.phb.puhuibao.entity.ItemInvestment;
 import com.phb.puhuibao.entity.LoanItem;
 import com.phb.puhuibao.entity.MobileUser;
-import com.phb.puhuibao.entity.Resource;
-import com.phb.puhuibao.entity.ResourceOrder;
 import com.phb.puhuibao.entity.UserAccountLog;
 import com.phb.puhuibao.entity.UserInvestment;
 import com.phb.puhuibao.entity.UserLoan;
@@ -247,7 +245,7 @@ public class Functions {
 			log.setBalanceAmount(user.getmUserMoney() - parent.getFrozenMoney());
 			log.setChangeType("投资提成");
 			log.setChangeDesc("您的下线：" + u.getmUserName() + u.getmUserTel() + "投资了: " + realInvestmentAmount + "元");
-			log.setAccountType(1);
+			log.setAccountType(2);
 			log.setFromUser(u.getmUserId());
 			userAccountLogDao.save(log);
 			
@@ -269,7 +267,7 @@ public class Functions {
 				log.setBalanceAmount(user.getmUserMoney() - grandparent.getFrozenMoney());
 				log.setChangeType("投资提成");
 				log.setChangeDesc("您的下下线：" + u.getmUserName() + u.getmUserTel() + "投资了: " + realInvestmentAmount + "元");
-				log.setAccountType(1);
+				log.setAccountType(2);
 				log.setFromUser(u.getmUserId());
 				userAccountLogDao.save(log);
 			}
@@ -579,37 +577,7 @@ public class Functions {
 		return sb.toString();
 	}
 
-	public static void refund(IBaseService<MobileUser, String> mobileUserService, IBaseService<UserAccountLog, String> userAccountLogService, Resource resource, double amount) {
-		MobileUser u = mobileUserService.getById(resource.getmUserId() + "");
-		MobileUser user = new MobileUser();
-		user.setmUserId(u.getmUserId());
-		user.setmUserMoney(u.getmUserMoney() + amount);
-		mobileUserService.update(user);
-		
-		UserAccountLog log = new UserAccountLog();
-		log.setmUserId(resource.getmUserId());
-		log.setAmount(amount);
-		log.setBalanceAmount(user.getmUserMoney() - u.getFrozenMoney());
-		log.setChangeType("下单被取消，退款");
-		log.setChangeDesc("资源id: " + resource.getResourceId());
-		log.setAccountType(31);
-		userAccountLogService.save(log);
-	}
+ 
 
-	public static void refund(IBaseService<MobileUser, String> mobileUserService, IBaseService<UserAccountLog, String> userAccountLogService, ResourceOrder order, double amount) {
-		MobileUser u = mobileUserService.getById(order.getmUserId() + "");
-		MobileUser user = new MobileUser();
-		user.setmUserId(u.getmUserId());
-		user.setmUserMoney(u.getmUserMoney() + amount);
-		mobileUserService.update(user);
-
-		UserAccountLog log = new UserAccountLog();
-		log.setmUserId(order.getmUserId());
-		log.setAmount(amount);
-		log.setBalanceAmount(user.getmUserMoney() - u.getFrozenMoney());
-		log.setChangeType("下单被取消，退款");
-		log.setChangeDesc("资源id: " + order.getResourceId());
-		log.setAccountType(31);
-		userAccountLogService.save(log);
-	}
+ 
 }

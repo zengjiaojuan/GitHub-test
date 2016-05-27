@@ -12,7 +12,15 @@ public class UserAccountLog {
 	private Date createTime;
 	private Integer accountType;
 	private Integer fromUser;
+	private String flagAmount; // 交易类型
 	
+	
+	public String getFlagAmount() {
+		return flagAmount;
+	}
+	public void setFlagAmount(String flagAmount) {
+		this.flagAmount = flagAmount;
+	}
 	public Integer getFromUser() {
 		return fromUser;
 	}

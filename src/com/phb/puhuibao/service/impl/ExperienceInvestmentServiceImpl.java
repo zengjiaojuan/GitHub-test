@@ -12,8 +12,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.idp.pub.dao.IBaseDao;
 import com.idp.pub.service.impl.DefaultBaseService;
-import com.phb.puhuibao.entity.ExperienceProduct;
 import com.phb.puhuibao.entity.ExperienceInvestment;
+import com.phb.puhuibao.entity.ExperienceProduct;
 import com.phb.puhuibao.entity.MobileUser;
 import com.phb.puhuibao.entity.UserAccountLog;
 import com.phb.puhuibao.entity.UserExperience;
@@ -21,6 +21,7 @@ import com.phb.puhuibao.entity.UserExperience;
 @Transactional
 @Service("experienceInvestmentService")
 public class ExperienceInvestmentServiceImpl extends DefaultBaseService<ExperienceInvestment, String> {
+	@Override
 	@Resource(name = "experienceInvestmentDao")
 	public void setBaseDao(IBaseDao<ExperienceInvestment, String> baseDao) {
 		super.setBaseDao(baseDao);
@@ -32,6 +33,7 @@ public class ExperienceInvestmentServiceImpl extends DefaultBaseService<Experien
 	@Resource(name = "userExperienceDao")
 	private IBaseDao<UserExperience, String> userExperienceDao;
 
+	@Override
 	public ExperienceInvestment save(ExperienceInvestment entity) {
 		Map<String,Object> params = new HashMap<String,Object>();
 		params.put("mUserId", entity.getmUserId());
@@ -58,6 +60,7 @@ public class ExperienceInvestmentServiceImpl extends DefaultBaseService<Experien
 	@Resource(name = "userAccountLogDao")
 	private IBaseDao<UserAccountLog, String> userAccountLogDao;
 
+	@Override
 	public ExperienceInvestment update(ExperienceInvestment entity) {
 		String sql = "select 1 from phb_mobile_user where m_user_id=" + entity.getmUserId() + " for update";
 		this.jdbcTemplate.execute(sql);
@@ -74,7 +77,7 @@ public class ExperienceInvestmentServiceImpl extends DefaultBaseService<Experien
 		log.setBalanceAmount(user.getmUserMoney() - u.getFrozenMoney());
 		log.setChangeType("理财体验收益");
 		log.setChangeDesc("理财体验投资id: " + entity.getInvestmentId());
-		log.setAccountType(1);
+		log.setAccountType(3);
 		userAccountLogDao.save(log);
 		
 		entity.setmUserId(null);

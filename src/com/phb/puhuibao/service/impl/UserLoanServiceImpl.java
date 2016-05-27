@@ -28,11 +28,13 @@ import com.phb.puhuibao.service.UserLoanService;
 @Transactional
 @Service("userLoanService")
 public class UserLoanServiceImpl extends DefaultBaseService<UserLoan, String> implements UserLoanService {
+	@Override
 	@Resource(name = "userLoanDao")
 	public void setBaseDao(IBaseDao<UserLoan, String> baseDao) {
 		super.setBaseDao(baseDao);
 	}
 
+	@Override
 	@Resource(name = "userLoanDao")
 	public void setPagerDao(IPagerDao<UserLoan> pagerDao) {
 		super.setPagerDao(pagerDao);
@@ -53,12 +55,14 @@ public class UserLoanServiceImpl extends DefaultBaseService<UserLoan, String> im
 	@Resource(name = "jdbcTemplate")
 	private JdbcTemplate jdbcTemplate;
 
+	@Override
 	public UserLoan save(UserLoan entity) {
 		entity.setCreateTime(new Date());
 		this.getBaseDao().save(entity);
 		return entity;
 	}
 	
+	@Override
 	public void processLoan(UserLoan entity) {
 		String sql = "select 1 from phb_mobile_user where m_user_id=" + entity.getmUserId() + " for update";
 		this.jdbcTemplate.execute(sql);
@@ -74,7 +78,7 @@ public class UserLoanServiceImpl extends DefaultBaseService<UserLoan, String> im
 		log.setBalanceAmount(user.getmUserMoney() - u.getFrozenMoney());
 		log.setChangeType("授信贷款");
 		log.setChangeDesc("贷款id: " + entity.getLoanId());
-		log.setAccountType(0);
+		log.setAccountType(11);
 		userAccountLogDao.save(log);
 		
 		UserLoan loan = new UserLoan();
@@ -99,6 +103,7 @@ public class UserLoanServiceImpl extends DefaultBaseService<UserLoan, String> im
 	@Resource(name = "appContext")
 	private AppContext appContext;
 
+	@Override
 	public UserLoan update(UserLoan entity) {
 		if (entity.getStatus() == 2) {
 			UserLoan loan = userLoanDao.get(entity.getLoanId() + "");
@@ -108,6 +113,7 @@ public class UserLoanServiceImpl extends DefaultBaseService<UserLoan, String> im
 		return this.getBaseDao().update(entity);
 	}
 
+	@Override
 	public void monthProcess(UserLoan entity) {
 		String sql = "select 1 from phb_mobile_user where m_user_id=" + entity.getmUserId() + " for update";
 		this.jdbcTemplate.execute(sql);
@@ -123,7 +129,7 @@ public class UserLoanServiceImpl extends DefaultBaseService<UserLoan, String> im
 		log.setBalanceAmount(user.getmUserMoney() - u.getFrozenMoney());
 		log.setChangeType("授信贷款月息");
 		log.setChangeDesc("贷款id: " + entity.getLoanId() + "，月息");
-		log.setAccountType(2); // 授信贷款月息
+		log.setAccountType(12); // 授信贷款月息
 		userAccountLogDao.save(log);		
 		
 		entity.setmUserId(null);
@@ -131,6 +137,7 @@ public class UserLoanServiceImpl extends DefaultBaseService<UserLoan, String> im
 		this.getBaseDao().update(entity);		
 	}
 
+	@Override
 	public void monthProcessLast(UserLoan entity) {
 		String sql = "select 1 from phb_mobile_user where m_user_id=" + entity.getmUserId() + " for update";
 		this.jdbcTemplate.execute(sql);
@@ -146,7 +153,7 @@ public class UserLoanServiceImpl extends DefaultBaseService<UserLoan, String> im
 		log.setBalanceAmount(user.getmUserMoney() - u.getFrozenMoney());
 		log.setChangeType("授信贷款还本");
 		log.setChangeDesc("贷款id: " + entity.getLoanId() + "，本金");
-		log.setAccountType(0);
+		log.setAccountType(13);
 		userAccountLogDao.save(log);
 
 		entity.setmUserId(null);
@@ -154,6 +161,7 @@ public class UserLoanServiceImpl extends DefaultBaseService<UserLoan, String> im
 		this.getBaseDao().update(entity);		
 	}
 
+	@Override
 	public void closeUser(MobileUser u) {
 		String sql = "select 1 from phb_mobile_user where m_user_id=" + u.getmUserId() + " for update";
 		this.jdbcTemplate.execute(sql);
@@ -174,7 +182,7 @@ public class UserLoanServiceImpl extends DefaultBaseService<UserLoan, String> im
 			log.setBalanceAmount(user.getmUserMoney() - u.getFrozenMoney());
 			log.setChangeType("投资平仓");
 			log.setChangeDesc("投资id: " + entity.getInvestmentId());
-			log.setAccountType(0);
+			log.setAccountType(14);
 			userAccountLogDao.save(log);
 
 			UserInvestment e = new UserInvestment();
@@ -196,7 +204,7 @@ public class UserLoanServiceImpl extends DefaultBaseService<UserLoan, String> im
 			log.setBalanceAmount(user.getmUserMoney() - u.getFrozenMoney());
 			log.setChangeType("投资平仓");
 			log.setChangeDesc("投资id: " + entity.getInvestmentId());
-			log.setAccountType(0);
+			log.setAccountType(14);
 			userAccountLogDao.save(log);
 
 			UserInvestment e = new UserInvestment();
@@ -224,7 +232,7 @@ public class UserLoanServiceImpl extends DefaultBaseService<UserLoan, String> im
 			log.setBalanceAmount(user.getmUserMoney() - u.getFrozenMoney());
 			log.setChangeType("贷款平仓");
 			log.setChangeDesc("贷款id: " + entity.getLoanId());
-			log.setAccountType(0);
+			log.setAccountType(15);
 			userAccountLogDao.save(log);
 
 			UserLoan e = new UserLoan();
