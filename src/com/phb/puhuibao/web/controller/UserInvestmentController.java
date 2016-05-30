@@ -342,14 +342,8 @@ public class UserInvestmentController extends BaseController<UserInvestment, Str
 //		cal.set(Calendar.MINUTE, 0);
 //		cal.set(Calendar.MILLISECOND, 0);
 		entity.setIncomeDate(cal.getTime()); // short date
-		try {
-			userInvestmentService.processSave(entity, redpacketId);
-		    //entity = this.getBaseService().save(entity);
-		} catch (Exception e) {
-			data.put("message", "网络异常！");
-			data.put("status", 0);
-			return data;
-		}
+		
+		
 		Map<String, Object> result = new HashMap<String, Object>();
 		result.put("incomeDate", entity.getIncomeDate());
         if (product.getUnit().equals("年")) {
@@ -363,6 +357,20 @@ public class UserInvestmentController extends BaseController<UserInvestment, Str
 		int days = (int) ((cal.getTimeInMillis() - entity.getIncomeDate().getTime()) / (24 * 3600 * 1000));
 		double everyIncome = Functions.calEveryIncome(investmentAmount, product.getAnnualizedRate());
 		result.put("LastIncome", everyIncome * days);
+		
+		entity.setTotalIncome(everyIncome * days);// 预期收益
+		entity.setExpireDate(cal.getTime());// 到期日
+		
+		
+		try {
+			userInvestmentService.processSave(entity, redpacketId);
+		    //entity = this.getBaseService().save(entity);
+		} catch (Exception e) {
+			data.put("message", "网络异常！");
+			data.put("status", 0);
+			return data;
+		}
+
 		//incomeDate：起息日
 		//redeemDate：收入日
 		//LastIncome：预计收益

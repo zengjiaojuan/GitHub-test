@@ -18,6 +18,10 @@
     <result property="productName" column="product_name" jdbcType="VARCHAR"/>
     <result property="guaranteeMethod" column="guarantee_method" jdbcType="VARCHAR"/>
     <result property="lastDate" column="last_date" jdbcType="DATE" />
+    <result property="expireDate" column="expire_date" jdbcType="DATE" />
+    <result property="totalIncome" column="total_income" jdbcType="DECIMAL" />
+    
+    
   </resultMap>
 
   <!-- RESOURCE INSERT -->
@@ -76,7 +80,9 @@
 	investment_amount,
 	create_time,
 	status,
-	income_date
+	income_date,
+	expire_date,
+	total_income
   </sql>
   <sql id="allapplColumnVar">
 	values(
@@ -85,7 +91,11 @@
 			#{investmentAmount,jdbcType=BIGINT},
 			#{createTime,jdbcType=TIMESTAMP},
 			#{status,jdbcType=TINYINT},
-			#{incomeDate,jdbcType=DATE}
+			#{incomeDate,jdbcType=DATE},
+			#{expireDate,jdbcType=DATE},
+			#{totalIncome,jdbcType=DECIMAL}
+			
+			
 	)
   </sql>
   <sql id="allColumn">
@@ -102,7 +112,9 @@
 	b.period,
 	b.unit,
 	a.create_time,
-	a.last_date
+	a.last_date,
+	a.expire_date,
+	a.total_income
   </sql>
   <sql id="dynamicWhere">
 	<trim prefix="WHERE" prefixOverrides="AND|OR">

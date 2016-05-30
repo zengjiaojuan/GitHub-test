@@ -11,15 +11,31 @@ public class UserInvestment {
 	private Date createTime;
 	private Integer status;
 	private Date incomeDate;
-	private Double lastIncome;
+	private Double lastIncome; // 累计金额
 	private String productName; // 产品名称
 	private String guaranteeMethod; // 保障方式
 	private Integer period; // 周期
 	private String unit; // 单位
 	private Double annualizedRate; // 年化利率
 	private Integer leftDays; // 到期天数
-	private Date lastDate;
+	private Date lastDate; // 最后一次计息的日期  朗月赢每个月都有一天
+	private Date expireDate;//expire_Date  到期日
+	private Double totalIncome;//total_income  预期总收益
 	
+	
+	
+	public Date getExpireDate() {
+		return expireDate;
+	}
+	public void setExpireDate(Date expireDate) {
+		this.expireDate = expireDate;
+	}
+	public Double getTotalIncome() {
+		return totalIncome;
+	}
+	public void setTotalIncome(Double totalIncome) {
+		this.totalIncome = totalIncome;
+	}
 	public String getProductSN() {
 		return productSN;
 	}
