@@ -50,7 +50,7 @@ public class UserAccountLogController extends BaseController<UserAccountLog, Str
 			if(log.getAccountType() == 1 || log.getAccountType() == 2 || log.getAccountType() ==  3 || log.getAccountType() == 6 || log.getAccountType() == 9 || log.getAccountType() == 14){
 				log.setFlagAmount("+"+log.getAmount());
 			}else if(log.getAccountType() == 0 || log.getAccountType() == 4 || log.getAccountType() == 10 || log.getAccountType() == 11 || log.getAccountType() == 12 || log.getAccountType() == 13 || log.getAccountType() == 15 || log.getAccountType() == 8){
-				log.setFlagAmount("-"+log.getAmount());
+				log.setFlagAmount(""+log.getAmount());
 			}else if(log.getAccountType() ==  5 || log.getAccountType() == 7){
 				log.setFlagAmount(""+log.getAmount());
 			}

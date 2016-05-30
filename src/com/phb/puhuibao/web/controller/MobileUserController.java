@@ -41,10 +41,8 @@ import com.phb.puhuibao.entity.Invite;
 import com.phb.puhuibao.entity.MobileUser;
 import com.phb.puhuibao.entity.MobileUserExtra;
 import com.phb.puhuibao.entity.MobileUserSignin;
-import com.phb.puhuibao.entity.MuserFollow;
 import com.phb.puhuibao.entity.UserCard;
 import com.phb.puhuibao.service.MobileUserService;
-import com.phb.puhuibao.service.impl.MuserFollowServiceImpl;
 
 @Controller
 @RequestMapping(value = "/userInformation")
@@ -64,8 +62,7 @@ public class MobileUserController extends BaseController<MobileUser, String> {
 	private IBaseService<Invite, String> inviteService;
 	@Resource(name = "mobileUserService")
 	private MobileUserService mobileUserService;
-	@Resource(name = "muserFollowService")
-	private MuserFollowServiceImpl muserFollowService;
+ 
 	
   
 	
@@ -746,112 +743,7 @@ public class MobileUserController extends BaseController<MobileUser, String> {
 		return data;
 	}
 	
-	
-	/**
-	 * 个人名片中的信息 如果fmuid为空，则取的是当前自己的信息，否则取的是当前正在查看的别人的信息，这时候需要查看本人和这个人的关系表，取备注名，如果存在的话
-	 * @param muid
-	 * @param fmuid
-	 * @return
-	 */
-	@RequestMapping(value="getUserSocialProfile")
-	@ResponseBody
-	public Map<String, Object> getUserSocialProfile(@RequestParam String muid,String fmuid){
-		MobileUser user = null;
-		if(StringUtil.isEmpty(fmuid)){//查自己
-			user = this.getBaseService().getById(muid);
-		}else{
-			user = this.getBaseService().getById(fmuid);
-		}
-		 
-		Map<String, Object> map = new HashMap<String, Object>();
-		map.put("mUserId",user.getmUserId() );
-		map.put("mUserName",user.getmUserName() );
-		map.put("mUserTel",user.getmUserTel() );
-		map.put("mUserEmail",user.getmUserEmail() );
-		map.put("photo", user.getPhoto());
-		map.put("sex", user.getSex());
-		map.put("age", user.getAge());
-		map.put("level",user.getLevel() );
-		map.put("nickname",user.getNickname() );
-		map.put("constellation", user.getConstellation());
-		map.put("socialStatus",user.getSocialStatus() );
-		map.put("isFollowing", "0");//默认不是好友关系
-		map.put("isBlocking", 0);//默认没有拉黑他
-		map.put("isFriend", 0);//默认不是朋友
-		if(!StringUtils.isEmpty(fmuid)){
-			Map<String,Object> params = new HashMap<String,Object>();
-			params.put("muserId", muid);
-			params.put("followUser", fmuid);
-			MuserFollow mf =  muserFollowService.unique(params);
-			if(mf!=null){//我已经关注他
-				if("1".equals(mf.getFollowIsblocked() )){//已经拉黑了
-					map.put("isBlocking", 1);
-				}else{
-					map.put("nickname",mf.getFollowUname() );//用备注名代替默认的Nickname
-					map.put("isFollowing", "1");//关注关系
-					    params = new HashMap<String,Object>();
-						params.put("muserId", fmuid);
-						params.put("followUser", muid);
-						mf =  muserFollowService.unique(params);
-						if(mf!=null){//对方也关注我了
-							if("0".equals(mf.getFollowIsblocked() ) || mf.getFollowIsblocked()== null){// 对方也没有将我拉黑  则我们是朋友关系
-								map.put("isFriend", 1);//是朋友
-							}
-						}
-				}
- 
-			} 
-		}
-		Map<String, Object> data = new HashMap<String, Object>();
-		data.put("result", map);
-		data.put("message", "");
-		data.put("status", 1);
-		return data;
-	}
-	
-	
-	/**
-	 * 根据id搜索好友,以后可能就是关键字搜索
-	 * @param muid   自己的id
-	 * @param keyword   目标id
-	 * @return
-	 */
-	@RequestMapping(value="searchUserByKeyword")
-	@ResponseBody
-	public Map<String, Object> searchUserByKeyword(@RequestParam String currentuserid,String keyword){
-		MobileUser user = this.getBaseService().getById(keyword);
-		Map<String, Object> map = new HashMap<String, Object>();
-		map.put("mUserId",user.getmUserId() );
-		map.put("mUserName",user.getmUserName() );
-		map.put("mUserTel",user.getmUserTel() );
-		map.put("mUserEmail",user.getmUserEmail() );
-		map.put("photo", user.getPhoto());
-		map.put("sex", user.getSex());
-		map.put("age", user.getAge());
-		map.put("level",user.getLevel() );
-		map.put("nickname",user.getNickname() );
-		map.put("constellation", user.getConstellation());
-		map.put("socialStatus",user.getSocialStatus() );
-	 
-		Map<String,Object> params = new HashMap<String,Object>();
-		params.put("muserId", currentuserid);
-		params.put("followUser", keyword);
-		MuserFollow mf =  muserFollowService.unique(params);
-		if(mf!=null){
-			if(!StringUtils.isEmpty(mf.getFollowUname())){
-				map.put("nickname",mf.getFollowUname() );//用备注名代替默认的Nickname
-				map.put("isFollowing", "1");//关注关系
-			}
-		}else{
-			map.put("isFollowing", "0");//默认不是关注关系
-		} 
-
-		Map<String, Object> data = new HashMap<String, Object>();
-		data.put("result", map);
-		data.put("message", "");
-		data.put("status", 1);
-		return data;
-	}
+  
 	
 	
 	/**

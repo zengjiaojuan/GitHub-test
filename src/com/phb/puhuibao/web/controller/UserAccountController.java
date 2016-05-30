@@ -5,17 +5,11 @@ import java.io.ByteArrayOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.net.URLEncoder;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.UUID;
@@ -24,7 +18,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -56,13 +49,8 @@ import com.llpay.client.vo.CashBean;
 import com.llpay.client.vo.PayDataBean;
 import com.llpay.client.vo.RetBean;
 import com.phb.puhuibao.common.Functions;
-import com.phb.puhuibao.common.alipayapi.AlipayConfig;
-import com.phb.puhuibao.common.alipayapi.AlipayNotify;
-import com.phb.puhuibao.common.alipayapi.RSA;
 import com.phb.puhuibao.entity.ItemInvestment;
 import com.phb.puhuibao.entity.MobileUser;
-import com.phb.puhuibao.entity.Resource;
-import com.phb.puhuibao.entity.ResourceOrder;
 import com.phb.puhuibao.entity.ThirdPayAccount;
 import com.phb.puhuibao.entity.ThirdPayLog;
 import com.phb.puhuibao.entity.UserAccount;
@@ -77,6 +65,7 @@ import com.yeepay.TZTService;
 public class UserAccountController extends BaseController<UserAccount, String> {
 	private static final Log LOG = LogFactory.getLog(UserAccountController.class);
 
+	@Override
 	@javax.annotation.Resource(name = "userAccountService")
 	public void setBaseService(IBaseService<UserAccount, String> baseService) {
 		super.setBaseService(baseService);
@@ -110,13 +99,7 @@ public class UserAccountController extends BaseController<UserAccount, String> {
 
 	@javax.annotation.Resource(name = "userCardService")
 	private IBaseService<UserCard, String> baseUserCardService;
-
-	@javax.annotation.Resource(name = "resourceService")
-	private IBaseService<Resource, String> resourceService;
-
-	@javax.annotation.Resource(name = "resourceOrderService")
-	private IBaseService<ResourceOrder, String> resourceOrderService;
-
+ 
 	@javax.annotation.Resource(name = "userCardService")
 	private IBaseService<UserCard, String> userCardService;
 
@@ -626,6 +609,7 @@ public class UserAccountController extends BaseController<UserAccount, String> {
 		return data;
 	}
 	
+	@Override
 	@RequestMapping(params = "method=update", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, Object> update(UserAccount entity) {
@@ -652,7 +636,7 @@ public class UserAccountController extends BaseController<UserAccount, String> {
 				entity.setIsPaid(3); // 银行处理中
 			} else {
 				results.put(Constants.SUCCESS, Constants.FALSE);
-				results.put(Constants.MESSAGE, (String) data.get("message"));
+				results.put(Constants.MESSAGE, data.get("message"));
 				return results;
 			}
 		}
@@ -1572,224 +1556,8 @@ public class UserAccountController extends BaseController<UserAccount, String> {
     /** 商户平台和开发平台约定的API密钥，在商户平台设置  */
     public static final String WX_KEY = "qwertyuiop1234567890asdfghjkl123";
 
-    /**
-     * getWebChatOrder
-     * @param id
-     * @return
-     */
-	@RequestMapping(value="getWebChatOrder")
-	@ResponseBody
-    public Map<String, Object> getWebChatOrder(@RequestParam String id, HttpServletRequest request) {
-		// appid，body，mch_id，nonce_str，notify_url，out_trade_no，total_fee，trade_type，spbill_create_ip，sign
-		Map<String, Object> data = new HashMap<String, Object>();
-		Resource resource;
-		String price;
-		if (id.startsWith("R-")) {
-			String resourceId = id.substring(2);
-			resource = resourceService.getById(resourceId);
-			price = (int) (resource.getPrice() * resource.getNumber() * 100) + "";
-		} else {
-			String orderId = id.substring(2);
-			ResourceOrder order = resourceOrderService.getById(orderId);
-			resource = resourceService.getById(order.getResourceId() + "");
-			
-			Pager<ResourceOrder> pager = new Pager<ResourceOrder>();
-			pager.setCurrent(0);
-			Map<String, Object> params = new HashMap<String, Object>();
-			params.put("resourceId", resource.getResourceId());
-			params.put("status", 1);
-			Pager<ResourceOrder> p = resourceOrderService.findByPager(pager, params);
-			if (p.getTotal() >= resource.getNumber()) {
-				data.put("message", "人数已满！");
-				data.put("status", 0);
-				return data;
-			}
-
-			price = (int) (resource.getPrice() * 100) + "";
-		}
-		price = "1";
-		String uuid = UUID.randomUUID().toString().replace("-", "");
-		String timeStamp = System.currentTimeMillis() / 1000 + "";
-		SortedMap<String, String> parameters = new TreeMap<String, String>();
-		parameters.put("appid", WX_APP_ID);
-		parameters.put("mch_id", WX_PARTNER_ID);
-		parameters.put("nonce_str", uuid);
-		parameters.put("body", resource.getName());
-        SimpleDateFormat dataFormat = new SimpleDateFormat("yyyyMMddHHmmssSSS");
-        String timeString = dataFormat.format(new Date());
-		parameters.put("out_trade_no", timeString + "-" + id); // 为了重复支付，见关闭订单
-		parameters.put("total_fee", price);
-		parameters.put("spbill_create_ip", appContext.getUserIP());
-		String notifyUrl = request.getScheme() + "://" + appContext.getUserIP() + ":" + request.getServerPort() + request.getContextPath() + "/userAccount/webChatNotifyUrl.shtml";
-		parameters.put("notify_url", notifyUrl);
-		parameters.put("trade_type", "APP");
-		
-		StringBuffer sb = new StringBuffer();
-		for (Entry<String, String> entity : parameters.entrySet()) {
-			String k = entity.getKey();
-			String v = entity.getValue();
-			sb.append(k + "=" + v + "&");
-		}
-		sb.append("key=" + WX_KEY);
-		String sign = null;
-		try {
-			sign = DigestUtils.md5Hex(sb.toString().getBytes("utf-8"));
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		}
-		parameters.put("sign", sign);
-		String requestXML = Functions.toXml(parameters);
-		String returnXML = Functions.httpsRequest(WX_PREPAY_URL, "POST", requestXML);
-		Map<String, String> map = Functions.parseXml(returnXML);
-		String prepayId = map.get("prepay_id");
-		if (!map.get("return_code").equals("SUCCESS")) {
-			data.put("message", map.get("return_msg"));
-			data.put("status", 0);
-		} else if (!map.get("result_code").equals("SUCCESS")) {
-			data.put("message", map.get("err_code_des"));
-			data.put("status", 0);
-		} else if (prepayId == null && !"".equals(prepayId)) {
-			data.put("message", "预支付交易失败！");
-			data.put("status", 0);
-		} else {
-			Map<String, String> result = new HashMap<String, String>();
-			result.put("appId", WX_APP_ID);
-			result.put("nonceStr", uuid);
-			result.put("packageValue", "Sign=WXPay");
-			result.put("partnerId", WX_PARTNER_ID);
-			result.put("prepayId", prepayId);
-			result.put("timeStamp", timeStamp);
-			String signString = "appid=" + WX_APP_ID + "&noncestr=" + uuid + "&package=Sign=WXPay&partnerid=" + WX_PARTNER_ID + "&prepayid=" + prepayId
-					+ "&timestamp=" + timeStamp + "&key=" + WX_KEY;
-			sign = null;
-			try {
-				sign = DigestUtils.md5Hex(signString.getBytes("utf-8"));
-			} catch (UnsupportedEncodingException e) {
-				e.printStackTrace();
-			}
-			result.put("sign", sign);
-			data.put("result", result);
-			data.put("message", "");
-			data.put("status", 1);			
-		}
-
-//        HttpPost post = new HttpPost(WX_PREPAY_URL);
-//        post.setHeader("Content-Type", "text/html;charset=GBK");
-//        StringEntity se = null;
-//		try {
-//			se = new StringEntity(new String(toXml(nvps).getBytes(), "GBK"));
-//		} catch (UnsupportedEncodingException e) {
-//			e.printStackTrace();
-//		}
-//        post.setEntity(se);
-//        HttpResponse response = null;
-//		HttpClient client = new DefaultHttpClient();
-//		try {
-//			response = client.execute(post);
-//		} catch (ClientProtocolException e) {
-//			e.printStackTrace();
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
-//
-//		Map<String, Object> data = new HashMap<String, Object>();
-//        int status = response.getStatusLine().getStatusCode();
-//        if (status == 200) {
-//    		BufferedReader br = null;
-//			try {
-//				br = new BufferedReader(new InputStreamReader(response.getEntity().getContent(), "GBK"));
-//			} catch (IllegalStateException e) {
-//				e.printStackTrace();
-//			} catch (IOException e) {
-//				e.printStackTrace();
-//			}
-//    		sb = new StringBuffer();
-//    		String line = "";
-//    		try {
-//				while ((line = br.readLine()) != null) {
-//					sb.append(line);
-//				}
-//			} catch (IOException e) {
-//				e.printStackTrace();
-//			}
-//    		data.put("result", sb.toString());
-//    		data.put("message", "");
-//			data.put("status", 1);
-//        } else {
-//    		data.put("message", "");
-//			data.put("status", 0);
-//        }
-		return data;
-	}
-    
-	@RequestMapping(value="webChatNotifyUrl")
-	@ResponseBody
-	public void webChatNotifyUrl(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String returnXML = LLPayUtil.readReqStr(request);
-        if (returnXML ==  null || "".equals(returnXML)) {
-        	response.getWriter().write("null");
-            response.getWriter().flush();
-            return;
-        }
-		Map<String, String> map = Functions.parseXml(returnXML);
-		String out_trade_no = map.get("out_trade_no");
-		Map<String,Object> params = new HashMap<String,Object>();
-		params.put("orderId", out_trade_no);
-		UserAccount entity = baseUserAccountService.unique(params);
-		if (entity != null) {
-			return;
-		}
-
-        ThirdPayLog log = new ThirdPayLog();
-		log.setLogId(out_trade_no);
-		log.setAction("notify_webchat");
-		log.setParams(returnXML);
-		log.setError("");
-		log.setStatus(1);
-		thirdPayLogService.save(log);
-		
-		int muid;
-		Resource r = null;
-		ResourceOrder o = null;
-		String id;
-		if (out_trade_no.indexOf("-R-") > 0) {
-			String resourceId = out_trade_no.substring(out_trade_no.indexOf("-R-") + 3);
-			Resource resource = resourceService.getById(resourceId);
-			muid = resource.getmUserId();
-			r = new Resource();
-			r.setResourceId(resource.getResourceId());
-			r.setStatus(1);
-			id = "R-" + resourceId;
-		} else {
-			String orderId = out_trade_no.substring(out_trade_no.indexOf("-O-") + 3);
-			ResourceOrder order = resourceOrderService.getById(orderId);
-			muid = order.getmUserId();
-			o = new ResourceOrder();
-			o.setOrderId(order.getOrderId());
-			o.setStatus(1);
-			id = "O-" + orderId;
-		}
-
-		entity = new UserAccount();
-		entity.setmUserId(muid);
-		String total_fee = map.get("total_fee");
-		entity.setAmount((double) (Integer.valueOf(total_fee)) / 100);
-		entity.setProcessType(0);
-		entity.setUserNote("WEBCHAT");
-		entity.setOrderId(id);
-		try {
-			if (r == null) {
-				userAccountService.processSave(entity, o, 33);
-			} else {
-				userAccountService.processSave(entity, r, 33);
-			}
-		} catch (Exception e) {
-			LOG.error(e);
-			e.printStackTrace();
-		}
-		
-		paySuccess(response);
-	}
+   
+   
 	
 	private void paySuccess(HttpServletResponse response) {
         SortedMap<String, String> resMap = new TreeMap<String, String>();
@@ -1814,184 +1582,7 @@ public class UserAccountController extends BaseController<UserAccount, String> {
         }
 	}
 	
-	/**
-     * alipay
-     * @param id
-     * @return
-     */
-	@RequestMapping(value="alipay")
-	@ResponseBody
-    public Map<String, Object> alipay(@RequestParam String id, HttpServletRequest request) {
-		Map<String, Object> data = new HashMap<String, Object>();
-		Resource resource;
-		String price;
-		if (id.startsWith("R")) {
-			String resourceId = id.substring(2);
-			resource = resourceService.getById(resourceId);
-			price = resource.getPrice() * resource.getNumber() + "";
-		} else {
-			String orderId = id.substring(2);
-			ResourceOrder order = resourceOrderService.getById(orderId);
-			resource = resourceService.getById(order.getResourceId() + "");
-			
-			Pager<ResourceOrder> pager = new Pager<ResourceOrder>();
-			pager.setCurrent(0);
-			Map<String, Object> params = new HashMap<String, Object>();
-			params.put("resourceId", resource.getResourceId());
-			params.put("status", 1);
-			Pager<ResourceOrder> p = resourceOrderService.findByPager(pager, params);
-			if (p.getTotal() >= resource.getNumber()) {
-				data.put("message", "人数已满！");
-				data.put("status", 0);
-				return data;
-			}
-
-			price = resource.getPrice() + "";
-		}
-		price = "0.01";
-		
-		String desc = resource.getResourceDesc();
-		if (StringUtils.isEmpty(desc)) {
-			desc = resource.getName();
-		}
-		Map<String, String> params = new HashMap<String, String>();
-		params.put("service", AlipayConfig.service);//接口服务----即时到账
-		params.put("partner", AlipayConfig.partner);//支付宝PID
-		params.put("_input_charset", AlipayConfig.input_charset);//统一编码
-		params.put("payment_type", "1");//支付类型
-		String notifyUrl = request.getScheme() + "://" + appContext.getUserIP() + ":" + request.getServerPort() + request.getContextPath() + "/userAccount/alipayNotifyUrl.shtml";
-		params.put("notify_url", notifyUrl);//异步通知页面
-		//params.put("seller_email", AlipayConfig.SELLER_EMAIL);//卖家支付宝账号
-		params.put("seller_id", AlipayConfig.SELLER_EMAIL);//卖家支付宝账号
-        SimpleDateFormat dataFormat = new SimpleDateFormat("yyyyMMddHHmmssSSS");
-        String timeString = dataFormat.format(new Date());
-        String out_trade_no = timeString + "-" + id;
-		params.put("out_trade_no", out_trade_no); // 为了重复支付，见关闭订单
-		params.put("subject", resource.getName());//商品名称
-		params.put("total_fee", price);//价格
-		params.put("body", desc);
-		params.put("it_b_pay", "30m");
-		params.put("return_url", "m.alipay.com");
-		
-		// 订单
-		String orderInfo = "partner=\"" + AlipayConfig.partner + "\"";
-		orderInfo += "&seller_id=\"" + AlipayConfig.SELLER_EMAIL + "\"";
-		orderInfo += "&out_trade_no=\"" + out_trade_no + "\"";
-		// 商品名称
-		orderInfo += "&subject=\"" +  resource.getName() + "\"";
-		// 商品详情
-		orderInfo += "&body=\"" + desc + "\"";
-		orderInfo += "&total_fee=\"" + price + "\"";
-		orderInfo += "&notify_url=\"" + notifyUrl + "\"";
-		orderInfo += "&service=\"mobile.securitypay.pay\"";
-		orderInfo += "&payment_type=\"1\"";
-		orderInfo += "&_input_charset=\"utf-8\"";
-		orderInfo += "&it_b_pay=\"30m\"";
-		// 支付宝处理完请求后，当前页面跳转到商户指定页面的路径，可空
-		orderInfo += "&return_url=\"m.alipay.com\"";
-		String sign = RSA.sign(orderInfo, AlipayConfig.private_key, "UTF-8");
-		try {
-			sign = URLEncoder.encode(sign, "UTF-8");
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		}
-		params.put("sign", sign);
-		params.put("sign_type", "RSA");
-
-		data.put("result", params);
-		data.put("message", "");
-		data.put("status", 1);
-		return data;
-	}
+ 
 	
-    
-	@RequestMapping(value="alipayNotifyUrl")
-	@ResponseBody
-	public void alipayNotifyUrl(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		String out_trade_no = request.getParameter("out_trade_no");
-		if (out_trade_no == null) {
-        	response.getWriter().write("null");
-            response.getWriter().flush();
-            return;
-		}
-		Map<String, Object> params = new HashMap<String, Object>();
-		params.put("orderId", out_trade_no);
-		UserAccount entity = baseUserAccountService.unique(params);
-		if (entity != null) {
-			return;
-		}
-
-		StringBuffer sb = new StringBuffer();
-		Map<String, String[]> requestParams = request.getParameterMap();
-		Map<String, String> map = new HashMap<String, String>();
-		for (Iterator<String> iter = requestParams.keySet().iterator(); iter.hasNext();) {
-			String name = iter.next();
-			String[] values = requestParams.get(name);
-			String valueStr = "";
-			for (int i = 0; i < values.length; i++) {
-				valueStr = (i == values.length - 1) ? valueStr + values[i] : valueStr + values[i] + ",";
-			}
-			map.put(name, valueStr);
-			sb.append(name + ":" + valueStr + ";");
-		}
-		
-        ThirdPayLog log = new ThirdPayLog();
-		log.setLogId(out_trade_no);
-		log.setAction("notify_alipay");
-		log.setParams(sb.toString());
-		log.setError("");
-		log.setStatus(1);
-		thirdPayLogService.save(log);
-		
-		int muid;
-		Resource r = null;
-		ResourceOrder o = null;
-		String id;
-		if (out_trade_no.indexOf("-R-") > 0) {
-			String resourceId = out_trade_no.substring(out_trade_no.indexOf("-R-") + 3);
-			Resource resource = resourceService.getById(resourceId);
-			muid = resource.getmUserId();
-			r = new Resource();
-			r.setResourceId(resource.getResourceId());
-			r.setStatus(1);
-			id = "R-" + resourceId;
-		} else {
-			String orderId = out_trade_no.substring(out_trade_no.indexOf("-O-") + 3);
-			ResourceOrder order = resourceOrderService.getById(orderId);
-			muid = order.getmUserId();
-			o = new ResourceOrder();
-			o.setOrderId(order.getOrderId());
-			o.setStatus(1);
-			id = "O-" + orderId;
-		}
-		
-		String trade_status = new String(request.getParameter("trade_status").getBytes("ISO-8859-1"), "UTF-8");
-		if(AlipayNotify.verify(map)){//验证成功
-			entity = new UserAccount();
-			entity.setmUserId(muid);
-			String total_fee = map.get("total_fee");
-			entity.setAmount(Double.valueOf(total_fee));
-			entity.setProcessType(0);
-			entity.setUserNote("ALIPAY");
-			entity.setOrderId(id);
-			try {
-				if (r == null) {
-					userAccountService.processSave(entity, o, 32);
-				} else {
-					userAccountService.processSave(entity, r, 32);
-				}
-			} catch (Exception e) {
-				LOG.error(e);
-				e.printStackTrace();
-			}
-
-			if(trade_status.equals("TRADE_FINISHED")) {
-			} else if (trade_status.equals("TRADE_SUCCESS")){
-			}
-			response.getWriter().write("success");
-		}else{ // 验证失败
-			response.getWriter().write("fail");
-		}
-		response.getWriter().flush();
-	}
+  
 }

@@ -13,8 +13,6 @@ import com.idp.pub.dao.IBaseDao;
 import com.idp.pub.dao.IPagerDao;
 import com.idp.pub.service.impl.DefaultBaseService;
 import com.phb.puhuibao.entity.MobileUser;
-import com.phb.puhuibao.entity.Resource;
-import com.phb.puhuibao.entity.ResourceOrder;
 import com.phb.puhuibao.entity.UserAccount;
 import com.phb.puhuibao.entity.UserAccountLog;
 import com.phb.puhuibao.entity.UserLoan;
@@ -45,10 +43,8 @@ public class UserAccountServiceImpl extends DefaultBaseService<UserAccount, Stri
 	private IBaseDao<UserAccountLog, String> userAccountLogDao;
 	@javax.annotation.Resource(name = "jdbcTemplate")
 	private JdbcTemplate jdbcTemplate;
-	@javax.annotation.Resource(name = "resourceDao")
-	private IBaseDao<Resource, String> resourceDao;
-	@javax.annotation.Resource(name = "resourceOrderDao")
-	private IBaseDao<ResourceOrder, String> resourceOrderDao;
+ 
+ 
 
 	@Override
 	public UserAccount save(UserAccount entity) {
@@ -269,32 +265,5 @@ public class UserAccountServiceImpl extends DefaultBaseService<UserAccount, Stri
 		account.setAdminNote(entity.getAdminNote());
 		this.update(account);
 	}
-
-	@Override
-	public void processSave(UserAccount entity, ResourceOrder order, int accountType) {
-		save(entity);
-		if (appContext.getPayOnline() == 1) {
-			//if (entity.getProcessType() == 0) {
-				entity.setIsPaid(1);
-				confirmPay(entity, accountType, order);
-			//}
-		}
-		resourceOrderDao.update(order);
-	}
-
-	private void confirmPay(UserAccount entity, int accountType, ResourceOrder order) { }
-
-	@Override
-	public void processSave(UserAccount entity, Resource resource, int accountType) {
-		save(entity);
-		if (appContext.getPayOnline() == 1) {
-			//if (entity.getProcessType() == 0) {
-				entity.setIsPaid(1);
-				confirmPay(entity, accountType, resource);
-			//}
-		}
-		resourceDao.update(resource);
-	}
-
-	private void confirmPay(UserAccount entity, int accountType, Resource resource) { }
+ 
 }
