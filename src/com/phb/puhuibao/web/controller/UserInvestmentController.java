@@ -43,6 +43,7 @@ public class UserInvestmentController extends BaseController<UserInvestment, Str
 	@Resource(name = "appContext")
 	private AppContext appContext;
 
+	@Override
 	@Resource(name = "userInvestmentService")
 	public void setBaseService(IBaseService<UserInvestment, String> baseService) {
 		super.setBaseService(baseService);
@@ -319,7 +320,7 @@ public class UserInvestmentController extends BaseController<UserInvestment, Str
 		entity.setInvestmentAmount(investmentAmount);
 		entity.setStatus(appContext.getInvestmentStatus());
 		Calendar cal = Calendar.getInstance();
-		cal.add(Calendar.DATE, 1); // 到账第二天起息
+		cal.add(Calendar.DATE, 1); // 到账第二天起息  如果第二天是周末  则从周一开始
 		int w = cal.get(Calendar.DAY_OF_WEEK);
 		if (w == 1) {
 			cal.add(Calendar.DATE, 1);
@@ -362,7 +363,9 @@ public class UserInvestmentController extends BaseController<UserInvestment, Str
 		int days = (int) ((cal.getTimeInMillis() - entity.getIncomeDate().getTime()) / (24 * 3600 * 1000));
 		double everyIncome = Functions.calEveryIncome(investmentAmount, product.getAnnualizedRate());
 		result.put("LastIncome", everyIncome * days);
-		
+		//incomeDate：起息日
+		//redeemDate：收入日
+		//LastIncome：预计收益
 		data.put("result", result);
 		data.put("message", "保存成功！");
 		data.put("status", 1);
