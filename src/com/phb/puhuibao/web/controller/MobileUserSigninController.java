@@ -27,6 +27,7 @@ import com.phb.puhuibao.entity.UserExperience;
 public class MobileUserSigninController extends BaseController<MobileUserSignin, String> {
 	private final static boolean[] CHANCE = {true, true, true, false, false, false, false, false, false, false};
 	
+	@Override
 	@Resource(name = "mobileUserSigninService")
 	public void setBaseService(IBaseService<MobileUserSignin, String> baseService) {
 		super.setBaseService(baseService);
@@ -49,22 +50,36 @@ public class MobileUserSigninController extends BaseController<MobileUserSignin,
 	public Map<String, Object> getChanceAward(@RequestParam int muid) {
 		Map<String, Object> data = new HashMap<String, Object>();
 		MobileUserSignin entity = this.getBaseService().getById("" + muid);
-		if (entity == null || entity.getTotalIntegral() <= entity.getUsedIntegral()) {
+		if (entity == null ) { // 第一次刮奖,必中
+			int[] firstoption = {123,666,888};
+			int first =  (int)(Math.random()*(3));
+			int retmoney = firstoption[first];
+			data.put("result", retmoney);
+			data.put("message", "恭喜中奖！");
+			data.put("status", 0);
+			return data;
+		}else if (entity.getTotalIntegral() <= entity.getUsedIntegral()) {
 			data.put("message", "您没有可用的积分！");
 			data.put("status", 0);
 			return data;
-		}
-		int award = 0;
-		int i = (int) (Math.random() * 10);
-		int upMoney = appContext.getUpMoney();
-		if (CHANCE[i]) {
-			award = (int) (Math.random() * upMoney) + 1;
-		}
+		}else{
+			int award = 0;
+			int i = (int) (Math.random() * 10);
+			int upMoney = appContext.getUpMoney();
+			if (CHANCE[i]) {// 20%的概率获得大数目奖金
+				award = (int) (Math.random() * upMoney) + 1;
+			}else{// 80%概率获得小数目奖金
+				award = (int) (Math.random() * 100) + 1;
+			}
 
-		data.put("result", award);
-		data.put("message", "");
-		data.put("status", 1);
-		return data;		
+			data.put("result", award);
+			data.put("message", "");
+			data.put("status", 1);
+			return data;
+			
+			
+		}
+		
 	}
 	
 	@RequestMapping(value="saveChanceAward")
