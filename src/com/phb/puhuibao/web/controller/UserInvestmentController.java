@@ -79,6 +79,7 @@ public class UserInvestmentController extends BaseController<UserInvestment, Str
 		Pager<UserInvestment> pager = new Pager<UserInvestment>();
 		pager.setReload(true);
 		pager.setCurrent(pageno);
+		pager.setLimit(30);
 		Map<String,Object> map=new HashMap<String,Object>();
 		map.put("mUserId", muid);
 		map.put("orderBy", "create_time");

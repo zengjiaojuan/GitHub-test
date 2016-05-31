@@ -33,7 +33,7 @@ public class UserAccountLogController extends BaseController<UserAccountLog, Str
 	 */
 	@RequestMapping(value="pageQuery")
 	@ResponseBody
-	public Map<String, Object> pageQuery(@RequestParam int pageno, @RequestParam String muid) {
+	public Map<String, Object> pageQuery(@RequestParam int pageno, @RequestParam String muid, Integer type) {
 		Pager<UserAccountLog> pager = new Pager<UserAccountLog>();
 		pager.setReload(true);
 		pager.setCurrent(pageno);
@@ -42,6 +42,7 @@ public class UserAccountLogController extends BaseController<UserAccountLog, Str
 		map.put("mUserId", muid);
 		map.put("orderBy", "create_time");
 		map.put("order", "desc");
+		map.put("accountType", type);
 		Pager<UserAccountLog> p=this.getBaseService().findByPager(pager, map);
 		Map<String, Object> data = new HashMap<String, Object>();
 		
