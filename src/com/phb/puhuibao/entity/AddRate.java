@@ -8,7 +8,22 @@ public class AddRate {
 	private int ratePeriod; // 天数
 	private int rateStatus;//rate_status   状态
 	
+	private String amountFlag; // 限制额度前面的符号
+	private int rateAmount; // 限制额度
+	
 	 
+	public String getAmountFlag() {
+		return amountFlag;
+	}
+	public void setAmountFlag(String amountFlag) {
+		this.amountFlag = amountFlag;
+	}
+	public int getRateAmount() {
+		return rateAmount;
+	}
+	public void setRateAmount(int rateAmount) {
+		this.rateAmount = rateAmount;
+	}
 	public int getRateStatus() {
 		return rateStatus;
 	}

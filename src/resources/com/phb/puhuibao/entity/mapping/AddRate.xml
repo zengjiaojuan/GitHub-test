@@ -11,6 +11,10 @@
     	    <result property="rateFlag"              column="rate_flag"             jdbcType="VARCHAR" />
     	    <result property="ratePeriod"            column="rate_period"           jdbcType="INTEGER" />	    	    	    
     	    <result property="rateStatus"            column="rate_status"           jdbcType="INTEGER" />
+    	    <result property="amountFlag"              column="amount_flag"             jdbcType="VARCHAR" />
+    	    <result property="rateAmount"            column="rate_amount"           jdbcType="INTEGER" />
+    	    
+    	    
 	</resultMap>
 	
    
@@ -22,7 +26,9 @@
 			annualized_rate	,
 			rate_flag	    ,
 			rate_period	    ,
-			rate_status	    
+			rate_status,
+			amount_flag,	    
+			rate_amount
 	</sql>
  
 	<select id="findByPager" parameterType="java.util.Map" resultMap="AddRate">
@@ -98,7 +104,9 @@
 			annualized_rate	,
 			rate_flag	    ,
 			rate_period	    ,
-			rate_status	 
+			rate_status,
+			amount_flag,	    
+			rate_amount	 
          
 	</sql>
 	
@@ -112,7 +120,10 @@
 		          #{annualizedRate,         jdbcType=DECIMAL},
 		          #{rateFlag,              jdbcType=VARCHAR},
 		          #{ratePeriod,            jdbcType=INTEGER},
-		          #{rateStatus,              jdbcType=INTEGER}
+		          #{rateStatus,              jdbcType=INTEGER},
+		          #{amountFlag,              jdbcType=VARCHAR},
+		           #{rateAmount,              jdbcType=INTEGER}
+		           
 		         
 		     )
 	</sql>
