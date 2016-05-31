@@ -220,7 +220,7 @@ public class Functions {
 		
 		return lastIncome;
 	}
-
+// 下线投资的时候,下下线投资的时候,计算上级提成
 	public static void ProcessCommission(MobileUser u,
 			double realInvestmentAmount,
 			AppContext appContext, JdbcTemplate jdbcTemplate,
@@ -243,7 +243,7 @@ public class Functions {
 			log.setmUserId(parent.getmUserId());
 			log.setAmount(commission);
 			log.setBalanceAmount(user.getmUserMoney() - parent.getFrozenMoney());
-			log.setChangeType("投资提成");
+			log.setChangeType("下线投资提成");
 			log.setChangeDesc("您的下线：" + u.getmUserName() + u.getmUserTel() + "投资了: " + realInvestmentAmount + "元");
 			log.setAccountType(2);
 			log.setFromUser(u.getmUserId());
@@ -265,7 +265,7 @@ public class Functions {
 				log.setmUserId(grandparent.getmUserId());
 				log.setAmount(commission);
 				log.setBalanceAmount(user.getmUserMoney() - grandparent.getFrozenMoney());
-				log.setChangeType("投资提成");
+				log.setChangeType("下下线投资提成");
 				log.setChangeDesc("您的下下线：" + u.getmUserName() + u.getmUserTel() + "投资了: " + realInvestmentAmount + "元");
 				log.setAccountType(2);
 				log.setFromUser(u.getmUserId());
