@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8" ?>   
+<!DOCTYPE mapper   
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"   
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">   
+    
+<mapper namespace="com.phb.puhuibao.entity.AddRate" >
+    <resultMap id="AddRate" type="com.phb.puhuibao.entity.AddRate">
+            <result property="rateId"                column="rate_id"               jdbcType="INTEGER" />
+            <result property="rateName"              column="rate_name"             jdbcType="VARCHAR" />
+            <result property="annualizedRate"        column="annualized_rate"       jdbcType="DECIMAL" />
+    	    <result property="rateFlag"              column="rate_flag"             jdbcType="VARCHAR" />
+    	    <result property="ratePeriod"            column="rate_period"           jdbcType="INTEGER" />	    	    	    
+    	    <result property="rateStatus"            column="rate_status"           jdbcType="INTEGER" />
+	</resultMap>
+	
+   
+	
+	
+	<sql id="allColumn">
+	        rate_id	 ,
+			rate_name	    ,
+			annualized_rate	,
+			rate_flag	    ,
+			rate_period	    ,
+			rate_status	    
+	</sql>
+ 
+	<select id="findByPager" parameterType="java.util.Map" resultMap="AddRate">
+		<include refid="queryBody" />
+	</select>
+	
+	<select id="AddRatequery" parameterType="java.util.Map" resultMap="AddRate">
+		<include refid="queryBody" />
+	</select>
+	
+	<select id="query" parameterType="java.util.Map" resultMap="AddRate">
+		select
+			<include refid="allColumn" />
+			 from
+			 phb_add_rate  
+			<include refid="dynamicWhere" />
+		 
+	</select>
+	
+		
+	<!-- 3.1.根据对像条件查询记录数 MAP参数 --><select id="findByPagerCount" parameterType="java.util.Map" resultType="int" >
+		select
+		count(1)
+		from
+		phb_add_rate 
+		<include refid="dynamicWhere" />
+		    
+	</select>
+	<select id="getById" parameterType="java.util.Map" resultMap="AddRate">
+			select
+			<include refid="allColumn" />
+			 from
+			 phb_add_rate  
+	</select>
+	<select id="unique" parameterType="java.util.Map" resultMap="AddRate" >
+			select
+			<include refid="allColumn" />
+			 from
+			 phb_add_rate 
+			<include refid="dynamicWhere" />
+			limit 1
+	</select>
+
+	<sql id="dynamicWhere">
+			<trim prefix="WHERE" prefixOverrides="AND|OR">
+				<if test="rateId !=null">
+					AND rate_id = #{rateId}
+				</if>
+				 
+			</trim>
+	</sql>
+ 
+ 	<!-- order by 排序 -->
+	<sql id="dynamicOrderBy">
+		<if test="orderBy!=null">
+			order by ${orderBy}
+			<if test="order!=null">
+				${order}
+		</if>
+		</if>
+	</sql>
+	
+
+	<insert id="insert" parameterType="com.phb.puhuibao.entity.AddRate" >
+	    INSERT INTO 
+	    phb_add_rate(<include refid="allapplColumn"/>	)
+		<include refid="allapplColumnVar"/>
+	</insert>
+	
+	<sql id="allapplColumn">
+		  
+			rate_name	    ,
+			annualized_rate	,
+			rate_flag	    ,
+			rate_period	    ,
+			rate_status	 
+         
+	</sql>
+	
+	
+ 
+	
+	<sql id="allapplColumnVar">
+		values(
+				  
+		          #{rateName,             jdbcType=VARCHAR},                 
+		          #{annualizedRate,         jdbcType=DECIMAL},
+		          #{rateFlag,              jdbcType=VARCHAR},
+		          #{ratePeriod,            jdbcType=INTEGER},
+		          #{rateStatus,              jdbcType=INTEGER}
+		         
+		     )
+	</sql>
+	
+	<update id="update" parameterType="com.phb.puhuibao.entity.AddRate">
+			update phb_add_rate
+			<trim prefix=" SET " prefixOverrides=",">
+				<if test="rateStatus !=null">
+					  ,rate_status=#{rateStatus,jdbcType=INTEGER}
+				</if>
+				 
+				
+				
+			</trim>
+			WHERE 
+				rate_id=#{rateId}
+	</update>
+
+	<delete id="delete" parameterType="java.util.Map">
+		DELETE FROM phb_add_rate 
+		where rate_id =#{rateId}
+	</delete>	
+	
+	<sql id="queryBody">
+		<if test="sno!=null and eno!=null and orderBy!=null">
+			select
+			<include refid="allColumn" />
+			 from
+			  phb_add_rate   
+			<include refid="dynamicWhere" />
+			<include refid="dynamicOrderBy" />
+			limit ${sno-1},${eno}
+		</if>
+		<!-- 无orderby -->
+		<if test="sno!=null and eno!=null and orderBy==null">
+			select
+			<include refid="allColumn" />
+			 from
+			phb_add_rate 
+			<include refid="dynamicWhere" />
+			limit ${sno-1},${eno}
+		</if>
+	</sql>	
+
+</mapper>
+
+
+
+
