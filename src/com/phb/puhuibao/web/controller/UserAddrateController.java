@@ -4,6 +4,8 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -25,43 +27,41 @@ public class UserAddrateController extends BaseController<UserAddrate, String> {
 	}
 	
 	/**
-	 * 合同列表
+	 * 我的加息劵列表
 	 * @param pageno
 	 * @param clinicId
 	 * @return
 	 */
-	@RequestMapping(value="queryDoctorsFromClinic")
+	@RequestMapping(value="myUserAddrateList")
 	@ResponseBody
-	public Map<String, Object> queryDoctorsManagement(@RequestParam int pageno,@RequestParam(value="clinic_id") String clinicId){
+	public Map<String, Object> myUserAddrateList(@RequestParam int pageno, @RequestParam String muid){
+		final Log log = LogFactory.getLog(NotificationController.class);
 		Pager<UserAddrate> pdoctorResult=new Pager<UserAddrate>();
 		pdoctorResult.setReload(true);
 		pdoctorResult.setCurrent(pageno);
+		pdoctorResult.setLimit(30);
 		Map<String,Object> hmap=new HashMap<String,Object>();
-		hmap.put("orderBy", "doctor_date");
-		hmap.put("clinicId", clinicId);
-		Pager<UserAddrate> p=this.getBaseService().findByPager(pdoctorResult, hmap);
-		 
+		hmap.put("orderBy", "m.last_date desc");
+		hmap.put("rateStatus", "0,1");
 		Map<String, Object> data = new HashMap<String, Object>();
-		data.put("result", p.getData());
-		data.put("count", p.getTotal());
-		data.put("message", "");
-		data.put("status", 1);
-		return data;		
+		
+		try {
+			Pager<UserAddrate> p=this.getBaseService().findByPager(pdoctorResult, hmap);
+			data.put("result", p.getData());
+			data.put("count", p.getTotal());
+			data.put("message", "");
+			data.put("status", 1);
+			return data;	
+		} catch (Exception e) {
+			log.error("我的加息劵列表出错:"  +e);
+			data.put("message", "查询出错!");
+			data.put("status", 0);
+			return data;
+			 
+		}
+ 
 	}
 	
-	/**
-	 * 医生详细
-	 * @param id
-	 * @return
-	 */
-	@RequestMapping(value="queryDoctorById")
-	@ResponseBody
-	public Map<String, Object> queryContractManagement(@RequestParam(value="id") String id){
-		Map<String, Object> data = new HashMap<String, Object>();
-		data.put("result", this.getBaseService().getById(id));
-		data.put("message", "");
-		data.put("status", 1);
-		return data;		
-	}
+	 
 
 }

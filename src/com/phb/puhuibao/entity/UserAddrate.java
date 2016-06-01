@@ -3,52 +3,91 @@ package com.phb.puhuibao.entity;
 import java.util.Date;
 
 public class UserAddrate {
-	private int record_id; // id
-	private int muser_id; // 用户
-	private int rateId; // 加息劵id
-	private int rate_status; // 状态
-	private Date last_date; // 到期日
-	private Date create_time;//领取日
+		private int recordId; // id
+		private int muserId; // 用户
+		private int rateId; // 加息劵id
+		private int rateStatus; // 状态
+		private Date lastDate; // 到期日
+		private Date createTime;//领取日
+	 private String rateName;      // 加息劵名字  
+	 private Double annualizedRate;  // 加息劵利率
+	 private String  rateFlag;      //期限前的标记 
+	 private int ratePeriod;       //期限的数值  
+	 private String amountFlag;  //额度前的标记     
+	 private int rateAmount;     //额度的数值
 	
-	
-	public int getRecord_id() {
-		return record_id;
+	public String getRateName() {
+		return rateName;
 	}
-	public void setRecord_id(int record_id) {
-		this.record_id = record_id;
+	public void setRateName(String rateName) {
+		this.rateName = rateName;
 	}
-	public int getMuser_id() {
-		return muser_id;
+	public Double getAnnualizedRate() {
+		return annualizedRate;
 	}
-	public void setMuser_id(int muser_id) {
-		this.muser_id = muser_id;
+	public void setAnnualizedRate(Double annualizedRate) {
+		this.annualizedRate = annualizedRate;
 	}
- 
+	public String getRateFlag() {
+		return rateFlag;
+	}
+	public void setRateFlag(String rateFlag) {
+		this.rateFlag = rateFlag;
+	}
+	public int getRatePeriod() {
+		return ratePeriod;
+	}
+	public void setRatePeriod(int ratePeriod) {
+		this.ratePeriod = ratePeriod;
+	}
+	public String getAmountFlag() {
+		return amountFlag;
+	}
+	public void setAmountFlag(String amountFlag) {
+		this.amountFlag = amountFlag;
+	}
+	public int getRateAmount() {
+		return rateAmount;
+	}
+	public void setRateAmount(int rateAmount) {
+		this.rateAmount = rateAmount;
+	}
+	public int getRecordId() {
+		return recordId;
+	}
+	public void setRecordId(int recordId) {
+		this.recordId = recordId;
+	}
+	public int getMuserId() {
+		return muserId;
+	}
+	public void setMuserId(int muserId) {
+		this.muserId = muserId;
+	}
 	public int getRateId() {
 		return rateId;
 	}
 	public void setRateId(int rateId) {
 		this.rateId = rateId;
 	}
-	public int getRate_status() {
-		return rate_status;
+	public int getRateStatus() {
+		return rateStatus;
 	}
-	public void setRate_status(int rate_status) {
-		this.rate_status = rate_status;
+	public void setRateStatus(int rateStatus) {
+		this.rateStatus = rateStatus;
 	}
-	public Date getLast_date() {
-		return last_date;
+	public Date getLastDate() {
+		return lastDate;
 	}
-	public void setLast_date(Date last_date) {
-		this.last_date = last_date;
+	public void setLastDate(Date lastDate) {
+		this.lastDate = lastDate;
 	}
-	public Date getCreate_time() {
-		return create_time;
+	public Date getCreateTime() {
+		return createTime;
 	}
-	public void setCreate_time(Date create_time) {
-		this.create_time = create_time;
+	public void setCreateTime(Date createTime) {
+		this.createTime = createTime;
 	}
-	
  
  
 

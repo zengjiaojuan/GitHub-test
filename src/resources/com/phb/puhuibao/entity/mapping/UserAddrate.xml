@@ -13,16 +13,30 @@
     	    <result property="rateStatus"          column="rate_status"             jdbcType="INTEGER" />
     	    <result property="lastDate"            column="last_date"               jdbcType="DATE" />	    	    	    
     	    <result property="createTime"          column="create_time"             jdbcType="TIMESTAMP" />
+    	    
+    	    <result property="rateName"          column="rate_name"             jdbcType="VARCHAR" />
+    	    <result property="annualizedRate"        column="annualized_rate"       jdbcType="DECIMAL" />
+    	    <result property="rateFlag"          column="rate_flag"             jdbcType="VARCHAR" />
+    	    <result property="ratePeriod"          column="rate_period"             jdbcType="INTEGER" />
+    	    <result property="amountFlag"          column="amount_flag"             jdbcType="VARCHAR" />
+    	    <result property="rateAmount"          column="rate_amount"             jdbcType="INTEGER" />
  
 	</resultMap>
   
 	<sql id="allColumn">
-	        record_id,
-			muser_id,
-			rate_id	,
-			rate_status,
-			last_date,
-			create_time 
+	        m.record_id,
+			m.muser_id,
+			m.rate_id	,
+			m.rate_status,
+			m.last_date,
+			m.create_time,
+			
+			r.rate_name,
+			r.annualized_rate,
+			r.rate_flag,
+			r.rate_period,
+			r.amount_flag,	    
+			r.rate_amount 
 	</sql>
  
 	<select id="findByPager" parameterType="java.util.Map" resultMap="UserAddrate">
@@ -37,7 +51,7 @@
 		select
 			<include refid="allColumn" />
 			 from
-			 phb_muser_addrate
+			 phb_muser_addrate m
 			<include refid="dynamicWhere" />
 		 
 	</select>
@@ -47,7 +61,7 @@
 		select
 		count(1)
 		from
-		phb_muser_addrate 
+		phb_muser_addrate m
 		<include refid="dynamicWhere" />
 		    
 	</select>
@@ -55,13 +69,13 @@
 			select
 			<include refid="allColumn" />
 			 from
-			 phb_muser_addrate  
+			 phb_muser_addrate  m
 	</select>
 	<select id="unique" parameterType="java.util.Map" resultMap="UserAddrate" >
 			select
 			<include refid="allColumn" />
 			 from
-			 phb_muser_addrate 
+			 phb_muser_addrate m
 			<include refid="dynamicWhere" />
 			limit 1
 	</select>
@@ -69,7 +83,15 @@
 	<sql id="dynamicWhere">
 			<trim prefix="WHERE" prefixOverrides="AND|OR">
 				<if test="recordId !=null">
-					AND record_id = #{recordId}
+					AND m.record_id = #{recordId}
+				</if>
+				
+				<if test="muserId !=null">
+					AND m.muser_id = #{muserId}
+				</if>
+				
+				<if test="rateStatus !=null">
+					AND m.rate_status in  (${rateStatus})  
 				</if>
 				 
 			</trim>
@@ -138,7 +160,7 @@
 			select
 			<include refid="allColumn" />
 			 from
-			  phb_muser_addrate   
+			  phb_muser_addrate m  left join phb_add_rate r on( m.rate_id =r.rate_id) 
 			<include refid="dynamicWhere" />
 			<include refid="dynamicOrderBy" />
 			limit ${sno-1},${eno}
@@ -148,7 +170,7 @@
 			select
 			<include refid="allColumn" />
 			 from
-			phb_muser_addrate 
+			phb_muser_addrate  m  left join phb_add_rate r on( m.rate_id =r.rate_id) 
 			<include refid="dynamicWhere" />
 			limit ${sno-1},${eno}
 		</if>
