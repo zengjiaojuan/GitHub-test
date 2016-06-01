@@ -35,7 +35,7 @@ public class UserAddrateController extends BaseController<UserAddrate, String> {
 	@RequestMapping(value="myUserAddrateList")
 	@ResponseBody
 	public Map<String, Object> myUserAddrateList(@RequestParam int pageno, @RequestParam String muid){
-		final Log log = LogFactory.getLog(NotificationController.class);
+		final Log log = LogFactory.getLog(UserAddrateController.class);
 		Pager<UserAddrate> pdoctorResult=new Pager<UserAddrate>();
 		pdoctorResult.setReload(true);
 		pdoctorResult.setCurrent(pageno);

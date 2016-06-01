@@ -16,6 +16,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -47,6 +49,7 @@ import com.phb.puhuibao.service.MobileUserService;
 @Controller
 @RequestMapping(value = "/userInformation")
 public class MobileUserController extends BaseController<MobileUser, String> {
+	final Log log = LogFactory.getLog(MobileUserController.class);
 	@Override
 	@Resource(name = "mobileUserService")
 	public void setBaseService(IBaseService<MobileUser, String> baseService) {

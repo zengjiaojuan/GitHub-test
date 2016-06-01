@@ -24,11 +24,14 @@ import com.idap.web.common.controller.Commons;
 import com.idp.pub.constants.Constants;
 import com.idp.pub.service.IBaseService;
 import com.idp.pub.web.controller.BaseController;
+
+import nl.justobjects.pushlet.util.Log;
  
 
 @Controller
 @RequestMapping(value = "/uploadFile")
 public class UploadFileController extends BaseController<UploadFile, String> {
+	@Override
 	@Resource(name = "uploadFileService")
 	public void setBaseService(IBaseService<UploadFile, String> baseService) {
 		super.setBaseService(baseService);
@@ -98,7 +101,8 @@ public class UploadFileController extends BaseController<UploadFile, String> {
 						oldFileName.getBytes("GBK"), "iso-8859-1"));
 			} 
 		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
+			Log.error("读取图片出错"+e);
+			 
 		}
   
 		return new ResponseEntity<byte[]>(
