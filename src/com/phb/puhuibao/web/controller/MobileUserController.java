@@ -80,7 +80,7 @@ public class MobileUserController extends BaseController<MobileUser, String> {
 
 		Map<String,Object> params=new HashMap<String,Object>();
 		Map<String,Object> result=new HashMap<String,Object>();
-		params.put("muid", muid);
+		params.put("mUserId", muid);
 		MobileUser muser = this.getBaseService().unique(params);
 		if (muser == null) {
 			data.put("message", "该用户不存在！");

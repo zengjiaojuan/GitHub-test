@@ -40,6 +40,7 @@ import com.yeepay.TZTService;
 @Controller
 @RequestMapping(value = "/userCard")
 public class UserCardController extends BaseController<UserCard, String> {
+	@Override
 	@Resource(name = "userCardService")
 	public void setBaseService(IBaseService<UserCard, String> baseService) {
 		super.setBaseService(baseService);
@@ -447,10 +448,28 @@ public class UserCardController extends BaseController<UserCard, String> {
 			if ("0000".endsWith(ret_code)) {
 				JSONArray o = new JSONArray(object.getString("agreement_list"));
 				String bank_name = o.getJSONObject(0).getString("bank_name"); // 单卡
+				String bank_code = o.getJSONObject(0).getString("bank_code"); // 单卡
 				List<Map<String, String>> result = new ArrayList<Map<String, String>>();
 				Map<String, String> map = new HashMap<String, String>();
 				map.put("bank_name", bank_name);
 				map.put("card_no", cardno);
+				map.put("bank_code", bank_code);
+				map.put("icon_id", bank_code);
+
+//中国银行   01040000
+//农业银行   01030000
+//工商银行   01020000
+//建设银行   01050000
+//招商银行   03080000
+//中信银行   03020000
+//华夏银行   03040000
+//民生银行   03050000
+//广发银行   03060000
+//平安银行   03070000
+//兴业银行   03090000
+//交通银行   03010000
+//邮政储蓄银行   01000000
+//光大银行     03030000
 				map.put("prcptcd", prcptcd);
 				result.add(map);
 				data.put("result", result);
