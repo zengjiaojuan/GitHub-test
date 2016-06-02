@@ -11,5 +11,7 @@ public interface MobileUserService {
 	Map<String, Object> processmyAsset(String muid);
 
 	void adminCreate(MobileUser entity);
+	
+	MobileUser userCreate(MobileUser entity);
 
 }

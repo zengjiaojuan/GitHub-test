@@ -33,6 +33,9 @@
 	<result property="picturewall" column="PICTUREWALL" jdbcType="VARCHAR" />
 	<result property="socialStatus" column="social_status" jdbcType="VARCHAR" />
 	
+	<result property="userProvince" column="user_province" jdbcType="VARCHAR" />
+	<result property="userCity" column="user_city" jdbcType="VARCHAR" />
+	
   </resultMap>
 
   <!-- RESOURCE INSERT -->
@@ -165,7 +168,9 @@
 	m_user_email,
 	pay_password,
     id_number,
-    nickname 
+    nickname, 
+    user_province,
+    user_city
   </sql>
   <sql id="allapplColumnVar">
 	values(
@@ -180,7 +185,10 @@
 			#{mUserEmail,jdbcType=VARCHAR},
 			#{payPassword,jdbcType=VARCHAR},
 			#{idNumber,jdbcType=VARCHAR},
-			#{nickname,jdbcType=VARCHAR}
+			#{nickname,jdbcType=VARCHAR},
+			#{userProvince,jdbcType=VARCHAR},
+			#{userCity,jdbcType=VARCHAR}
+			
 			 
 			
 	)

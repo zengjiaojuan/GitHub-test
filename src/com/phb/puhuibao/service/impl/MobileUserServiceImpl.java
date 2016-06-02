@@ -1,7 +1,13 @@
 package com.phb.puhuibao.service.impl;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.StringReader;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.net.URL;
+import java.net.URLConnection;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -10,11 +16,17 @@ import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.jsoup.helper.StringUtil;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.w3c.dom.Document;
+import org.xml.sax.InputSource;
 
+import com.alibaba.fastjson.JSON;
 import com.idp.pub.context.AppContext;
 import com.idp.pub.dao.IBaseDao;
 import com.idp.pub.dao.IPagerDao;
@@ -100,142 +112,7 @@ public class MobileUserServiceImpl extends DefaultBaseService<MobileUser, String
 		return entity;
 	}
 	
-//	public Map<String, Object> processFortune(String muid) {
-//		Map<String, Object> params = new HashMap<String, Object>();
-//		params.put("mUserId", muid);
-//		List<UserInvestment> investments = userInvestmentDao.find(params);
-//		double todayIncome = 0;
-//		double totalIncome = 0;
-//		long currentTime = new Date().getTime();
-//		for (UserInvestment investment : investments) {
-//			if (investment.getStatus() >= 2) {
-//				totalIncome += investment.getLastIncome();
-//			} else {
-//				Long incomeTime = investment.getIncomeDate().getTime();
-//				if (currentTime > incomeTime) {
-//					String productSN = investment.getProductSN();
-//					params = new HashMap<String, Object>();
-//					params.put("productSN", productSN);
-//					AssetProduct product = assetProductDao.unique(params);
-//					Calendar cal = Calendar.getInstance();
-//					cal.setTimeInMillis(incomeTime);
-//			        if (product.getUnit().equals("年")) {
-//			        	cal.add(Calendar.YEAR, product.getPeriod());
-//					} else if (product.getUnit().indexOf("月") > 0) {
-//			        	cal.add(Calendar.MONTH, product.getPeriod());
-//			        } else {
-//			        	cal.add(Calendar.DATE, product.getPeriod());
-//			        }
-//
-//					double rate = product.getAnnualizedRate();
-//					double amount = investment.getInvestmentAmount();
-//					double everyIncome = Functions.calEveryIncome(amount, rate);
-//			        
-//					int days = 0;
-//					// 今日收益包含当天
-//					if (product.getType() == 3) { // 金宝宝
-//						Calendar cal3 = Calendar.getInstance();
-//						cal3.setTimeInMillis(incomeTime);
-//					    cal3.add(Calendar.MONTH, product.getPeriod() - 3);
-//						if (currentTime < cal3.getTimeInMillis()) {
-//							cal3.setTimeInMillis(currentTime);
-//							days = (int) ((currentTime - incomeTime) / (24 * 3600 * 1000)) + 1;
-//							totalIncome += everyIncome * days;
-//							todayIncome += everyIncome;
-//						} else {
-//							days = (int) ((cal3.getTimeInMillis() - incomeTime) / (24 * 3600 * 1000)) + 1;
-//							totalIncome += everyIncome * days;
-//							everyIncome = Functions.calEveryIncome(amount, 0.12);
-//							if (currentTime >= cal3.getTimeInMillis() && currentTime < cal.getTimeInMillis()) {
-//								days = (int) ((currentTime - cal3.getTimeInMillis()) / (24 * 3600 * 1000)) + 1;
-//								todayIncome += everyIncome;
-//							} else {
-//								days = (int) ((cal.getTimeInMillis() - cal3.getTimeInMillis()) / (24 * 3600 * 1000));
-//							}
-//							totalIncome += everyIncome * days;
-//						}
-//					} else if (product.getType() == 4) {
-//						double lastIncome = 0;
-//						if (currentTime < cal.getTimeInMillis()) {
-//							Calendar monthCal = Calendar.getInstance();
-//							monthCal.setTimeInMillis(incomeTime);
-//							currentTime += 24 * 3600 * 1000;
-//							while (currentTime > monthCal.getTimeInMillis()) {
-//								monthCal.add(Calendar.MONTH, 1);
-//								days = (int) ((monthCal.getTimeInMillis() - incomeTime) / (24 * 3600 * 1000));
-//								everyIncome = Functions.calEveryIncome(amount, rate);
-//								lastIncome += everyIncome * days;
-//								incomeTime = monthCal.getTimeInMillis();
-//								amount += lastIncome;
-//							}
-//							todayIncome += everyIncome;
-//						} else {
-//							Calendar monthCal = Calendar.getInstance();
-//							monthCal.setTimeInMillis(incomeTime);
-//							while (cal.getTimeInMillis() > monthCal.getTimeInMillis()) {
-//								monthCal.add(Calendar.MONTH, 1);
-//								days = (int) ((monthCal.getTimeInMillis() - incomeTime) / (24 * 3600 * 1000));
-//								everyIncome = Functions.calEveryIncome(amount, rate);
-//								lastIncome += everyIncome * days;
-//								incomeTime = monthCal.getTimeInMillis();
-//								amount += lastIncome;
-//							}						
-//						}
-//						totalIncome += lastIncome;
-//					} else {
-//						if (currentTime < cal.getTimeInMillis()) {
-//							days = (int) ((currentTime - incomeTime) / (24 * 3600 * 1000)) + 1;
-//							todayIncome += everyIncome;
-//						} else {
-//							days = (int) ((cal.getTimeInMillis() - incomeTime) / (24 * 3600 * 1000));
-//						}
-//						totalIncome += everyIncome * days;
-//					}
-//				}
-//			}
-//		}
-//		
-//		params = new HashMap<String, Object>();
-//		params.put("mUserId", muid);
-//		params.put("status", 1);
-//		List<ExperienceInvestment> experienceInvestments = experienceInvestmentDao.find(params);
-//		for (ExperienceInvestment investment : experienceInvestments) {
-//			if (investment.getStatus() >= 2) {
-//				totalIncome += investment.getLastIncome();
-//			} else {
-//				Long incomeTime = investment.getIncomeDate().getTime();
-//				if (currentTime > incomeTime) {
-//					String productSN = investment.getProductSN();
-//					params = new HashMap<String, Object>();
-//					params.put("productSN", productSN);
-//					ExperienceProduct product = experienceProductDao.unique(params);
-//					Calendar cal = Calendar.getInstance();
-//					cal.setTimeInMillis(incomeTime);
-//			        cal.add(Calendar.DATE, product.getPeriod());
-//			        
-//					double rate = product.getAnnualizedRate();
-//					double amount = investment.getInvestmentAmount();
-//					double everyIncome = Functions.calEveryIncome(amount, rate);
-//
-//					int days = 0;
-//					if (currentTime < cal.getTimeInMillis()) {
-//						days = (int) ((currentTime - incomeTime) / (24 * 3600 * 1000)) + 1;
-//						todayIncome += everyIncome;
-//					} else {
-//						days = (int) ((cal.getTimeInMillis() - incomeTime) / (24 * 3600 * 1000));
-//					}
-//					totalIncome += everyIncome * days;
-//				}
-//			}
-//		}
-//		
-//		BigDecimal todayIncomeBD = new BigDecimal(todayIncome).setScale(2, RoundingMode.DOWN);
-//		BigDecimal totalIncomeBD = new BigDecimal(totalIncome).setScale(2, RoundingMode.DOWN);
-//		Map<String, Object> result = new HashMap<String, Object>();
-//		result.put("todayIncome", todayIncomeBD.doubleValue());
-//		result.put("totalIncome", totalIncomeBD.doubleValue());
-//		return result;
-//	}
+ 
 	@Override
 	public Map<String, Object> processFortune(String muid) {
 		Map<String, Object> params = new HashMap<String, Object>();
@@ -416,5 +293,112 @@ public class MobileUserServiceImpl extends DefaultBaseService<MobileUser, String
 		user.setEmergencyPhone(entity.getEmergencyPhone());
 		user.setEmergencyRelation(entity.getEmergencyRelation());
 		this.update(user);
+	}
+	
+
+	/**
+	 * 手机号码归属地
+	 
+	 */
+public  String calcMobileProvince(String mobileNumber) {
+ 
+        String jsonString = null;
+        com.alibaba.fastjson.JSONObject object = null;
+        String urlString = "https://tcc.taobao.com/cc/json/mobile_tel_segment.htm?tel=" + mobileNumber;
+        StringBuffer sb = new StringBuffer();
+        BufferedReader buffer;
+       
+        try{
+        	URL url = new URL(urlString);
+            InputStream in = url.openStream();
+            buffer = new BufferedReader(new InputStreamReader(in,"gb2312"));
+            String line = null;
+            while((line = buffer.readLine()) != null){
+                sb.append(line);
+            }
+            in.close();
+            buffer.close();
+            jsonString = sb.toString();
+            jsonString = jsonString.substring(jsonString.indexOf('{'), jsonString.length());
+            object = JSON.parseObject(jsonString);
+            return object.getString("province");
+        }catch(Exception e){
+        	return "";
+        }
+        
+    }
+   
+   
+ 
+private  String callUrlByGet(String callurl,String charset){   
+    String result = "";   
+    try {   
+        URL url = new URL(callurl);   
+        URLConnection connection = url.openConnection();   
+        connection.connect();   
+        BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream(),charset));   
+        String line;   
+        while((line = reader.readLine())!= null){    
+            result += line;   
+            result += "\n";
+        }
+    } catch (Exception e) {   
+        e.printStackTrace();   
+        return "";
+    }
+    return result;
+}
+/**
+ * 手机号码归属地
+ 
+ */
+public  String getMobileLocation(String tel) {
+	
+	try{
+		 String url = "http://life.tenpay.com/cgi-bin/mobile/MobileQueryAttribution.cgi?chgmobile=" + tel;
+	        String result = callUrlByGet(url,"GBK");
+	        StringReader stringReader = new StringReader(result); 
+	        InputSource inputSource = new InputSource(stringReader); 
+	        DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance(); 
+	        DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder(); 
+	        Document document = documentBuilder.parse(inputSource);
+	        String retmsg = document.getElementsByTagName("retmsg").item(0).getFirstChild().getNodeValue();
+	        if(retmsg.equals("OK")){
+	      
+	            String province = document.getElementsByTagName("province").item(0).getFirstChild().getNodeValue().trim();
+	            String city = document.getElementsByTagName("city").item(0).getFirstChild().getNodeValue().trim();
+	            if (province.equals("-") || city.equals("-")) {
+	                return (calcMobileProvince(tel) );
+	            }else {
+	                return (province +","+ city );
+	            }
+		        }else {
+		            return "";
+		        }
+			} catch(Exception e){
+		    	return "";
+		    }
+ 
+}
+	
+
+	@Override
+	public MobileUser userCreate(MobileUser entity) {
+		
+		String provinceandcity = getMobileLocation(entity.getmUserTel());
+		if( !StringUtil.isBlank(provinceandcity) && provinceandcity.indexOf(",")>0){ // 正确获取了用户的省市信息
+			String[] array  = provinceandcity.split(",");
+			entity.setUserProvince(array[0]);
+			entity.setUserCity(array[1]);
+			
+		}else if(!StringUtil.isBlank(provinceandcity) && provinceandcity.indexOf(",") == -1){// 只获取了 省份信息
+			entity.setUserProvince(provinceandcity);
+		} else{// 省市信息都是空
+			
+		}
+		this.save(entity);
+ 
+		return entity;
+		
 	}
 }

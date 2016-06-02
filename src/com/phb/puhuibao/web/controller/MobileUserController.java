@@ -291,144 +291,141 @@ public class MobileUserController extends BaseController<MobileUser, String> {
 	@ResponseBody
 	public Map<String, Object> saveMobileUserForAndroid(@RequestParam String mUserTel, @RequestParam String mUserPwd, @RequestParam String inviteCode) {
 		Map<String, Object> data = new HashMap<String, Object>();
-		if (!Functions.isMobile(mUserTel)) {
-			data.put("message", "请输入正确的手机号！");
-			data.put("status", 0);
-			return data;
-		}
+		
+		
 
-		Map<String, Object> params=new HashMap<String, Object>();
-		params.put("mUserTel", mUserTel);
-		MobileUser u = this.getBaseService().unique(params);
-		if (u != null) {
-			data.put("message", "该手机号已注册，请登录！");
-			data.put("status", 0);
-			return data;
-		}
-		
-		
-		int parentId = 0;
-		if (inviteCode.length() > 0) {
-			params = new HashMap<String, Object>();
-			params.put("code", inviteCode);
-			Invite result = inviteService.unique(params);
-			if (result == null) {
-				data.put("message", "该邀请码无效！");
-				data.put("status", 0);
-				return data;
-			}
-			parentId = result.getmUserId();
-		}
-		
-		MobileUser entity = new MobileUser();
-		entity.setmUserTel(mUserTel);
-		entity.setmUserPwd(RSAUtils.decrypt(mUserPwd));
-		entity.setThirdParty("");
-		entity.setmUserName("");
-		entity.setPhoto("");
-		entity.setOccupation("");
-		entity.setmUserEmail("");
-		entity.setPayPassword("");
-		entity.setParentId(parentId);
-		entity.setIdNumber("");
-		
-		String base = "abcdefghijkmnpqrstuvwxyz23456789";     
-	    Random random = new Random();     
-	    StringBuffer sb = new StringBuffer();     
-	    for (int i = 0; i < 6; i++) {     
-	        int number = random.nextInt(base.length());     
-	        sb.append(base.charAt(number));     
-	    }     
-	    entity.setNickname(sb.toString());//生成随机昵称
 	    
 		
 		try {
-		    entity = this.getBaseService().save(entity);
+			if (!Functions.isMobile(mUserTel)) {
+				data.put("message", "请输入正确的手机号！");
+				data.put("status", 0);
+				return data;
+			}
+
+			Map<String, Object> params=new HashMap<String, Object>();
+			params.put("mUserTel", mUserTel);
+			MobileUser u = this.getBaseService().unique(params);
+			if (u != null) {
+				data.put("message", "该手机号已注册，请登录！");
+				data.put("status", 0);
+				return data;
+			}
+			
+			
+			int parentId = 0;
+			if (inviteCode.length() > 0) {
+				params = new HashMap<String, Object>();
+				params.put("code", inviteCode);
+				Invite result = inviteService.unique(params);
+				if (result == null) {
+					data.put("message", "该邀请码无效！");
+					data.put("status", 0);
+					return data;
+				}
+				parentId = result.getmUserId();
+			}
+			MobileUser entity = new MobileUser();
+			entity.setmUserTel(mUserTel);
+			entity.setmUserPwd(RSAUtils.decrypt(mUserPwd));
+			entity.setThirdParty("");
+			entity.setmUserName("");
+			entity.setPhoto("");
+			entity.setOccupation("");
+			entity.setmUserEmail("");
+			entity.setPayPassword("");
+			entity.setParentId(parentId);
+			entity.setIdNumber("");
+			
+			String base = "abcdefghijkmnpqrstuvwxyz23456789";     
+		    Random random = new Random();     
+		    StringBuffer sb = new StringBuffer();     
+		    for (int i = 0; i < 6; i++) {     
+		        int number = random.nextInt(base.length());     
+		        sb.append(base.charAt(number));     
+		    }     
+		    entity.setNickname(sb.toString());//生成随机昵称
+		        mobileUserService.userCreate(entity);
+			  	entity.setmUserPwd("");
+				data.put("result", entity);
+				data.put("message", "注册成功！");
+				data.put("status", 1);
+				return data;
 		} catch (Exception e) {
-			data.put("message", "注册保存失败！" + e.getMessage());
+			log.error("注册失败:"+e);
+			data.put("message", "注册保存失败！");
 			data.put("status", 0);			
 			return data;
 		}
-		entity.setmUserPwd("");
- 
-		
-	    
-	 
-		
-		
-		data.put("result", entity);
-		data.put("message", "注册成功！");
-		data.put("status", 1);
-		return data;
+	
 	}
 	@RequestMapping(value="saveMobileUserForIOS")
 	@ResponseBody
 	public Map<String, Object> saveMobileUserForIOS(@RequestParam String mUserTel, @RequestParam String mUserPwd, @RequestParam String inviteCode) {
 		Map<String, Object> data = new HashMap<String, Object>();
-		if (!Functions.isMobile(mUserTel)) {
-			data.put("message", "请输入正确的手机号！");
-			data.put("status", 0);
-			return data;
-		}
-
-		Map<String,Object> params=new HashMap<String,Object>();
-		params.put("mUserTel", mUserTel);
-		MobileUser u = this.getBaseService().unique(params);
-		if (u != null) {
-			data.put("message", "该手机号已注册，请登录！");
-			data.put("status", 0);
-			return data;
-		}
 		
-		
-		int parentId = 0;
-		if (inviteCode.length() > 0) {
-			params=new HashMap<String,Object>();
-			params.put("code", inviteCode);
-			Invite result = inviteService.unique(params);
-			if (result == null) {
-				data.put("message", "该邀请码无效！");
+		try {
+			if (!Functions.isMobile(mUserTel)) {
+				data.put("message", "请输入正确的手机号！");
 				data.put("status", 0);
 				return data;
 			}
-			parentId = result.getmUserId();
-		}
 
-		MobileUser entity = new MobileUser();
-		entity.setmUserTel(mUserTel);
-		entity.setmUserPwd(DESUtils.decrypt(mUserPwd));
-		entity.setThirdParty("");
-		entity.setmUserName("");
-		entity.setPhoto("");
-		entity.setOccupation("");
-		entity.setmUserEmail("");
-		entity.setPayPassword("");
-		entity.setParentId(parentId);
-		entity.setIdNumber("");
-		String base = "abcdefghijklmnopqrstuvwxyz123456789";     
-	    Random random = new Random();     
-	    StringBuffer sb = new StringBuffer();     
-	    for (int i = 0; i < 6; i++) {     
-	        int number = random.nextInt(base.length());     
-	        sb.append(base.charAt(number));     
-	    }     
-	    entity.setNickname(sb.toString());//生成随机昵称
-		try {
-		    entity = this.getBaseService().save(entity);
+			Map<String,Object> params=new HashMap<String,Object>();
+			params.put("mUserTel", mUserTel);
+			MobileUser u = this.getBaseService().unique(params);
+			if (u != null) {
+				data.put("message", "该手机号已注册，请登录！");
+				data.put("status", 0);
+				return data;
+			}
+			
+			
+			int parentId = 0;
+			if (inviteCode.length() > 0) {
+				params=new HashMap<String,Object>();
+				params.put("code", inviteCode);
+				Invite result = inviteService.unique(params);
+				if (result == null) {
+					data.put("message", "该邀请码无效！");
+					data.put("status", 0);
+					return data;
+				}
+				parentId = result.getmUserId();
+			}
+
+			MobileUser entity = new MobileUser();
+			entity.setmUserTel(mUserTel);
+			entity.setmUserPwd(DESUtils.decrypt(mUserPwd));
+			entity.setThirdParty("");
+			entity.setmUserName("");
+			entity.setPhoto("");
+			entity.setOccupation("");
+			entity.setmUserEmail("");
+			entity.setPayPassword("");
+			entity.setParentId(parentId);
+			entity.setIdNumber("");
+			String base = "abcdefghijklmnopqrstuvwxyz123456789";     
+		    Random random = new Random();     
+		    StringBuffer sb = new StringBuffer();     
+		    for (int i = 0; i < 6; i++) {     
+		        int number = random.nextInt(base.length());     
+		        sb.append(base.charAt(number));     
+		    }     
+		    entity.setNickname(sb.toString());//生成随机昵称
+			 mobileUserService.userCreate(entity);
+			 entity.setmUserPwd("");
+			data.put("result", entity);
+			data.put("message", "注册成功！");
+			data.put("status", 1);
+			return data;
 		} catch (Exception e) {
-			data.put("message", "注册保存失败！" + e.getMessage());
+			log.error("注册失败:"+e);
+			data.put("message", "注册保存失败！" );
 			data.put("status", 0);			
 			return data;
 		}
-		entity.setmUserPwd("");
 		
- 
-	 
- 
-		data.put("result", entity);
-		data.put("message", "注册成功！");
-		data.put("status", 1);
-		return data;
 	}
 
 	/**
@@ -1514,44 +1511,7 @@ public class MobileUserController extends BaseController<MobileUser, String> {
 		}
 	}
 
-//	@RequestMapping(value="saveBankCardForAndroid")
-//	@ResponseBody
-//	public Map<String, Object> saveBankCardForAndroid(@RequestParam int muid, @RequestParam String bankName, @RequestParam String bankAccount) {
-//		MobileUser entity = new MobileUser();
-//		entity.setmUserId(muid);
-//		entity.setBankName(RSAUtils.decrypt(bankName));
-//		entity.setBankAccount(RSAUtils.decrypt(bankAccount));
-//		Map<String, Object> data = new HashMap<String, Object>();
-//		try {
-//			entity = this.getBaseService().update(entity);
-//		} catch (Exception e) {
-//			data.put("message", "网络异常！");
-//			data.put("status", 0);			
-//			return data;
-//		}
-//		data.put("message", "保存成功");
-//		data.put("status", 1);
-//		return data;
-//	}
-//	@RequestMapping(value="saveBankCardForIOS")
-//	@ResponseBody
-//	public Map<String, Object> saveBankCardForIOS(@RequestParam int muid, @RequestParam String bankName, @RequestParam String bankAccount) {
-//		MobileUser entity = new MobileUser();
-//		entity.setmUserId(muid);
-//		entity.setBankName(DESUtils.decrypt(bankName));
-//		entity.setBankAccount(DESUtils.decrypt(bankAccount));
-//		Map<String, Object> data = new HashMap<String, Object>();
-//		try {
-//			entity = this.getBaseService().update(entity);
-//		} catch (Exception e) {
-//			data.put("message", "网络异常！");
-//			data.put("status", 0);			
-//			return data;
-//		}
-//		data.put("message", "保存成功");
-//		data.put("status", 1);
-//		return data;
-//	}
+ 
 	
  
 	

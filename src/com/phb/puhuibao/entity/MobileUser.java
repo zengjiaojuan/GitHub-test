@@ -38,7 +38,23 @@ public class MobileUser implements Serializable {
 	private String picturewall; // 照片墙
 	private String socialStatus;//个人签名
 	
+	private String userProvince;//个人签名
+	private String userCity;//个人签名
 	
+	
+	 
+	public String getUserProvince() {
+		return userProvince;
+	}
+	public void setUserProvince(String userProvince) {
+		this.userProvince = userProvince;
+	}
+	public String getUserCity() {
+		return userCity;
+	}
+	public void setUserCity(String userCity) {
+		this.userCity = userCity;
+	}
 	public Integer getLiveness() {
 		return liveness;
 	}
