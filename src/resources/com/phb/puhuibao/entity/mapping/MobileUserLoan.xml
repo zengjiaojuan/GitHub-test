@@ -10,8 +10,7 @@
     <result property="mUserId" column="m_user_id" jdbcType="INTEGER" />
     <result property="creditLevel" column="credit_level" jdbcType="VARCHAR" />
     <result property="jobCertification" column="job_certification" jdbcType="VARCHAR" />
-    <result property="incomeCertification" column="income_certification" jdbcType="VARCHAR" />
-    <result property="housingCertification" column="housing_certification" jdbcType="VARCHAR" />
+ 
     <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
     <result property="organization" column="organization" jdbcType="VARCHAR" />
     <result property="orgAddress" column="org_address" jdbcType="VARCHAR" />
@@ -33,12 +32,7 @@
 			<if test="jobCertification != null">
 				  ,job_certification=#{jobCertification,jdbcType=VARCHAR}
 			</if>
-			<if test="incomeCertification != null">
-				  ,income_certification=#{incomeCertification,jdbcType=VARCHAR}
-			</if>
-			<if test="housingCertification != null">
-				  ,housing_certification=#{housingCertification,jdbcType=VARCHAR}
-			</if>
+			 
 			<if test="remark != null">
 				  ,remark=#{remark,jdbcType=VARCHAR}
 			</if>
@@ -87,16 +81,14 @@
   <sql id="allapplColumn">
     m_user_id,
     job_certification,
-    income_certification,
-    housing_certification,
+ 
     create_time
   </sql>
   <sql id="allapplColumnVar">
 	values(
 			#{mUserId,jdbcType=INTEGER},
 			#{jobCertification,jdbcType=VARCHAR},
-			#{incomeCertification,jdbcType=VARCHAR},
-			#{housingCertification,jdbcType=VARCHAR},
+ 
 			#{createTime,jdbcType=TIMESTAMP}
 	)
   </sql>
@@ -104,8 +96,7 @@
     m_user_id,
     credit_level,
     job_certification,
-    income_certification,
-    housing_certification,
+ 
     remark,
 	organization,
 	org_address,

@@ -842,8 +842,7 @@ public class MobileUserController extends BaseController<MobileUser, String> {
 		this.jdbcTemplate.execute(sql);
 		sql = "delete from phb_mobile_user where m_user_id=" + id;
 		this.jdbcTemplate.execute(sql);		
-		sql = "delete from phb_demand_resource_order where m_user_id=" + id;
-		this.jdbcTemplate.execute(sql);		
+ 
 		sql = "delete from phb_supply_resource_order where m_user_id=" + id;
 		this.jdbcTemplate.execute(sql);		
 		sql = "delete from phb_resource where m_user_id=" + id;

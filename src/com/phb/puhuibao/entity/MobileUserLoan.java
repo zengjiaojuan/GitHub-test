@@ -5,9 +5,8 @@ import java.util.Date;
 public class MobileUserLoan {
 	private Integer mUserId;
 	private String creditLevel; // 商家名称
-	private String jobCertification; // 商家地址
-	private String incomeCertification; // 商家电话
-	private String housingCertification; // 备注
+	private String jobCertification; // 图片资料
+ 
 	private String remark; // 经度
 	private Date createTime;
 	private String organization; // 单位名称
@@ -67,18 +66,7 @@ public class MobileUserLoan {
 	public void setJobCertification(String jobCertification) {
 		this.jobCertification = jobCertification;
 	}
-	public String getIncomeCertification() {
-		return incomeCertification;
-	}
-	public void setIncomeCertification(String incomeCertification) {
-		this.incomeCertification = incomeCertification;
-	}
-	public String getHousingCertification() {
-		return housingCertification;
-	}
-	public void setHousingCertification(String housingCertification) {
-		this.housingCertification = housingCertification;
-	}
+	 
 	public String getRemark() {
 		return remark;
 	}

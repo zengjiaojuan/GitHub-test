@@ -5,6 +5,8 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -18,6 +20,8 @@ import com.phb.puhuibao.entity.MobileUserLoan;
 @Controller
 @RequestMapping(value = "/mobileUserLoan")
 public class MobileUserLoanController extends BaseController<MobileUserLoan, String> {
+	private static final Log log = LogFactory.getLog(MobileUserLoanController.class);
+	@Override
 	@Resource(name = "mobileUserLoanService")
 	public void setBaseService(IBaseService<MobileUserLoan, String> baseService) {
 		super.setBaseService(baseService);
@@ -28,70 +32,24 @@ public class MobileUserLoanController extends BaseController<MobileUserLoan, Str
 
 	@RequestMapping(value="loanCertification")
 	@ResponseBody
-	public Map<String, Object> loanCertification(@RequestParam int muid, 
-			@RequestParam String jobFileName, 
-			@RequestParam String jobFileType, 
-			@RequestParam String jobFilePath, 
-			@RequestParam String jobOrgFileName,
-			@RequestParam String incomeFileName, 
-			@RequestParam String incomeFileType, 
-			@RequestParam String incomeFilePath, 
-			@RequestParam String incomeOrgFileName,
-			@RequestParam String housingFileName, 
-			@RequestParam String housingFileType, 
-			@RequestParam String housingFilePath, 
-			@RequestParam String housingOrgFileName) {		
-		UploadFile uploadFileJob = new UploadFile();
-		uploadFileJob.setFileName(jobFileName);
-		uploadFileJob.setFileType(jobFileType);
-		uploadFileJob.setFilePath(jobFilePath);
-		uploadFileJob.setOrgFileName(jobOrgFileName);
-		UploadFile uploadFileIncome = new UploadFile();
-		uploadFileIncome.setFileName(incomeFileName);
-		uploadFileIncome.setFileType(incomeFileType);
-		uploadFileIncome.setFilePath(incomeFilePath);
-		uploadFileIncome.setOrgFileName(incomeOrgFileName);
-		UploadFile uploadFileHousing = new UploadFile();
-		uploadFileHousing.setFileName(housingFileName);
-		uploadFileHousing.setFileType(housingFileType);
-		uploadFileHousing.setFilePath(housingFilePath);
-		uploadFileHousing.setOrgFileName(housingOrgFileName);
-
+	public Map<String, Object> loanCertification( @RequestParam int muid,  @RequestParam String fileIds  ) {	
+ 
 		Map<String, Object> data = new HashMap<String, Object>();
-		try {
-			uploadFileService.save(uploadFileJob);
-			uploadFileService.save(uploadFileIncome);
-			uploadFileService.save(uploadFileHousing);
-		} catch (Exception e) {
-			data.put("message", "网络异常！");
-			data.put("status", 0);			
-			return data;
-		}
-		Map<String,Object> params = new HashMap<String, Object>();
-		MobileUserLoan u = this.getBaseService().getById("" + muid);
-		if (u != null) {
-			params = new HashMap<String, Object>();
-			params.put("id", "'" + u.getJobCertification() + "','" + u.getIncomeCertification() + "','" + u.getHousingCertification() + "'");
-			uploadFileService.delete(params);
-		}
-		
 		MobileUserLoan entity = new MobileUserLoan();
 		entity.setmUserId(muid);
-		entity.setJobCertification(uploadFileJob.getId());
-		entity.setIncomeCertification(uploadFileIncome.getId());
-		entity.setHousingCertification(uploadFileHousing.getId());
+		entity.setJobCertification(fileIds);
+	 
 		try {
 			this.getBaseService().save(entity);
+			data.put("message", "保存成功！");
+			data.put("status", 1);
+			return data;
 		} catch (Exception e) {
-			data.put("message", "网络异常！");
-			data.put("status", 0);			
+			log.error("失败:"+e);
+			data.put("message", "保存失败！");
+			data.put("status", 0);
 			return data;
 		}
-		
-		Map<String, String> result = new HashMap<String, String>();
-		data.put("result", result);
-		data.put("message", "保存成功");
-		data.put("status", 1);
-		return data;
+ 
 	}
 }
