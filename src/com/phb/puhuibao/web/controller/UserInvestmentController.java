@@ -10,6 +10,8 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 //import org.apache.commons.logging.Log;
 //import org.apache.commons.logging.LogFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -34,11 +36,10 @@ import com.phb.puhuibao.entity.ProductBid;
 import com.phb.puhuibao.entity.UserInvestment;
 import com.phb.puhuibao.entity.UserRedpacket;
 import com.phb.puhuibao.service.UserInvestmentService;
-
 @Controller
 @RequestMapping(value = "/userInvestment")
 public class UserInvestmentController extends BaseController<UserInvestment, String> {
-	//private static final Log LOG = LogFactory.getLog(UserInvestmentController.class);
+	private static final Log log = LogFactory.getLog(UserInvestmentController.class);
 	
 	@Resource(name = "appContext")
 	private AppContext appContext;
@@ -84,48 +85,54 @@ public class UserInvestmentController extends BaseController<UserInvestment, Str
 		map.put("mUserId", muid);
 		map.put("orderBy", "create_time");
 		map.put("order", "desc");
-		Pager<UserInvestment> p=this.getBaseService().findByPager(pager, map);
+		Map<String, Object> data = new HashMap<String, Object>();;
+		try {
+			Pager<UserInvestment> p = this.getBaseService().findByPager(pager, map);
+			Calendar cal = Calendar.getInstance();
+			long currentTime = new Date().getTime();
+			Map<String, Object> params = new HashMap<String, Object>();
+			for (UserInvestment investment : p.getData()) {
+				String productSN = investment.getProductSN();
+				params = new HashMap<String, Object>();
+				params.put("productSN", productSN);
+				AssetProduct product = assetProductService.unique(params);
+				double rate = product.getAnnualizedRate();
+				investment.setAnnualizedRate(rate);
 
-		Calendar cal = Calendar.getInstance();
-		long currentTime = new Date().getTime();
-		Map<String, Object> params = new HashMap<String, Object>();
-		for (UserInvestment investment : p.getData()) {
-			String productSN = investment.getProductSN();
-			params = new HashMap<String, Object>();
-			params.put("productSN", productSN);
-			AssetProduct product = assetProductService.unique(params);
-			double rate = product.getAnnualizedRate();
-	        investment.setAnnualizedRate(rate);
-
-	        if (investment.getStatus() >= 2) {
-		        investment.setLeftDays(0);
-			} else {
-				Date incomeDate = investment.getIncomeDate();
-				Long incomeTime = incomeDate.getTime();
-				if (currentTime > incomeTime) {
-					double amount = investment.getInvestmentAmount();
-					double everyIncome = Functions.calEveryIncome(amount, rate);
-					long days = (currentTime - incomeTime) / (24 * 3600 * 1000) + 1;
-			        investment.setLastIncome(everyIncome * days);
+				if (investment.getStatus() >= 2) {
+					investment.setLeftDays(0);
+				} else {
+					Date incomeDate = investment.getIncomeDate();
+					Long incomeTime = incomeDate.getTime();
+					if (currentTime > incomeTime) {
+						double amount = investment.getInvestmentAmount();
+						double everyIncome = Functions.calEveryIncome(amount, rate);
+						long days = (currentTime - incomeTime) / (24 * 3600 * 1000) + 1;
+						investment.setLastIncome(everyIncome * days);
+					}
+					cal = Calendar.getInstance();
+					cal.setTime(incomeDate);
+					if (product.getUnit().equals("年")) {
+						cal.add(Calendar.YEAR, product.getPeriod());
+					} else if (product.getUnit().indexOf("月") > 0) {
+						cal.add(Calendar.MONTH, product.getPeriod());
+					} else {
+						cal.add(Calendar.DATE, product.getPeriod());
+					}
+					int leftDays = (int) ((cal.getTimeInMillis() - currentTime) / (24 * 3600 * 1000)) + 1;
+					investment.setLeftDays(leftDays);
 				}
-		        cal = Calendar.getInstance();
-		        cal.setTime(incomeDate);
-		        if (product.getUnit().equals("年")) {
-		            cal.add(Calendar.YEAR, product.getPeriod());
-		        } else if (product.getUnit().indexOf("月") > 0) {
-		            cal.add(Calendar.MONTH, product.getPeriod());
-		        } else {
-		            cal.add(Calendar.DATE, product.getPeriod());
-		        }
-		        int leftDays = (int) ((cal.getTimeInMillis() - currentTime) / (24 * 3600 * 1000)) + 1;
-		        investment.setLeftDays(leftDays);
 			}
+			 
+			data.put("result", p.getData());
+			data.put("count", p.getTotal());
+			data.put("message", "");
+			data.put("status", 1);
+		} catch (Exception e) {
+             
+			data.put("status", 0);
+			log.error("失败:"+e);
 		}
-		Map<String, Object> data = new HashMap<String, Object>();
-		data.put("result", p.getData());
-		data.put("count", p.getTotal());
-		data.put("message", "");
-		data.put("status", 1);
 		return data;
 	}
 	
@@ -140,30 +147,35 @@ public class UserInvestmentController extends BaseController<UserInvestment, Str
 	@ResponseBody
 	public Map<String, Object> getListByProduct(@RequestParam int pageno, @RequestParam String productSN) {
 		Pager<UserInvestment> pager = new Pager<UserInvestment>();
+		Map<String, Object> data = new HashMap<String, Object>();
 		pager.setReload(true);
 		pager.setCurrent(pageno);
+		pager.setLimit(30);
 		Map<String,Object> map = new HashMap<String,Object>();
 		map.put("productSN", productSN);
 		map.put("orderBy", "investment_amount");
 		map.put("order", "desc");
-		Pager<UserInvestment> p=this.getBaseService().findByPager(pager, map);
-		List<Map<String, Object>> result =  new ArrayList<Map<String, Object>>();
-		for (UserInvestment investment : p.getData()) {
-			String muid = "" + investment.getmUserId();
-			String userName = mobileUserService.getById(muid).getmUserName();
+		try {
+			Pager<UserInvestment> p = this.getBaseService().findByPager(pager, map);
+			List<Map<String, Object>> result = new ArrayList<Map<String, Object>>();
 			Map<String, Object> m = new HashMap<String, Object>();
-			m.put("userName", userName);
-			m.put("createTime", investment.getCreateTime());
-			m.put("investmentAmount", investment.getInvestmentAmount());
-			result.add(m);
+			for (UserInvestment investment : p.getData()) {
+				m = new HashMap<String, Object>();
+				m.put("userName", investment.getUserName());
+				m.put("createTime", investment.getCreateTime());
+				m.put("investmentAmount", investment.getInvestmentAmount());
+				result.add(m);
+			}
+			data.put("result", result);
+			data.put("count", p.getTotal());
+			data.put("message", "");
+			data.put("status", 1);
+			return data;
+		} catch (Exception e) {
+			log.error("失败:"+e);
+			data.put("status", 0);
+			return data;
 		}
-		
-		Map<String, Object> data = new HashMap<String, Object>();
-		data.put("result", result);
-		data.put("count", p.getTotal());
-		data.put("message", "");
-		data.put("status", 1);
-		return data;
 	}
 	
 	/**
@@ -196,31 +208,34 @@ public class UserInvestmentController extends BaseController<UserInvestment, Str
 	@ResponseBody
 	public Map<String, Object> getListByBid(@RequestParam int pageno, @RequestParam String bidSN) {
 		Pager<UserInvestment> pager = new Pager<UserInvestment>();
+		Map<String, Object> data = new HashMap<String, Object>();
 		pager.setReload(true);
 		pager.setCurrent(pageno);
-		pager.setLimit(10);
+		pager.setLimit(30);
 		Map<String,Object> map = new HashMap<String,Object>();
 		map.put("bidSN", bidSN);
 		map.put("orderBy", "investment_amount");
 		map.put("order", "desc");
-		Pager<UserInvestment> p=this.getBaseService().findByPager(pager, map);
-		List<Map<String, Object>> result =  new ArrayList<Map<String, Object>>();
-		for (UserInvestment investment : p.getData()) {
-			String muid = "" + investment.getmUserId();
-			String userName = mobileUserService.getById(muid).getmUserName();
+		try {
+			Pager<UserInvestment> p = this.getBaseService().findByPager(pager, map);
+			List<Map<String, Object>> result = new ArrayList<Map<String, Object>>();
 			Map<String, Object> m = new HashMap<String, Object>();
-			m.put("userName", userName);
-			m.put("createTime", investment.getCreateTime());
-			m.put("investmentAmount", investment.getInvestmentAmount());
-			result.add(m);
+			for (UserInvestment investment : p.getData()) {
+				m.put("userName", investment.getUserName());
+				m.put("createTime", investment.getCreateTime());
+				m.put("investmentAmount", investment.getInvestmentAmount());
+				result.add(m);
+			}
+			data.put("result", result);
+			data.put("count", p.getTotal());
+			data.put("message", "");
+			data.put("status", 1);
+			return data;
+		} catch (Exception e) {
+			data.put("status", 0);
+			log.error("失败:"+e);
+			return data;
 		}
-		
-		Map<String, Object> data = new HashMap<String, Object>();
-		data.put("result", result);
-		data.put("count", p.getTotal());
-		data.put("message", "");
-		data.put("status", 1);
-		return data;
 	}
 	
 	/**
@@ -365,9 +380,8 @@ public class UserInvestmentController extends BaseController<UserInvestment, Str
 		
 		try {
 			userInvestmentService.processSave(entity, redpacketId);
-		    //entity = this.getBaseService().save(entity);
 		} catch (Exception e) {
-			data.put("message", "网络异常！");
+			log.error("失败"+e);
 			data.put("status", 0);
 			return data;
 		}
@@ -381,22 +395,7 @@ public class UserInvestmentController extends BaseController<UserInvestment, Str
 		return data;
 	}
 
-//	@RequestMapping(value="delete")
-//	@ResponseBody
-//	public Map<String, Object> delete(@RequestParam int investmentId) {
-//		Map<String,Object> params = new HashMap<String,Object>();
-//		params.put("investmentId", investmentId);
-//		int count = this.getBaseService().delete(params);
-//		Map<String, Object> data = new HashMap<String, Object>();
-//		if (count == 0) {
-//			data.put("message", "删除失败！");
-//			data.put("status", 0);
-//		} else {
-//			data.put("message", "删除成功！");
-//			data.put("status", 1);
-//		}
-//		return data;
-//	}
+ 
 	public Map<String, Double> calIncome(UserInvestment investment) {
 		String productSN = investment.getProductSN();
 		Map<String, Object> params = new HashMap<String, Object>();
@@ -678,20 +677,18 @@ public class UserInvestmentController extends BaseController<UserInvestment, Str
 			}
 			cal.add(Calendar.DATE, 1);
 		}
-		
-//		cal.set(Calendar.HOUR_OF_DAY, 0);
-//		cal.set(Calendar.SECOND, 0);
-//		cal.set(Calendar.MINUTE, 0);
-//		cal.set(Calendar.MILLISECOND, 0);
 		entity.setIncomeDate(cal.getTime()); // short date
 		Map<String, Object> data = new HashMap<String, Object>();
 		try {
 			userInvestmentService.processSave(entity, redpacketId);
 			data.put(Constants.SUCCESS, Constants.TRUE);
+			return data;
 		} catch (Exception e) {
+			log.error("失败"+e);
 			data.put(Constants.SUCCESS, Constants.FALSE);
 			data.put(Constants.MESSAGE, e.getMessage());
+			return data;
 		}
-		return data;
+		
 	}
 }

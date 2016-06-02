@@ -22,8 +22,16 @@ public class UserInvestment {
 	private Date expireDate;//expire_Date  到期日
 	private Double totalIncome;//total_income  预期总收益
 	
+	private String userName;
 	
 	
+	
+	public String getUserName() {
+		return userName;
+	}
+	public void setUserName(String userName) {
+		this.userName = userName;
+	}
 	public Date getExpireDate() {
 		return expireDate;
 	}

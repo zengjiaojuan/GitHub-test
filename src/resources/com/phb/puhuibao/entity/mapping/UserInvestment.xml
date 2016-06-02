@@ -20,7 +20,7 @@
     <result property="lastDate" column="last_date" jdbcType="DATE" />
     <result property="expireDate" column="expire_date" jdbcType="DATE" />
     <result property="totalIncome" column="total_income" jdbcType="DECIMAL" />
-    
+    <result property="userName" column="m_user_name" jdbcType="VARCHAR" />
     
   </resultMap>
 
@@ -114,7 +114,8 @@
 	a.create_time,
 	a.last_date,
 	a.expire_date,
-	a.total_income
+	a.total_income,
+	u.m_user_name
   </sql>
   <sql id="dynamicWhere">
 	<trim prefix="WHERE" prefixOverrides="AND|OR">
@@ -143,14 +144,14 @@
 
   <sql id="queryBody">
 	<if test="sno!=null and eno!=null and orderBy!=null">
-		select <include refid="allColumn" /> from phb_muser_investment a left join phb_product_bid c on a.bid_sn= c.bid_sn left join phb_asset_product b on b.product_sn= c.product_sn
+		select <include refid="allColumn" /> from phb_muser_investment a left join phb_product_bid c on a.bid_sn= c.bid_sn left join phb_asset_product b on b.product_sn= c.product_sn left join phb_mobile_user u on u.m_user_id = a.m_user_id
 		<include refid="dynamicWhere" />
 		<include refid="dynamicOrderBy" />
 		limit ${sno-1},${eno}
 	</if>
 	<!-- 无orderby -->
 	<if test="sno!=null and eno!=null and orderBy==null">
-		select <include refid="allColumn" /> from phb_muser_investment a left join phb_product_bid c on a.bid_sn= c.bid_sn left join phb_asset_product b on b.product_sn= c.product_sn
+		select <include refid="allColumn" /> from phb_muser_investment a left join phb_product_bid c on a.bid_sn= c.bid_sn left join phb_asset_product b on b.product_sn= c.product_sn left join phb_mobile_user u on u.m_user_id = a.m_user_id
 		<include refid="dynamicWhere" />
 		limit ${sno-1},${eno}
 	</if>
