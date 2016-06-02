@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 //import com.alibaba.fastjson.TypeReference;
 import com.idp.pub.context.AppContext;
@@ -32,7 +31,6 @@ import com.llpay.client.config.PartnerConfig;
 import com.llpay.client.config.ServerURLConfig;
 import com.llpay.client.conn.HttpRequestSimple;
 import com.llpay.client.utils.LLPayUtil;
-import com.llpay.client.vo.RetBean;
 import com.phb.puhuibao.common.Functions;
 import com.phb.puhuibao.entity.MobileUser;
 //import com.phb.puhuibao.entity.ThirdPayLog;
@@ -298,29 +296,36 @@ public class UserCardController extends BaseController<UserCard, String> {
 		Map<String, String> params 	= new HashMap<String, String>();
 		params.put("requestid", 		requestid);
 		params.put("validatecode", 		captcha);
-		Map<String, String> result			= TZTService.confirmBindBankcard(params);
-//		String merchantaccount				= StringUtils.trimToEmpty(result.get("merchantaccount")); 
-//	    String requestidFromYeepay 	   		= StringUtils.trimToEmpty(result.get("requestid")); 
-//	    String bankcode 			   		= StringUtils.trimToEmpty(result.get("bankcode")); 
-//	    String card_top 			   		= StringUtils.trimToEmpty(result.get("card_top")); 
-//	    String card_last 			   		= StringUtils.trimToEmpty(result.get("card_last")); 
-//	    String signFromYeepay 		   		= StringUtils.trimToEmpty(result.get("sign")); 
-	    String error_code	   				= StringUtils.trimToEmpty(result.get("error_code")); 
-	    String error_msg	   				= StringUtils.trimToEmpty(result.get("error_msg")); 
-	    String customError	   				= StringUtils.trimToEmpty(result.get("customError")); 
+		Map<String, Object> data;
+		try {
+			Map<String, String> result = TZTService.confirmBindBankcard(params);
+			//		String merchantaccount				= StringUtils.trimToEmpty(result.get("merchantaccount")); 
+			//	    String requestidFromYeepay 	   		= StringUtils.trimToEmpty(result.get("requestid")); 
+			//	    String bankcode 			   		= StringUtils.trimToEmpty(result.get("bankcode")); 
+			//	    String card_top 			   		= StringUtils.trimToEmpty(result.get("card_top")); 
+			//	    String card_last 			   		= StringUtils.trimToEmpty(result.get("card_last")); 
+			//	    String signFromYeepay 		   		= StringUtils.trimToEmpty(result.get("sign")); 
+			String error_code = StringUtils.trimToEmpty(result.get("error_code"));
+			String error_msg = StringUtils.trimToEmpty(result.get("error_msg"));
+			String customError = StringUtils.trimToEmpty(result.get("customError"));
+			data = new HashMap<String, Object>();
+			if (!"".equals(error_code)) {
+				data.put("message", error_code + ": " + error_msg);
+				data.put("status", 0);
+				return data;
+			} else if (!"".equals(customError)) {
+				data.put("message", customError);
+				data.put("status", 0);
+				return data;
+			}
+			data.put("message", "");
+			data.put("status", 1);
+		} catch (Exception e) {
 
-		Map<String, Object> data = new HashMap<String, Object>();
-		if (!"".equals(error_code)) {
-			data.put("message", error_code + ": " + error_msg);
+            data = new HashMap<String, Object>();
 			data.put("status", 0);
-			return data;		
-		} else if (!"".equals(customError)) {
-			data.put("message", customError);
-			data.put("status", 0);
-			return data;		
+			log.error("失败:"+e);
 		}
-		data.put("message", "");
-		data.put("status", 1);
 		return data;		
 	}
 
@@ -441,65 +446,13 @@ public class UserCardController extends BaseController<UserCard, String> {
 				data.put("status", 0);
 			}
 		} catch (JSONException e) {
-			e.printStackTrace();
+			log.error("失败:"+e);
 			data.put("message", e.getMessage());
 			data.put("status", 0);
 		}
 		return data;
 	}
-	
-	@RequestMapping(value="unbind")
-	@ResponseBody
-	public Map<String, Object> unbind(@RequestParam String muid) {
-        JSONObject reqObj = new JSONObject();
-        reqObj.put("oid_partner", PartnerConfig.OID_PARTNER);
-        reqObj.put("user_id", muid);
-        reqObj.put("offset", "0");
-        reqObj.put("sign_type", PartnerConfig.SIGN_TYPE);
-        reqObj.put("pay_type", "D");
-        String sign = LLPayUtil.addSign(reqObj, PartnerConfig.TRADER_PRI_KEY);
-        reqObj.put("sign", sign);
-        String reqJSON = reqObj.toString();
-        String resJSON = HttpRequestSimple.getInstance().postSendHttp(ServerURLConfig.QUERY_USER_BANKCARD_URL, reqJSON);
-        String no_agree = null;
-		Map<String, Object> data = new HashMap<String, Object>();
-		try {
-			org.json.JSONObject object = new org.json.JSONObject(resJSON);
-			String ret_code = object.getString("ret_code");
-			if ("0000".endsWith(ret_code)) {
-				JSONArray o = new JSONArray(object.getString("agreement_list"));
-				no_agree = o.getJSONObject(0).getString("no_agree"); // 单卡
-			} else {
-				data.put("message", object.getString("ret_msg"));
-				data.put("status", 1);
-				return data;
-			}
-		} catch (JSONException e) {
-			e.printStackTrace();
-			data.put("message", e.getMessage());
-			data.put("status", 0);
-			return data;
-		}
-		
-//		JSONObject reqObj = new JSONObject();
-//        reqObj.put("oid_partner", PartnerConfig.OID_PARTNER);
-//        reqObj.put("user_id", muid);
-//        reqObj.put("sign_type", PartnerConfig.SIGN_TYPE);
-//        reqObj.put("pay_type", "D");
-        reqObj.put("no_agree", no_agree);
-        sign = LLPayUtil.addSign(reqObj, PartnerConfig.TRADER_PRI_KEY);
-        reqObj.put("sign", sign);
-        reqJSON = reqObj.toString();
-        resJSON = HttpRequestSimple.getInstance().postSendHttp(ServerURLConfig.UNBIND_BANKCARD_URL, reqJSON);
-        RetBean retBean = JSON.parseObject(resJSON, RetBean.class);
-		data.put("message", retBean.getRet_msg());
-		if ("0000".endsWith(retBean.getRet_code())) {
-			data.put("status", 1);
-		} else {
-			data.put("status", 0);
-		}
-		return data;
-	}
+ 
 
 	/**
 	 * 支行列表
@@ -510,25 +463,26 @@ public class UserCardController extends BaseController<UserCard, String> {
 	@ResponseBody
 	public Map<String, Object> getBranchBanks(@RequestParam String muid, @RequestParam String cityCode, @RequestParam String branchBankName) {
 		Map<String, Object> params = new HashMap<String, Object>();
-		params.put("mUserId", muid);
-		UserCard card = baseUserCardService.unique(params);
-
-        JSONObject reqObj = new JSONObject();
-        reqObj.put("oid_partner", PartnerConfig.OID_PARTNER);
-        reqObj.put("card_no", card.getBankAccount());
-        if ("".equals(branchBankName)) {
-            reqObj.put("brabank_name", "银行");
-        } else {
-            reqObj.put("brabank_name", branchBankName);
-        }
-        reqObj.put("city_code", cityCode);
-        reqObj.put("sign_type", PartnerConfig.SIGN_TYPE);
-        String sign = LLPayUtil.addSign(reqObj, PartnerConfig.TRADER_PRI_KEY);
-        reqObj.put("sign", sign);
-        String reqJSON = reqObj.toString();
-        String resJSON = HttpRequestSimple.getInstance().postSendHttp(ServerURLConfig.QUERY_CNAPS_URL, reqJSON);
 		Map<String, Object> data = new HashMap<String, Object>();
 		try {
+			params.put("mUserId", muid);
+			UserCard card = baseUserCardService.unique(params);
+
+	        JSONObject reqObj = new JSONObject();
+	        reqObj.put("oid_partner", PartnerConfig.OID_PARTNER);
+	        reqObj.put("card_no", card.getBankAccount());
+	        if ("".equals(branchBankName)) {
+	            reqObj.put("brabank_name", "银行");
+	        } else {
+	            reqObj.put("brabank_name", branchBankName);
+	        }
+	        reqObj.put("city_code", cityCode);
+	        reqObj.put("sign_type", PartnerConfig.SIGN_TYPE);
+	        String sign = LLPayUtil.addSign(reqObj, PartnerConfig.TRADER_PRI_KEY);
+	        reqObj.put("sign", sign);
+	        String reqJSON = reqObj.toString();
+	        String resJSON = HttpRequestSimple.getInstance().postSendHttp(ServerURLConfig.QUERY_CNAPS_URL, reqJSON);
+			
 			org.json.JSONObject object = new org.json.JSONObject(resJSON);
 			String ret_code = object.getString("ret_code");
 			data.put("message", object.getString("ret_msg"));
@@ -538,7 +492,7 @@ public class UserCardController extends BaseController<UserCard, String> {
 			}
 			data.put("status", 1);
 		} catch (JSONException e) {
-			e.printStackTrace();
+			log.error("失败:"+e);
 			data.put("message", e.getMessage());
 			data.put("status", 0);
 		}

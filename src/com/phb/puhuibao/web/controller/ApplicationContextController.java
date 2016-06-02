@@ -75,15 +75,7 @@ public class ApplicationContextController {
 		this.jdbcTemplate.execute(sql);
 		sql = "delete from phb_month_balance";
 		this.jdbcTemplate.execute(sql);
-		sql = "delete from phb_evaluate";
-		this.jdbcTemplate.execute(sql);
-		sql = "delete from phb_resource_gallery";
-		this.jdbcTemplate.execute(sql);
-		sql = "delete from phb_resource_order";
-		this.jdbcTemplate.execute(sql);
 		sql = "delete from phb_resource";
-		this.jdbcTemplate.execute(sql);
-		sql = "delete from phb_mobile_user_hexagram";
 		this.jdbcTemplate.execute(sql);
 		sql = "delete from phb_mobile_user_signin";
 		this.jdbcTemplate.execute(sql);
