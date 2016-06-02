@@ -30,6 +30,7 @@ import com.idp.pub.utils.RSAUtils;
 import com.idp.pub.utils.StringUtils;
 import com.idp.pub.web.controller.BaseController;
 import com.phb.puhuibao.common.Functions;
+import com.phb.puhuibao.entity.AddRate;
 import com.phb.puhuibao.entity.AssetProduct;
 import com.phb.puhuibao.entity.MobileUser;
 import com.phb.puhuibao.entity.ProductBid;
@@ -58,6 +59,9 @@ public class UserInvestmentController extends BaseController<UserInvestment, Str
 
 	@Resource(name = "assetProductService")
 	private IBaseService<AssetProduct, String> assetProductService;
+	
+	@Resource(name = "addRateService")
+	private IBaseService<AddRate, String> addRateService;
 
 	@Resource(name = "productBidService")
 	private IBaseService<ProductBid, String> productBidService;
@@ -267,7 +271,7 @@ public class UserInvestmentController extends BaseController<UserInvestment, Str
 	 */
 	@RequestMapping(value="save")
 	@ResponseBody
-	public Map<String, Object> save(@RequestParam int muid, @RequestParam String bidSN, @RequestParam long investmentAmount, @RequestParam String redpacketId) {
+	public Map<String, Object> save(@RequestParam int muid, @RequestParam String bidSN, @RequestParam long investmentAmount, @RequestParam String redpacketId, String addRateId) {
 		Map<String, Object> data = new HashMap<String, Object>();
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("bidSN", bidSN);
@@ -289,6 +293,17 @@ public class UserInvestmentController extends BaseController<UserInvestment, Str
 		params = new HashMap<String, Object>();
 		params.put("productSN", bid.getProductSN());
 		AssetProduct product = assetProductService.unique(params);
+		
+		
+		params = new HashMap<String, Object>();
+		params.put("rateId", addRateId);
+		AddRate addRate = addRateService.unique(params);
+		if(addRate != null && (addRate.getRateStatus() ==0 || addRate.getRateStatus() ==2)){// 加息劵存在
+			data.put("message", "加息劵失效");
+			data.put("status", 0);
+			return data;
+		}
+		
 
 		double deductionAmount = 0;
 		UserRedpacket redpacket = null;
@@ -297,7 +312,7 @@ public class UserInvestmentController extends BaseController<UserInvestment, Str
 		}
 		if (redpacket != null) {
 			deductionAmount = investmentAmount * redpacket.getDeductionRate();
-			if (deductionAmount > redpacket.getRedpacketAmount()) {
+			if (deductionAmount > redpacket.getRedpacketAmount()) {// 红包抵资的额度不能大于红包额度
 				deductionAmount = redpacket.getRedpacketAmount();
 			}
 		}
@@ -323,7 +338,7 @@ public class UserInvestmentController extends BaseController<UserInvestment, Str
 		} else if (totalAmount - currentAmount > investmentAmount) {
 			//double multiple = product.getInvestmentAmountMultiple();
 			int minInvestmentAmount = product.getInvestmentAmountMin();
-			if (investmentAmount % (minInvestmentAmount) > 0) {
+			if (investmentAmount % (minInvestmentAmount) > 0) {// 投资额应该是100整数倍
 				data.put("message", "不符合投资额递增倍数！");
 				data.put("status", 0);
 				return data;
@@ -379,7 +394,7 @@ public class UserInvestmentController extends BaseController<UserInvestment, Str
 		
 		
 		try {
-			userInvestmentService.processSave(entity, redpacketId);
+			userInvestmentService.processSave(entity, redpacketId,addRate,product.getAnnualizedRate());
 		} catch (Exception e) {
 			log.error("失败"+e);
 			data.put("status", 0);
@@ -680,7 +695,7 @@ public class UserInvestmentController extends BaseController<UserInvestment, Str
 		entity.setIncomeDate(cal.getTime()); // short date
 		Map<String, Object> data = new HashMap<String, Object>();
 		try {
-			userInvestmentService.processSave(entity, redpacketId);
+			userInvestmentService.processSave(entity, redpacketId,product.getAnnualizedRate());
 			data.put(Constants.SUCCESS, Constants.TRUE);
 			return data;
 		} catch (Exception e) {

@@ -38,6 +38,7 @@ import com.phb.puhuibao.entity.UserLoan;
 @Controller
 @RequestMapping(value = "/loanItem")
 public class LoanItemController extends BaseController<LoanItem, String> {
+	@Override
 	@Resource(name = "loanItemService")
 	public void setBaseService(IBaseService<LoanItem, String> baseService) {
 		super.setBaseService(baseService);
@@ -303,9 +304,7 @@ public class LoanItemController extends BaseController<LoanItem, String> {
 		result.put("itemDesc", item.getItemDesc());
 		result.put("type", userLoan.getType());
 		result.put("certificate1", userLoan.getJobCertification());
-		result.put("certificate2", userLoan.getHousingCertification());
-		result.put("certificate3", userLoan.getIncomeCertification());
-
+  
 		Map<String, Object> data = new HashMap<String, Object>();
 		data.put("result", result);
 		data.put("message", "");
@@ -316,6 +315,7 @@ public class LoanItemController extends BaseController<LoanItem, String> {
 	/**
 	 * 可投资标
 	 */
+	@Override
 	@RequestMapping(params = "isArray=true", method = RequestMethod.GET)
 	@ResponseBody
 	public List<LoanItem> findByList(@RequestParam String muid) {

@@ -15,6 +15,7 @@ import com.idp.pub.dao.IBaseDao;
 import com.idp.pub.dao.IPagerDao;
 import com.idp.pub.service.impl.DefaultBaseService;
 import com.phb.puhuibao.common.Functions;
+import com.phb.puhuibao.entity.AddRate;
 import com.phb.puhuibao.entity.AssetProduct;
 import com.phb.puhuibao.entity.ItemInvestment;
 import com.phb.puhuibao.entity.LoanItem;
@@ -106,7 +107,7 @@ public class UserInvestmentServiceImpl extends DefaultBaseService<UserInvestment
 	}
 
 	@Override
-	public void processSave(UserInvestment entity, String redpacketId) {
+	public void processSave(UserInvestment entity, String redpacketId,Double productAnnualizedRate) {
 		double deductionAmount = 0;
 		
 		String sql = "select 1 from phb_mobile_user where m_user_id=" + entity.getmUserId() + " for update";
@@ -140,6 +141,7 @@ public class UserInvestmentServiceImpl extends DefaultBaseService<UserInvestment
 		productBidDao.update(bid);
 		
 		entity.setCreateTime(new Date());
+		entity.setAnnualizedRate(productAnnualizedRate);
 		this.getBaseDao().save(entity);
 
 		UserAccountLog log = new UserAccountLog();
@@ -269,5 +271,94 @@ public class UserInvestmentServiceImpl extends DefaultBaseService<UserInvestment
 		entity.setmUserId(null);
 		entity.setInvestmentAmount(null);
 		this.getBaseDao().update(entity);
+	}
+
+	// 投资  带红包 带加息劵
+	@Override
+	public void processSave(UserInvestment entity, String redpacketId, AddRate addRate,Double productAnnualizedRate) {
+
+		double deductionAmount = 0;
+		
+		String sql = "select 1 from phb_mobile_user where m_user_id=" + entity.getmUserId() + " for update";
+		this.jdbcTemplate.execute(sql);
+		UserRedpacket redpacket = null;
+		if (!"".equals(redpacketId)) {
+			redpacket = userRedpacketDao.get(redpacketId);
+		}
+		if (redpacket != null && redpacket.getStatus() == 1) {
+			deductionAmount = entity.getInvestmentAmount() * redpacket.getDeductionRate();
+			if (deductionAmount > redpacket.getRedpacketAmount()) {
+				deductionAmount = redpacket.getRedpacketAmount();
+			}
+		}
+
+		MobileUser u = mobileUserDao.get("" + entity.getmUserId());
+		MobileUser user = new MobileUser();
+		user.setmUserId(entity.getmUserId());
+		user.setmUserMoney(u.getmUserMoney() - entity.getInvestmentAmount() + deductionAmount);
+		mobileUserDao.update(user);
+		
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("bidSN", entity.getBidSN());
+		ProductBid b = productBidDao.unique(params);
+		ProductBid bid = new ProductBid();
+		bid.setBidId(b.getBidId());
+		bid.setCurrentAmount(b.getCurrentAmount() + entity.getInvestmentAmount());
+		if (bid.getCurrentAmount().equals(b.getTotalAmount())) {   // 如果投资额度满了   状态修改
+			bid.setStatus(2);
+		}
+		productBidDao.update(bid);
+		
+		entity.setCreateTime(new Date());
+		entity.setAnnualizedRate(productAnnualizedRate +  addRate.getAnnualizedRate()); // 产品年利率+加息劵利率
+		this.getBaseDao().save(entity); // 保存投资
+
+		UserAccountLog log = new UserAccountLog();
+		log.setmUserId(entity.getmUserId());
+		//log.setAmount(deductionAmount - entity.getInvestmentAmount());
+		log.setAmount(- (double) entity.getInvestmentAmount());
+		log.setBalanceAmount(user.getmUserMoney() - u.getFrozenMoney() - deductionAmount);
+		log.setChangeType("投资");
+		log.setChangeDesc("投资id: " + entity.getInvestmentId());
+		log.setAccountType(4);
+		userAccountLogDao.save(log);
+
+		if (deductionAmount > 0) {
+			UserRedpacket r = new UserRedpacket();
+			r.setRedpacketId(redpacket.getRedpacketId());
+			r.setStatus(0);
+			userRedpacketDao.update(r);
+			
+			log = new UserAccountLog();
+			log.setmUserId(entity.getmUserId());
+			log.setAmount(deductionAmount);
+			log.setBalanceAmount(user.getmUserMoney() - u.getFrozenMoney());
+			log.setChangeType("红包抵资");
+			log.setChangeDesc("投资id: " + entity.getInvestmentId());
+			log.setAccountType(5);
+			userAccountLogDao.save(log);
+		}
+		
+		UserMessage message =  new UserMessage();
+		message.setmUserId(entity.getmUserId());
+		message.setTitle("系统消息");
+		message.setContent("您成功投资了：" + entity.getBidSN() + ",投资总额：" + entity.getInvestmentAmount() + "元");
+		userMessageDao.save(message);
+
+		params = new HashMap<String, Object>();
+		params.put("productSN", b.getProductSN());
+		AssetProduct product = assetProductDao.unique(params);
+		int factor;
+        if (product.getUnit().equals("年")) {
+        	factor = 1;
+        } else if (product.getUnit().indexOf("月") > 0) {
+        	factor = 12;
+        } else {
+        	factor = 365;
+        }
+		Functions.ProcessCommission(u, entity.getInvestmentAmount() - deductionAmount, appContext, jdbcTemplate, mobileUserDao, userAccountLogDao, product.getPeriod(), factor);//// 下线投资的时候,下下线投资的时候,计算上级提成
+		//Functions.ProcessUserLevel(u, appContext, itemInvestmentDao, this.getBaseDao(), userLoanDao, loanItemDao, mobileUserDao);
+	
+		
 	}
 }
