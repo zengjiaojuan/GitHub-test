@@ -9,6 +9,8 @@ import java.util.UUID;
 import javax.annotation.Resource;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -40,6 +42,7 @@ import com.yeepay.TZTService;
 @Controller
 @RequestMapping(value = "/userCard")
 public class UserCardController extends BaseController<UserCard, String> {
+	final Log log = LogFactory.getLog(UserCardController.class);
 	@Override
 	@Resource(name = "userCardService")
 	public void setBaseService(IBaseService<UserCard, String> baseService) {
@@ -61,97 +64,7 @@ public class UserCardController extends BaseController<UserCard, String> {
 	@Resource(name = "jdbcTemplate")
 	private JdbcTemplate jdbcTemplate;
 
-	/**
-	 * 银行卡清单
-	 * @param muid
-	 * @return
-	 */
-//	@RequestMapping(value="listForAndroid")
-//	@ResponseBody
-//	protected Map<String, Object> listForAndroid(@RequestParam String muid) {
-//		Map<String,Object> map = new HashMap<String,Object>();
-//		map.put("mUserId", muid);
-//		map.put("orderBy", "create_time");
-//		map.put("order", "desc");
-//		List<UserCard> result = this.getBaseService().findList(map);
-//		for (UserCard uc : result) {
-//			uc.setBankAccount(RSAUtils.encrypt(uc.getBankAccount()));
-//			uc.setBankName(RSAUtils.encrypt(uc.getBankName()));
-//		}
-//		Map<String, Object> data = new HashMap<String, Object>();
-//		data.put("result", result);
-//		data.put("message", "");
-//		data.put("status", 1);
-//		return data;
-//	}
-//	@RequestMapping(value="listForIOS")
-//	@ResponseBody
-//	protected Map<String, Object> listForIOS(@RequestParam String muid) {
-//		Map<String,Object> map = new HashMap<String,Object>();
-//		map.put("mUserId", muid);
-//		map.put("orderBy", "create_time");
-//		map.put("order", "desc");
-//		List<UserCard> result = this.getBaseService().findList(map);
-//		for (UserCard uc : result) {
-//			uc.setBankAccount(DESUtils.encrypt(uc.getBankAccount()));
-//			uc.setBankName(DESUtils.encrypt(uc.getBankName()));
-//		}
-//		Map<String, Object> data = new HashMap<String, Object>();
-//		data.put("result", result);
-//		data.put("message", "");
-//		data.put("status", 1);
-//		return data;
-//	}
-
-	/**
-	 * 银行卡列表
-	 * @param muid
-	 * @return
-	 */
-	@RequestMapping(value="list")
-	@ResponseBody
-	protected Map<String, Object> list(@RequestParam String muid) {
-		MobileUser user = mobileUserService.getById(muid);
-		Map<String, String> result		= TZTService.queryAuthbindList(user.getmUserTel(), "4");
-//		String merchantaccount			= StringUtils.trimToEmpty(result.get("merchantaccount"));
-//		String identityidFromYeepay		= StringUtils.trimToEmpty(result.get("identityid"));
-//		String identitytypeFromYeeapy	= StringUtils.trimToEmpty(result.get("identitytype"));
-		String cardlist					= StringUtils.trimToEmpty(result.get("cardlist"));
-//		String sign						= StringUtils.trimToEmpty(result.get("sign"));
-		String error_code				= StringUtils.trimToEmpty(result.get("error_code"));
-		String error_msg				= StringUtils.trimToEmpty(result.get("error_msg"));
-		String customError				= StringUtils.trimToEmpty(result.get("customError"));
-
-		Map<String, Object> data = new HashMap<String, Object>();
-		if(!"".equals(error_code)) {
-			data.put("message", error_code + ": " + error_msg);
-			data.put("status", 0);
-			return data;		
-		} else if(!"".equals(customError)) {
-			data.put("message", customError);
-			data.put("status", 0);
-			return data;		
-		}
-		
-		//Map<String, String> map = JSON.parseObject(JSON.toJSONString(JSON.parseArray(cardlist).get(0)), new TypeReference<Map<String, String>>() {});
-		//Map<String, String> map = (Map<String, String>) JSON.parseArray(cardlist).get(0);
-		//Map<String, Object> m = (Map<String, Object>) JsonUtils.toMap(JSON.toJSONString(JSON.parseArray(cardlist).get(0)));
-		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
-		for (Object object : JSON.parseArray(cardlist)) {
-			Map<String, Object> card = new HashMap<String, Object>();
-			@SuppressWarnings("unchecked")
-			Map<String, String> map = (Map<String, String>) object;
-			card.put("card_top", map.get("card_top"));
-			card.put("card_last", map.get("card_last"));
-			card.put("card_name", map.get("card_name"));
-			list.add(card);
-		}
-		
-		data.put("result", list);
-		data.put("message", "");
-		data.put("status", 1);
-		return data;		
-	}
+	 
 	
 	/**
 	 * 保存
@@ -419,29 +332,30 @@ public class UserCardController extends BaseController<UserCard, String> {
 	@RequestMapping(value="getBankCards")
 	@ResponseBody
 	public Map<String, Object> getBankCards(@RequestParam String muid) {
-        JSONObject reqObj = new JSONObject();
-        reqObj.put("oid_partner", PartnerConfig.OID_PARTNER);
-        reqObj.put("user_id", muid);
-        reqObj.put("offset", "0");
-        reqObj.put("sign_type", PartnerConfig.SIGN_TYPE);
-        reqObj.put("pay_type", "D");
-        String sign = LLPayUtil.addSign(reqObj, PartnerConfig.TRADER_PRI_KEY);
-        reqObj.put("sign", sign);
-        String reqJSON = reqObj.toString();
-        String resJSON = HttpRequestSimple.getInstance().postSendHttp(ServerURLConfig.QUERY_USER_BANKCARD_URL, reqJSON);
-        
-		Map<String, Object> params = new HashMap<String, Object>();
-		params.put("mUserId", muid);
-		UserCard card = this.getBaseService().unique(params);
-        String cardno = "";
-        String prcptcd = "";
-        if (card != null) {
-        	cardno = card.getBankAccount();
-        	prcptcd = card.getPrcptcd();
-        }
+
         
 		Map<String, Object> data = new HashMap<String, Object>();
 		try {
+	        JSONObject reqObj = new JSONObject();
+	        reqObj.put("oid_partner", PartnerConfig.OID_PARTNER);
+	        reqObj.put("user_id", muid);
+	        reqObj.put("offset", "0");
+	        reqObj.put("sign_type", PartnerConfig.SIGN_TYPE);
+	        reqObj.put("pay_type", "D");
+	        String sign = LLPayUtil.addSign(reqObj, PartnerConfig.TRADER_PRI_KEY);
+	        reqObj.put("sign", sign);
+	        String reqJSON = reqObj.toString();
+	        String resJSON = HttpRequestSimple.getInstance().postSendHttp(ServerURLConfig.QUERY_USER_BANKCARD_URL, reqJSON);
+	        
+			Map<String, Object> params = new HashMap<String, Object>();
+			params.put("mUserId", muid);
+			UserCard card = this.getBaseService().unique(params);
+	        String cardno = "";
+	        String prcptcd = "";
+	        if (card != null) {
+	        	cardno = card.getBankAccount();
+	        	prcptcd = card.getPrcptcd();
+	        }
 			org.json.JSONObject object = new org.json.JSONObject(resJSON);
 			String ret_code = object.getString("ret_code");
 			data.put("message", object.getString("ret_msg"));
@@ -454,7 +368,7 @@ public class UserCardController extends BaseController<UserCard, String> {
 				map.put("bank_name", bank_name);
 				map.put("card_no", cardno);
 				map.put("bank_code", bank_code);
-				map.put("icon_id", bank_code);
+				map.put("icon_id", "06523cadab1a4ab798fbd715"+bank_code);
 
 //中国银行   01040000
 //农业银行   01030000
@@ -482,7 +396,7 @@ public class UserCardController extends BaseController<UserCard, String> {
 				data.put("status", 0);
 			}
 		} catch (JSONException e) {
-			e.printStackTrace();
+			log.error("失败"+e);
 			data.put("message", e.getMessage());
 			data.put("status", 0);
 		}
