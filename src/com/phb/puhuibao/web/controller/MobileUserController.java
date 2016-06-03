@@ -35,7 +35,6 @@ import com.idp.pub.constants.Constants;
 import com.idp.pub.context.AppContext;
 import com.idp.pub.service.IBaseService;
 import com.idp.pub.utils.DESUtils;
-import com.idp.pub.utils.RSAUtils;
 import com.idp.pub.web.controller.BaseController;
 import com.opensymphony.oscache.util.StringUtil;
 import com.phb.puhuibao.common.Functions;
@@ -105,56 +104,7 @@ public class MobileUserController extends BaseController<MobileUser, String> {
 	
 	
 	
-	
-	/**
-	 * 登录
-	 * @param mUserTel
-	 * @param mUserPwd
-	 * @return
-	 */
-	@RequestMapping(value="mobileLoginForAndroid")
-	@ResponseBody
-	public Map<String, Object> mobileLoginForAndroid(@RequestParam String mUserTel, @RequestParam String mUserPwd) {
-		Map<String, Object> data = new HashMap<String, Object>();
-		if (!Functions.isMobile(mUserTel)) {
-			data.put("message", "请输入正确的手机号！");
-			data.put("status", 0);
-			return data;
-		}
-
-		Map<String,Object> params=new HashMap<String,Object>();
-		params.put("mUserTel", mUserTel);
-		MobileUser u = this.getBaseService().unique(params);
-		if (u == null) {
-			data.put("message", "该手机号没注册！");
-			data.put("status", 0);
-		} else if (!RSAUtils.decrypt(mUserPwd).equals(u.getmUserPwd())) {
-			data.put("message", "密码错误！");
-			data.put("status", 0);			
-		} else {
-			if (u.getmUserName() != null) {
-				u.setmUserName(RSAUtils.encrypt(u.getmUserName()));
-			}
-			if (u.getIdNumber() != null) {
-				u.setIdNumber(RSAUtils.encrypt(u.getIdNumber()));
-			}
-//			if (u.getPayPassword() != null) {
-//				u.setPayPassword(RSAUtils.encrypt(u.getPayPassword()));
-//			}
-			u.setmUserPwd("");
-			u.setPayPassword("");
-//			MobileUserExtra extra = mobileUserExtraService.getById("" + u.getmUserId());
-//			if (extra == null) {
-//				u.setLevel(0);
-//			} else {
-//				u.setLevel(extra.getLevel());				
-//			}
-			data.put("result", u);
-			data.put("message", "登录成功！");
-			data.put("status", 1);
-		}
-		return data;
-	}
+ 
 	@RequestMapping(value="mobileLoginForIOS")
 	@ResponseBody
 	public Map<String, Object> mobileLoginForIOS(@RequestParam String mUserTel, @RequestParam String mUserPwd) {
@@ -281,84 +231,7 @@ public class MobileUserController extends BaseController<MobileUser, String> {
 		return data;
 	}
 
-	/**
-	 * 注册
-	 * @param mUserTel
-	 * @param mUserPwd
-	 * @return
-	 */
-	@RequestMapping(value="saveMobileUserForAndroid")
-	@ResponseBody
-	public Map<String, Object> saveMobileUserForAndroid(@RequestParam String mUserTel, @RequestParam String mUserPwd, @RequestParam String inviteCode) {
-		Map<String, Object> data = new HashMap<String, Object>();
-		
-		
-
-	    
-		
-		try {
-			if (!Functions.isMobile(mUserTel)) {
-				data.put("message", "请输入正确的手机号！");
-				data.put("status", 0);
-				return data;
-			}
-
-			Map<String, Object> params=new HashMap<String, Object>();
-			params.put("mUserTel", mUserTel);
-			MobileUser u = this.getBaseService().unique(params);
-			if (u != null) {
-				data.put("message", "该手机号已注册，请登录！");
-				data.put("status", 0);
-				return data;
-			}
-			
-			
-			int parentId = 0;
-			if (inviteCode.length() > 0) {
-				params = new HashMap<String, Object>();
-				params.put("code", inviteCode);
-				Invite result = inviteService.unique(params);
-				if (result == null) {
-					data.put("message", "该邀请码无效！");
-					data.put("status", 0);
-					return data;
-				}
-				parentId = result.getmUserId();
-			}
-			MobileUser entity = new MobileUser();
-			entity.setmUserTel(mUserTel);
-			entity.setmUserPwd(RSAUtils.decrypt(mUserPwd));
-			entity.setThirdParty("");
-			entity.setmUserName("");
-			entity.setPhoto("");
-			entity.setOccupation("");
-			entity.setmUserEmail("");
-			entity.setPayPassword("");
-			entity.setParentId(parentId);
-			entity.setIdNumber("");
-			
-			String base = "abcdefghijkmnpqrstuvwxyz23456789";     
-		    Random random = new Random();     
-		    StringBuffer sb = new StringBuffer();     
-		    for (int i = 0; i < 6; i++) {     
-		        int number = random.nextInt(base.length());     
-		        sb.append(base.charAt(number));     
-		    }     
-		    entity.setNickname(sb.toString());//生成随机昵称
-		        mobileUserService.userCreate(entity);
-			  	entity.setmUserPwd("");
-				data.put("result", entity);
-				data.put("message", "注册成功！");
-				data.put("status", 1);
-				return data;
-		} catch (Exception e) {
-			log.error("注册失败:"+e);
-			data.put("message", "注册保存失败！");
-			data.put("status", 0);			
-			return data;
-		}
-	
-	}
+ 
 	@RequestMapping(value="saveMobileUserForIOS")
 	@ResponseBody
 	public Map<String, Object> saveMobileUserForIOS(@RequestParam String mUserTel, @RequestParam String mUserPwd, @RequestParam String inviteCode) {
@@ -427,101 +300,7 @@ public class MobileUserController extends BaseController<MobileUser, String> {
 		}
 		
 	}
-
-	/**
-	 * 保存用户补充信息
-	 * @param uid
-	 * @param name
-	 * @param sex
-	 * @param age
-	 * @param occupation
-	 * @param fileName
-	 * @param fileType
-	 * @param filePath
-	 * @param orgFileName
-	 * @return
-	 */
-	@RequestMapping(value="saveUserInformationForAndroid")
-	@ResponseBody
-	public Map<String, Object> saveUserInformationForAndroid(
-			@RequestParam String uid, 
-			@RequestParam String sex, 
-			@RequestParam String age, 
-			@RequestParam String occupation, 
-			@RequestParam String nickname, 
-			@RequestParam String constellation, 
-			@RequestParam String fileName, 
-			@RequestParam String fileType, 
-			@RequestParam String filePath, 
-			@RequestParam String orgFileName) {
-		Map<String, Object> data = new HashMap<String, Object>();
-		MobileUser entity = new MobileUser();
-		if (fileName.length() > 0) {
-			UploadFile uploadFile = new UploadFile();
-			uploadFile.setFileName(fileName);
-			uploadFile.setFileType(fileType);
-			uploadFile.setFilePath(filePath);
-			uploadFile.setOrgFileName(orgFileName);
-			try {
-				uploadFile = uploadFileService.save(uploadFile);
-			} catch (Exception e) {
-				data.put("message", "网络异常！");
-				data.put("status", 0);			
-				return data;
-			}
-			Map<String,Object> params = new HashMap<String,Object>();
-			params.put("mUserId", uid);
-			MobileUser u = this.getBaseService().unique(params);
-			if (u.getPhoto() != null && u.getPhoto().length() > 0) {
-				params = new HashMap<String,Object>();
-				params.put("id", "'" + u.getPhoto() + "'");
-				uploadFileService.delete(params);
-			}
-			entity.setPhoto(uploadFile.getId());
-		}
-		int int_sex = 1;
-		if ("2".equals(sex)) {
-			int_sex = 2;
-		}
-		int int_age = 0;
-		if (age.length() > 0 && StringUtils.isNumeric(age)) {
-			int_age = Integer.parseInt(age);
-			if (int_age > 127) {
-				data.put("message", "用户年龄不合理！");
-				data.put("status", 0);			
-				return data;
-			}
-		}
-		if (uid.length() > 0 && StringUtils.isNumeric(uid)) {
-		} else {
-			data.put("message", "用户id非法！");
-			data.put("status", 0);			
-			return data;
-		}
-		entity.setmUserId(Integer.parseInt(uid));
-		entity.setSex(int_sex);
-		entity.setAge(int_age);
-		entity.setOccupation(occupation);
-		entity.setNickname(nickname);
-		entity.setConstellation(constellation);
-		try {
-		    entity = this.getBaseService().update(entity);
-		    entity = this.getBaseService().getById(uid);
-		} catch (Exception e) {
-			data.put("message", "网络异常！");
-			data.put("status", 0);			
-			return data;
-		}
-
-	    entity.setmUserName(RSAUtils.encrypt(entity.getmUserName()));
-	    entity.setIdNumber(RSAUtils.encrypt(entity.getIdNumber()));
-	    entity.setmUserPwd("");
-	    entity.setPayPassword("");
-		data.put("result", entity);
-		data.put("message", "保存成功！");
-		data.put("status", 1);
-		return data;
-	}
+ 
 	
 	
 	@RequestMapping(value="saveUserPhoto")
@@ -902,31 +681,7 @@ public class MobileUserController extends BaseController<MobileUser, String> {
 		data.put("status", 1);
 		return data;
 	}
-	@RequestMapping(value="modifyPasswordForAndroid")
-	@ResponseBody
-	public Map<String, Object> modifyPasswordForAndroid(@RequestParam String muid, @RequestParam String oldPassword, @RequestParam String password) {
-		MobileUser u = this.getBaseService().getById(muid);
-		if (!RSAUtils.decrypt(oldPassword).equals(u.getmUserPwd())) {
-			Map<String, Object> data = new HashMap<String, Object>();
-			data.put("message", "旧登录密码不正确！");
-			data.put("status", 0);
-			return data;
-		}
-		MobileUser entity = new MobileUser();
-		entity.setmUserId(u.getmUserId());
-		entity.setmUserPwd(RSAUtils.decrypt(password));
-		Map<String, Object> data = new HashMap<String, Object>();
-		try {
-			entity = this.getBaseService().update(entity);
-		} catch (Exception e) {
-			data.put("message", "登录密码修改失败！" + e.getMessage());
-			data.put("status", 0);			
-			return data;
-		}
-		data.put("message", "登录密码修改成功！");
-		data.put("status", 1);
-		return data;
-	}
+ 
 	@RequestMapping(value="modifyPasswordForIOS")
 	@ResponseBody
 	public Map<String, Object> modifyPasswordForIOS(@RequestParam String muid, @RequestParam String oldPassword, @RequestParam String password) {
@@ -953,38 +708,7 @@ public class MobileUserController extends BaseController<MobileUser, String> {
 		return data;
 	}
 
-	/**
-	 * 修改支付密码
-	 * @param mUserTel
-	 * @param old_mUserPwd
-	 * @param mUserPwd
-	 * @return
-	 */
-	@RequestMapping(value="modifyPayPasswordForAndroid")
-	@ResponseBody
-	public Map<String, Object> modifyPayPasswordForAndroid(@RequestParam String muid, @RequestParam String oldPayPassword, @RequestParam String payPassword) {
-		MobileUser u = this.getBaseService().getById(muid);
-		if (!RSAUtils.decrypt(oldPayPassword).equals(u.getPayPassword())) {
-			Map<String, Object> data = new HashMap<String, Object>();
-			data.put("message", "旧支付密码不正确！");
-			data.put("status", 0);
-			return data;
-		}
-		MobileUser entity = new MobileUser();
-		entity.setmUserId(u.getmUserId());
-		entity.setPayPassword(RSAUtils.decrypt(payPassword));
-		Map<String, Object> data = new HashMap<String, Object>();
-		try {
-			entity = this.getBaseService().update(entity);
-		} catch (Exception e) {
-			data.put("message", "支付密码修改失败！" + e.getMessage());
-			data.put("status", 0);			
-			return data;
-		}
-		data.put("message", "支付密码修改成功！");
-		data.put("status", 1);
-		return data;
-	}
+ 
 	@RequestMapping(value="modifyPayPasswordForIOS")
 	@ResponseBody
 	public Map<String, Object> modifyPayPasswordForIOS(@RequestParam String muid, @RequestParam String oldPayPassword, @RequestParam String payPassword) {
@@ -1011,27 +735,7 @@ public class MobileUserController extends BaseController<MobileUser, String> {
 		return data;
 	}
 	
-	/**
-	 * 检查登录密码是否正确
-	 * @param muid
-	 * @param loginPassword
-	 * @return
-	 */
-	@RequestMapping(value="checkLoginPasswordForAndroid")
-	@ResponseBody
-	public Map<String, Object> checkLoginPasswordForAndroid(@RequestParam String muid, @RequestParam String loginPassword) {
-		MobileUser u = this.getBaseService().getById(muid);
-		Map<String, Object> data = new HashMap<String, Object>();
-		if (!RSAUtils.decrypt(loginPassword).equals(u.getmUserPwd())) {
-			data.put("message", "登录密码不正确！");
-			data.put("status", 0);
-			return data;
-		}else{
-			data.put("message", "登录密码正确！");
-			data.put("status", 1);
-			return data;
-		}
-	}
+ 
 	
 	@RequestMapping(value="checkLoginPasswordForIOS")
 	@ResponseBody
@@ -1089,38 +793,7 @@ public class MobileUserController extends BaseController<MobileUser, String> {
 		return data;
 	}
 	
-	/**
-	 * 找回登录密码
-	 * @param muid
-	 * @param password
-	 * @return
-	 */
-	@RequestMapping(value="findPasswordForAndroid")
-	@ResponseBody
-	public Map<String, Object> findPasswordForAndroid(@RequestParam String mUserTel, @RequestParam String password) {
-		Map<String, Object> data = new HashMap<String, Object>();
-		Map<String,Object> params = new HashMap<String,Object>();
-		params.put("mUserTel", mUserTel);
-		MobileUser u = this.getBaseService().unique(params);
-		if (u == null) {
-			data.put("message", "改手机号未注册！");
-			data.put("status", 0);
-			return data;
-		}
-		MobileUser entity = new MobileUser();
-		entity.setmUserId(u.getmUserId());
-		entity.setmUserPwd(RSAUtils.decrypt(password));
-		try {
-			entity = this.getBaseService().update(entity);
-		} catch (Exception e) {
-			data.put("message", "登录密码修改失败！" + e.getMessage());
-			data.put("status", 0);			
-			return data;
-		}
-		data.put("message", "登录密码修改成功！");
-		data.put("status", 1);
-		return data;
-	}
+ 
 	@RequestMapping(value="findPasswordForIOS")
 	@ResponseBody
 	public Map<String, Object> findPasswordForIOS(@RequestParam String mUserTel, @RequestParam String password) {
@@ -1150,50 +823,7 @@ public class MobileUserController extends BaseController<MobileUser, String> {
 
 	@Resource(name = "userCardService")
 	private IBaseService<UserCard, String> userCardService;
-	/**
-	 * 找回支付密码
-	 * @param muid
-	 * @param bankAccount
-	 * @param payPassword
-	 * @return
-	 */
-	@RequestMapping(value="findPayPasswordForAndroid")
-	@ResponseBody
-	public Map<String, Object> findPayPasswordForAndroid(@RequestParam int muid, @RequestParam String payPassword) {
-//		Map<String,Object> params=new HashMap<String,Object>();
-//		params.put("bankAccount", RSAUtils.decrypt(bankAccount));
-//		UserCard card = userCardService.unique(params);
-//		if (card != null) {
-//			Map<String, Object> data = new HashMap<String, Object>();
-//			data.put("message", "银行卡卡号不正确！");
-//			data.put("status", 0);
-//			return data;
-//		}
-//		String cardno = RSAUtils.decrypt(bankAccount);
-//		Map<String, String> result = TZTService.bankCardCheck(cardno);
-//		String isvalid = StringUtils.trimToEmpty(result.get("isvalid"));
-//		if ("0".equals(isvalid)) {
-//			Map<String, Object> data = new HashMap<String, Object>();
-//			data.put("message", "银行卡卡号不正确！");
-//			data.put("status", 0);
-//			return data;
-//		}
-
-		MobileUser entity = new MobileUser();
-		entity.setmUserId(muid);
-		entity.setPayPassword(RSAUtils.decrypt(payPassword));
-		Map<String, Object> data = new HashMap<String, Object>();
-		try {
-			entity = this.getBaseService().update(entity);
-		} catch (Exception e) {
-			data.put("message", "支付密码修改失败！" + e.getMessage());
-			data.put("status", 0);			
-			return data;
-		}
-		data.put("message", "支付密码修改成功！");
-		data.put("status", 1);
-		return data;
-	}
+	 
 	@RequestMapping(value="findPayPasswordForIOS")
 	@ResponseBody
 	public Map<String, Object> findPayPasswordForIOS(@RequestParam int muid, @RequestParam String payPassword) {
@@ -1232,45 +862,7 @@ public class MobileUserController extends BaseController<MobileUser, String> {
 		return data;
 	}
 
-	/**
-	 * 实名认证
-	 * @param muid
-	 * @param mUserName
-	 * @param idNumber
-	 * @return
-	 */
-	@RequestMapping(value="certificationForAndroid")
-	@ResponseBody
-	public Map<String, Object> certificationForAndroid(@RequestParam int muid, @RequestParam String mUserName, @RequestParam String idNumber) {
-		Map<String, Object> data = new HashMap<String, Object>();
-		idNumber = RSAUtils.decrypt(idNumber);
-		String errorInfo = Functions.idCardValidate(idNumber);
-		if (!"".equals(errorInfo)) {
-			data.put("message", errorInfo);
-			data.put("status", 0);			
-			return data;			
-		}
-		
-		MobileUser entity = new MobileUser();
-		entity.setmUserId(muid);
-		entity.setmUserName(RSAUtils.decrypt(mUserName));
-		entity.setIdNumber(idNumber);
-		try {
-			entity = this.getBaseService().update(entity);
-		} catch (Exception e) {
-			data.put("message", "网络异常！");
-			data.put("status", 0);			
-			return data;
-		}
-
-		Map<String, Object> result = new HashMap<String, Object>();
-		result.put("mUserName", RSAUtils.encrypt(entity.getmUserName()));
-		result.put("idNumber", RSAUtils.encrypt(entity.getIdNumber()));
-		data.put("result", result);
-		data.put("message", "保存成功");
-		data.put("status", 1);
-		return data;
-	}
+ 
 	@RequestMapping(value="certificationForIOS")
 	@ResponseBody
 	public Map<String, Object> certificationForIOS(@RequestParam int muid, @RequestParam String mUserName, @RequestParam String idNumber) {
@@ -1657,26 +1249,7 @@ public class MobileUserController extends BaseController<MobileUser, String> {
 		return results;
 	}
 	
-	/**
-	 * 支付密码校验
-	 * @param muid
-	 * @param payPassword
-	 * @return
-	 */
-	@RequestMapping(value="verifyPayPasswordForAndroid")
-	@ResponseBody
-	public Map<String, Object> verifyPayPasswordForAndroid(@RequestParam String muid, @RequestParam String payPassword) {
-		Map<String, Object> data = new HashMap<String, Object>();
-		MobileUser user = this.getBaseService().getById(muid);
-		if (user.getPayPassword().equals(RSAUtils.decrypt(payPassword))) {
-			data.put("message", "");
-			data.put("status", 1);
-		} else {
-			data.put("message", "支付密码错误！");
-			data.put("status", 0);
-		}
-		return data;
-	}
+ 
 	@RequestMapping(value="verifyPayPasswordForIOS")
 	@ResponseBody
 	public Map<String, Object> verifyPayPasswordForIOS(@RequestParam String muid, @RequestParam String payPassword) {

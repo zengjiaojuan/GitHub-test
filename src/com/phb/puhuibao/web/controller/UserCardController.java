@@ -24,8 +24,6 @@ import com.alibaba.fastjson.JSONObject;
 import com.idp.pub.context.AppContext;
 import com.idp.pub.service.IBaseService;
 import com.idp.pub.utils.DESUtils;
-//import com.idp.pub.utils.JsonUtils;
-import com.idp.pub.utils.RSAUtils;
 import com.idp.pub.web.controller.BaseController;
 import com.llpay.client.config.PartnerConfig;
 import com.llpay.client.config.ServerURLConfig;
@@ -63,54 +61,7 @@ public class UserCardController extends BaseController<UserCard, String> {
 	private JdbcTemplate jdbcTemplate;
 
 	 
-	
-	/**
-	 * 保存
-	 * @param muid
-	 * @param bankName
-	 * @param bankAccount
-	 * @return
-	 */
-	@RequestMapping(value="saveForAndroid")
-	@ResponseBody
-	public Map<String, Object> saveForAndroid(@RequestParam String muid, @RequestParam String bankAccount, @RequestParam String phone) {
-		Map<String, Object> data = new HashMap<String, Object>();
-		
-		MobileUser user = mobileUserService.getById(muid);
-		String errorInfo = Functions.idCardValidate(user.getIdNumber());
-		if (StringUtils.isNotEmpty(errorInfo)) {
-			data.put("message", errorInfo);
-			data.put("status", 0);
-			return data;
-		}
-
-		bankAccount = RSAUtils.decrypt(bankAccount);
-//		Map<String, Object> params = new HashMap<String, Object>();
-//		params.put("mUserId", muid);
-//		params.put("bankAccount", bankAccount);
-//		UserCard entity = this.getBaseService().unique(params);
-//		if (entity != null) {
-//			data.put("message", "该银行卡已绑定！");
-//			data.put("status", 0);			
-//			return data;
-//		}
-
-		return bindBankCard(muid, bankAccount, phone);
-//		if ((Integer) data.get("status") == 1) {
-//			entity = new UserCard();
-//			entity.setmUserId(muid);
-//			entity.setBankName(RSAUtils.decrypt(bankName));
-//			entity.setBankAccount(bankAccount);
-//			try {
-//			    entity = this.getBaseService().save(entity);
-//			} catch (Exception e) {
-//				e.printStackTrace();
-//				data.put("message", "网络异常！");
-//				data.put("status", 0);			
-//				return data;
-//			}
-//		}
-	}
+ 
 
 	@RequestMapping(value="saveForIOS")
 	@ResponseBody
