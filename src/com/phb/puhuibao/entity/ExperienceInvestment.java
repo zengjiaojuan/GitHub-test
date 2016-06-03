@@ -16,7 +16,17 @@ public class ExperienceInvestment {
 	private Integer period; // 周期
 	private Double annualizedRate; // 年化利率
 	private Integer leftDays; // 到期天数
+	private String unit; // 产品 期限单位
 	
+	public void setInvestmentId(Integer investmentId) {
+		this.investmentId = investmentId;
+	}
+	public String getUnit() {
+		return unit;
+	}
+	public void setUnit(String unit) {
+		this.unit = unit;
+	}
 	public int getInvestmentId() {
 		return investmentId;
 	}

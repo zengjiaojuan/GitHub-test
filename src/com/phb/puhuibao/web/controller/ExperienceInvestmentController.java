@@ -34,6 +34,7 @@ import com.phb.puhuibao.entity.UserExperience;
 @RequestMapping(value = "/experienceInvestment")
 public class ExperienceInvestmentController extends BaseController<ExperienceInvestment, String> {
 	protected  final Logger       logger = LoggerFactory.getLogger(ExperienceInvestmentController.class);
+	@Override
 	@Resource(name = "experienceInvestmentService")
 	public void setBaseService(IBaseService<ExperienceInvestment, String> baseService) {
 		super.setBaseService(baseService);
@@ -60,6 +61,7 @@ public class ExperienceInvestmentController extends BaseController<ExperienceInv
 
 		params = new HashMap<String, Object>();
 		for (ExperienceInvestment investment : queryResult) {
+			investment.setUnit("天");
 			if (investment.getStatus() >= 2) {
 				investment.setLeftDays(0);
 			} else {
