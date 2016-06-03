@@ -26,7 +26,6 @@ import com.idp.pub.context.AppContext;
 import com.idp.pub.entity.Pager;
 import com.idp.pub.service.IBaseService;
 import com.idp.pub.utils.DESUtils;
-import com.idp.pub.utils.RSAUtils;
 import com.idp.pub.utils.StringUtils;
 import com.idp.pub.web.controller.BaseController;
 import com.phb.puhuibao.common.Functions;
@@ -386,15 +385,15 @@ public class UserInvestmentController extends BaseController<UserInvestment, Str
         }
 		result.put("RedeemDate", cal.getTime());
 		int days = (int) ((cal.getTimeInMillis() - entity.getIncomeDate().getTime()) / (24 * 3600 * 1000));
-		double everyIncome = Functions.calEveryIncome(investmentAmount, product.getAnnualizedRate());
-		result.put("LastIncome", everyIncome * days);
+		double everyIncome = Functions.calEveryIncome(investmentAmount, addRate.getAnnualizedRate()+product.getAnnualizedRate());  // 获取每日收益
+		result.put("LastIncome", everyIncome * days); 
 		
 		entity.setTotalIncome(everyIncome * days);// 预期收益
 		entity.setExpireDate(cal.getTime());// 到期日
 		
 		
 		try {
-			userInvestmentService.processSave(entity, redpacketId,addRate,product.getAnnualizedRate());
+			userInvestmentService.processSave(entity, redpacketId,addRate,product.getAnnualizedRate());  // 保存投资
 		} catch (Exception e) {
 			log.error("失败"+e);
 			data.put("status", 0);
@@ -508,54 +507,7 @@ public class UserInvestmentController extends BaseController<UserInvestment, Str
 		return data;
 	}
 	
-	/**
-	 * 保存赎回
-	 * @param investmentId
-	 * @return
-	 */
-	@RequestMapping(value="saveRedeemForAndroid")
-	@ResponseBody
-	public Map<String, Object> saveRedeemForAndroid(@RequestParam int investmentId, @RequestParam String payPassword) {
-		String sql = "select 1 from phb_muser_investment where investmentId=" + investmentId + " for update";
-		this.jdbcTemplate.execute(sql);
-		UserInvestment investment = this.getBaseService().getById("" + investmentId);
-		int muid = investment.getmUserId();
-		Map<String, Object> data = new HashMap<String, Object>();
-		MobileUser user = mobileUserService.getById("" + muid);
-		if (StringUtils.isEmpty(user.getPayPassword())) {
-			data.put("message", "请设置密码！");
-			data.put("status", 8);
-			return data;			
-		}
-		if (!RSAUtils.decrypt(payPassword).equals(user.getPayPassword())) {
-			data.put("message", "支付密码不正确！");
-			data.put("status", 0);
-			return data;
-		}
-
-		if (investment.getStatus() != 1) {
-			data.put("message", "该投资不能赎回，投资状态：" + investment.getStatus());
-			data.put("status", 0);
-			return data;
-		}
-		
-		Map<String, Double> income = calIncome(investment);
-		double managementFee = income.get("managementFee");
-		double totalIncome = income.get("totalIncome");
-
-		UserInvestment i = new UserInvestment();
-		i.setInvestmentId(investment.getInvestmentId());
-		i.setLastIncome(totalIncome - managementFee);
-		i.setStatus(3);
-		i.setmUserId(investment.getmUserId());
-		i.setInvestmentAmount(investment.getInvestmentAmount());
-		i.setLastDate(new Date());
-		this.getBaseService().update(i);
-		
-		data.put("message", "成功！");
-		data.put("status", 1);
-		return data;
-	}
+ 
 	@RequestMapping(value="saveRedeemForIOS")
 	@ResponseBody
 	public Map<String, Object> saveRedeemForIOS(@RequestParam int investmentId, @RequestParam String payPassword) {
