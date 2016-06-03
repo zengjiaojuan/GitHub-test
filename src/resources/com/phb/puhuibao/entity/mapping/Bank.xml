@@ -7,6 +7,10 @@
   <resultMap id="resourceResultMap" type="com.phb.puhuibao.entity.Bank">
     <result property="bankId" column="bank_id" jdbcType="TINYINT" />
     <result property="bankName" column="bank_name" jdbcType="VARCHAR" />
+   <result property="bankIcon" column="bank_icon" jdbcType="VARCHAR" />
+   <result property="orderLimit" column="order_limit" jdbcType="DECIMAL"/>
+   <result property="dayLimit" column="day_limit" jdbcType="DECIMAL"/>
+   <result property="monthLimit" column="month_limit" jdbcType="DECIMAL"/>
   </resultMap>
   
   <!-- RESOURCE INSERT -->
@@ -58,7 +62,11 @@
   </sql>
   <sql id="allColumn">
     bank_id,
-	bank_name
+	bank_name,
+	bank_icon,
+	order_limit,
+	day_limit,
+	month_limit
   </sql>
   <sql id="dynamicWhere">
 	<trim prefix="WHERE" prefixOverrides="AND|OR">
