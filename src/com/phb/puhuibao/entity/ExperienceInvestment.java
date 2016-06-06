@@ -17,7 +17,18 @@ public class ExperienceInvestment {
 	private Double annualizedRate; // 年化利率
 	private Integer leftDays; // 到期天数
 	private String unit; // 产品 期限单位
+	private Double totalIncome; // 预期总收益
 	
+	
+	
+	
+	
+	public Double getTotalIncome() {
+		return totalIncome;
+	}
+	public void setTotalIncome(Double totalIncome) {
+		this.totalIncome = totalIncome;
+	}
 	public void setInvestmentId(Integer investmentId) {
 		this.investmentId = investmentId;
 	}

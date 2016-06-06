@@ -84,6 +84,7 @@ public class ExperienceInvestmentController extends BaseController<ExperienceInv
 						investment.setLastIncome(everyIncome * currentTime_income);
 
 					}
+					investment.setTotalIncome(everyIncome * investment.getPeriod());// 总收益
 
 				} catch (ParseException e) {
 					logger.error("日期格式化错误");
