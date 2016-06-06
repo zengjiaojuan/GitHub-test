@@ -21,10 +21,42 @@ import com.phb.puhuibao.entity.UserRedpacket;
 @Controller
 @RequestMapping(value = "/userRedpacket")
 public class UserRedpacketController extends BaseController<UserRedpacket, String> {
+	@Override
 	@Resource(name = "userRedpacketService")
 	public void setBaseService(IBaseService<UserRedpacket, String> baseService) {
 		super.setBaseService(baseService);
 	}
+	
+	
+	
+	/**
+	 * 所有红包列表
+	 * @param pageno
+	 * @param muid
+	 * @return
+	 */
+	@RequestMapping(value="allRedpackets")
+	@ResponseBody
+	public Map<String, Object> allRedpackets(@RequestParam int pageno, @RequestParam String muid) {
+		Pager<UserRedpacket> pager = new Pager<UserRedpacket>();
+		pager.setReload(true);
+		pager.setCurrent(pageno);
+		Map<String,Object> params = new HashMap<String,Object>();
+		params.put("mUserId", muid);
+		params.put("orderBy", "status");
+		params.put("order", "desc");
+		Pager<UserRedpacket> p = this.getBaseService().findByPager(pager, params);
+		p.setLimit(30);
+		Map<String, Object> data = new HashMap<String, Object>();
+		data.put("result", p.getData());
+		data.put("count", p.getTotal());
+		data.put("message", "");
+		data.put("status", 1);
+		return data;
+	}
+	
+	
+	
 	
 	/**
 	 * 有效红包列表
@@ -106,6 +138,7 @@ public class UserRedpacketController extends BaseController<UserRedpacket, Strin
 	 * @param type
 	 * @return
 	 */
+	@Override
 	@RequestMapping(params = "isArray=true", method = RequestMethod.GET)
 	@ResponseBody
 	public List<UserRedpacket> findByList(@RequestParam String muid) {
