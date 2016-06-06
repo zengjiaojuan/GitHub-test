@@ -130,7 +130,7 @@ public class MobileUserServiceImpl extends DefaultBaseService<MobileUser, String
 				params = new HashMap<String, Object>();
 				params.put("productSN", productSN);
 				AssetProduct product = assetProductDao.unique(params);
-				double rate = product.getAnnualizedRate();// 年化利率
+				 double rate = investment.getAnnualizedRate();  // 年利率从用户投资表取
 				double amount = investment.getInvestmentAmount();
 				double everyIncome = Functions.calEveryIncome(amount, rate);
 				if (currentTime >= investment.getIncomeDate().getTime()) {
@@ -175,7 +175,7 @@ public class MobileUserServiceImpl extends DefaultBaseService<MobileUser, String
 				params = new HashMap<String, Object>();
 				params.put("productSN", productSN);
 				ExperienceProduct product = experienceProductDao.unique(params);
-				double rate = product.getAnnualizedRate();
+				double rate = investment.getAnnualizedRate();
 				double amount = investment.getInvestmentAmount();
 				double everyIncome = Functions.calEveryIncome(amount, rate);
 				if (currentTime >= investment.getIncomeDate().getTime()) {

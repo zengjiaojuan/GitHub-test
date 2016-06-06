@@ -1119,6 +1119,7 @@ public class MobileUserController extends BaseController<MobileUser, String> {
 		try {
 			result = mobileUserService.processFortune(muid);
 		} catch (Exception e) {
+			log.error(e.getStackTrace());
 			data.put("message", "错误！" + e.getMessage());
 			data.put("status", 0);			
 			return data;

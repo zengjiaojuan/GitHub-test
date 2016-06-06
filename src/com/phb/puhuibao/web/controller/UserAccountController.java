@@ -132,9 +132,8 @@ public class UserAccountController extends BaseController<UserAccount, String> {
 	@ResponseBody
 	public Map<String, Object> saveForIOS(@RequestParam String muid,
 			@RequestParam String payPassword,
-			@RequestParam double amount,
-			@RequestParam String userNote,
-			@RequestParam String prcptcd) {
+			@RequestParam double amount
+			  ) {
 		Map<String, Object> data = new HashMap<String, Object>();
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("mUserId", muid);
@@ -146,7 +145,7 @@ public class UserAccountController extends BaseController<UserAccount, String> {
 		}
 		UserCard c = new UserCard();
 		c.setBankAccount(card.getBankAccount());
-		c.setPrcptcd(prcptcd);
+		 
 
 		MobileUser user = mobileUserService.getById("" + muid);
 		if (StringUtils.isEmpty(user.getPayPassword())) {
@@ -175,7 +174,7 @@ public class UserAccountController extends BaseController<UserAccount, String> {
 		entity.setmUserId(user.getmUserId());
 		entity.setAmount(amount);
 		entity.setProcessType(1);
-		entity.setUserNote(userNote);
+ 
 		try {
 		    entity = userAccountService.processSave(entity);
 			baseUserCardService.update(c);

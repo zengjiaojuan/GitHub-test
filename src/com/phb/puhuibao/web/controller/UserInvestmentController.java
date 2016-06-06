@@ -99,9 +99,7 @@ public class UserInvestmentController extends BaseController<UserInvestment, Str
 				params = new HashMap<String, Object>();
 				params.put("productSN", productSN);
 				AssetProduct product = assetProductService.unique(params);
-				double rate = product.getAnnualizedRate();
-				investment.setAnnualizedRate(rate);
-
+ 
 				if (investment.getStatus() >= 2) {
 					investment.setLeftDays(0);
 				} else {
@@ -109,7 +107,7 @@ public class UserInvestmentController extends BaseController<UserInvestment, Str
 					Long incomeTime = incomeDate.getTime();
 					if (currentTime > incomeTime) {
 						double amount = investment.getInvestmentAmount();
-						double everyIncome = Functions.calEveryIncome(amount, rate);
+						double everyIncome = Functions.calEveryIncome(amount, investment.getAnnualizedRate());
 						long days = (currentTime - incomeTime) / (24 * 3600 * 1000) + 1;
 						investment.setLastIncome(everyIncome * days);
 					}
@@ -134,7 +132,7 @@ public class UserInvestmentController extends BaseController<UserInvestment, Str
 		} catch (Exception e) {
              
 			data.put("status", 0);
-			log.error("失败:"+e);
+			log.error("失败:"+e.getStackTrace());
 		}
 		return data;
 	}
@@ -175,7 +173,7 @@ public class UserInvestmentController extends BaseController<UserInvestment, Str
 			data.put("status", 1);
 			return data;
 		} catch (Exception e) {
-			log.error("失败:"+e);
+			log.error("失败:"+e.getStackTrace());
 			data.put("status", 0);
 			return data;
 		}
@@ -275,6 +273,7 @@ public class UserInvestmentController extends BaseController<UserInvestment, Str
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("bidSN", bidSN);
 		ProductBid bid = productBidService.unique(params);
+		
 		if (bid.getType() == 0) {
 			Pager<UserInvestment> pager = new Pager<UserInvestment>();
 			pager.setReload(true);
@@ -293,15 +292,10 @@ public class UserInvestmentController extends BaseController<UserInvestment, Str
 		params.put("productSN", bid.getProductSN());
 		AssetProduct product = assetProductService.unique(params);
 		
-		
 		params = new HashMap<String, Object>();
 		params.put("rateId", addRateId);
 		AddRate addRate = addRateService.unique(params);
-		if(addRate != null && (addRate.getRateStatus() ==0 || addRate.getRateStatus() ==2)){// 加息劵存在
-			data.put("message", "加息劵失效");
-			data.put("status", 0);
-			return data;
-		}
+
 		
 
 		double deductionAmount = 0;
@@ -391,11 +385,65 @@ public class UserInvestmentController extends BaseController<UserInvestment, Str
 		entity.setTotalIncome(everyIncome * days);// 预期收益
 		entity.setExpireDate(cal.getTime());// 到期日
 		
+
+
+
+		int addrateflag=1;
+		if(addRate != null){// 加息劵存在
+			if(addRate.getRateStatus() ==0){// 失效的加息劵
+				data.put("message", "加息劵失效");
+				data.put("status", 0);
+				return data;
+			} else{
+				if(addRate.getAmountFlag()=="equalorgreaterthan"){//>=
+					 if(investmentAmount < addRate.getRateAmount()){// 投资额小于加息劵
+						 data.put("message", "此加息劵最低额度要求"+addRate.getRateAmount()+"元.");
+						 addrateflag=0;
+					 }
+				}else if(addRate.getAmountFlag()=="equalorsmallerthan"){//<=
+					if(investmentAmount > addRate.getRateAmount()){// 投资额小于加息劵
+						 data.put("message", "此加息劵最多只能投"+addRate.getRateAmount()+"元.");
+						 addrateflag=0;
+					 }
+					
+				}else if(addRate.getAmountFlag()=="qual"){
+					if(investmentAmount != addRate.getRateAmount()){//  
+						 data.put("message", "此加息劵只能用在投资额度为"+addRate.getRateAmount()+"元的产品上.");
+						 addrateflag=0;
+					 }
+				}else if(addRate.getRateFlag()=="equalorgreaterthan"){//>=
+					 if(days < addRate.getRatePeriod()){// 投资额小于加息劵
+						 data.put("message", "此加息劵只能用在大于"+addRate.getRatePeriod()+"天的产品上.");
+						 addrateflag=0;
+					 }
+				}else if(addRate.getRateFlag()=="equalorsmallerthan"){//<=
+					if(days > addRate.getRatePeriod()){// 投资额小于加息劵
+						 data.put("message", "此加息劵只能用在小于"+addRate.getRateAmount()+"天的产品上.");
+						 addrateflag=0;
+					 }
+					
+				}else if(addRate.getRateFlag()=="qual"){
+					if(days != addRate.getRatePeriod()){// 投资额小于加息劵
+						 data.put("message", "此加息劵只能用在投资额度为"+addRate.getRateAmount()+"元的产品上.");
+						 addrateflag=0;
+					 }
+				}
+				 
+				
+			}
+			
+		}
+		if(addrateflag==0){
+			data.put("status", 0);
+			return data;
+		}
+		
+		
 		
 		try {
 			userInvestmentService.processSave(entity, redpacketId,addRate,product.getAnnualizedRate());  // 保存投资
 		} catch (Exception e) {
-			log.error("失败"+e);
+			log.error("失败"+e.getStackTrace());
 			data.put("status", 0);
 			return data;
 		}
@@ -420,7 +468,7 @@ public class UserInvestmentController extends BaseController<UserInvestment, Str
 		long currentTime = new Date().getTime();
 		Long incomeTime = investment.getIncomeDate().getTime();
 		if (currentTime > incomeTime) {
-			double rate = product.getAnnualizedRate();
+			double rate = investment.getAnnualizedRate();
 			double amount = investment.getInvestmentAmount();
 			double everyIncome = Functions.calEveryIncome(amount, rate);
 			if (product.getType() == 2 && investment.getLastDate() != null) { // 朗月赢

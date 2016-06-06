@@ -1,7 +1,5 @@
 package com.phb.puhuibao.job;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -230,7 +228,7 @@ public class RedeemJob {
 				}
 		        if (currentTime >= monthCal.getTimeInMillis()) {
 //		        if (year == monthCal.get(Calendar.YEAR) && month == monthCal.get(Calendar.MONTH) && date == monthCal.get(Calendar.DATE)) {
-			        double rate = product.getAnnualizedRate();
+			        double rate = investment.getAnnualizedRate();
 					double amount = investment.getInvestmentAmount();
 					// double lastIncome = 0;
 					int factor;
@@ -266,7 +264,7 @@ public class RedeemJob {
 	        	continue;
 	        }
 	        
-	        double rate = product.getAnnualizedRate();
+	        double rate = investment.getAnnualizedRate();
 			long amount = investment.getInvestmentAmount();
 			// double lastIncome = 0;
 			int factor;
@@ -385,7 +383,7 @@ public class RedeemJob {
 	        	continue;
 	        }
 
-	        double rate = product.getAnnualizedRate();
+	        double rate = investment.getAnnualizedRate();
 			double amount = investment.getInvestmentAmount();
 //	        double lastIncome = amount * rate * product.getPeriod() / 365;
 //			BigDecimal lastIncomeBD = new BigDecimal(lastIncome).setScale(2, RoundingMode.DOWN);
