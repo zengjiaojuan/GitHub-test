@@ -13,6 +13,8 @@
     <result property="deductionRate" column="deduction_rate" jdbcType="DECIMAL" />
     <result property="status" column="status" jdbcType="TINYINT" />
     <result property="lastDate" column="last_date" jdbcType="TIMESTAMP"/>
+     <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+    
   </resultMap>
 
   <!-- RESOURCE INSERT -->
@@ -73,7 +75,8 @@
     redpacket_amount,
     deduction_rate,
     status,
-    last_date
+    last_date,
+    create_time
   </sql>
   <sql id="dynamicWhere">
 	<trim prefix="WHERE" prefixOverrides="AND|OR">

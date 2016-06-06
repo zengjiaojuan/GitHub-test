@@ -9,6 +9,16 @@ public class UserRedpacket {
     private Double deductionRate;
 	private Integer status;
 	private Date lastDate;
+	private Date  createTime;
+	
+	
+	
+	public Date getCreateTime() {
+		return createTime;
+	}
+	public void setCreateTime(Date createTime) {
+		this.createTime = createTime;
+	}
 	public int getRedpacketId() {
 		return redpacketId;
 	}
