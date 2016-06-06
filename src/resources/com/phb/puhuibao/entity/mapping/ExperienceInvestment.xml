@@ -91,6 +91,7 @@
 	a.income_date,
 	a.last_income,
 	a.status,
+	a.create_time,
 	b.product_name,
 	b.period,
 	b.annualized_rate
