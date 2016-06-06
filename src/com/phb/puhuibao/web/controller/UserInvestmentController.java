@@ -268,7 +268,7 @@ public class UserInvestmentController extends BaseController<UserInvestment, Str
 	 */
 	@RequestMapping(value="save")
 	@ResponseBody
-	public Map<String, Object> save(@RequestParam int muid, @RequestParam String bidSN, @RequestParam long investmentAmount, @RequestParam String redpacketId, String addRateId) {
+	public Map<String, Object> save(@RequestParam int muid, @RequestParam String bidSN, @RequestParam long investmentAmount,  String redpacketId, String addRateId) {
 		Map<String, Object> data = new HashMap<String, Object>();
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("bidSN", bidSN);
@@ -395,34 +395,39 @@ public class UserInvestmentController extends BaseController<UserInvestment, Str
 				data.put("status", 0);
 				return data;
 			} else{
-				if(addRate.getAmountFlag()=="equalorgreaterthan"){//>=
+				if(addRate.getAmountFlag().equals("equalorgreaterthan")){//>=
 					 if(investmentAmount < addRate.getRateAmount()){// 投资额小于加息劵
 						 data.put("message", "此加息劵最低额度要求"+addRate.getRateAmount()+"元.");
 						 addrateflag=0;
 					 }
-				}else if(addRate.getAmountFlag()=="equalorsmallerthan"){//<=
+				}
+				if(addRate.getAmountFlag().equals("equalorsmallerthan")){//<=
 					if(investmentAmount > addRate.getRateAmount()){// 投资额小于加息劵
 						 data.put("message", "此加息劵最多只能投"+addRate.getRateAmount()+"元.");
 						 addrateflag=0;
 					 }
 					
-				}else if(addRate.getAmountFlag()=="qual"){
+				}
+				if(addRate.getAmountFlag().equals("equal")){
 					if(investmentAmount != addRate.getRateAmount()){//  
 						 data.put("message", "此加息劵只能用在投资额度为"+addRate.getRateAmount()+"元的产品上.");
 						 addrateflag=0;
 					 }
-				}else if(addRate.getRateFlag()=="equalorgreaterthan"){//>=
+				}
+				if(addRate.getRateFlag().equals("equalorgreaterthan")){//>=
 					 if(days < addRate.getRatePeriod()){// 投资额小于加息劵
 						 data.put("message", "此加息劵只能用在大于"+addRate.getRatePeriod()+"天的产品上.");
 						 addrateflag=0;
 					 }
-				}else if(addRate.getRateFlag()=="equalorsmallerthan"){//<=
+				} 
+				if(addRate.getRateFlag().equals("equalorsmallerthan")){//<=
 					if(days > addRate.getRatePeriod()){// 投资额小于加息劵
 						 data.put("message", "此加息劵只能用在小于"+addRate.getRateAmount()+"天的产品上.");
 						 addrateflag=0;
 					 }
 					
-				}else if(addRate.getRateFlag()=="qual"){
+				}
+				if(addRate.getRateFlag().equals("equal")){
 					if(days != addRate.getRatePeriod()){// 投资额小于加息劵
 						 data.put("message", "此加息劵只能用在投资额度为"+addRate.getRateAmount()+"元的产品上.");
 						 addrateflag=0;

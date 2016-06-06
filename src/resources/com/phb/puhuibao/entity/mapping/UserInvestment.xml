@@ -82,7 +82,8 @@
 	status,
 	income_date,
 	expire_date,
-	total_income
+	total_income,
+	annualized_rate
   </sql>
   <sql id="allapplColumnVar">
 	values(
@@ -93,7 +94,9 @@
 			#{status,jdbcType=TINYINT},
 			#{incomeDate,jdbcType=DATE},
 			#{expireDate,jdbcType=DATE},
-			#{totalIncome,jdbcType=DECIMAL}
+			#{totalIncome,jdbcType=DECIMAL},
+			#{annualizedRate,jdbcType=DECIMAL}
+			
 			
 			
 	)
