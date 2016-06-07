@@ -33,6 +33,7 @@ import com.phb.puhuibao.entity.AddRate;
 import com.phb.puhuibao.entity.AssetProduct;
 import com.phb.puhuibao.entity.MobileUser;
 import com.phb.puhuibao.entity.ProductBid;
+import com.phb.puhuibao.entity.UserAddrate;
 import com.phb.puhuibao.entity.UserInvestment;
 import com.phb.puhuibao.entity.UserRedpacket;
 import com.phb.puhuibao.service.UserInvestmentService;
@@ -61,6 +62,9 @@ public class UserInvestmentController extends BaseController<UserInvestment, Str
 	
 	@Resource(name = "addRateService")
 	private IBaseService<AddRate, String> addRateService;
+	
+	@Resource(name = "userAddrateService")
+	private IBaseService<UserAddrate, String> userAddrateService;
 
 	@Resource(name = "productBidService")
 	private IBaseService<ProductBid, String> productBidService;
@@ -93,13 +97,7 @@ public class UserInvestmentController extends BaseController<UserInvestment, Str
 			Pager<UserInvestment> p = this.getBaseService().findByPager(pager, map);
 			Calendar cal = Calendar.getInstance();
 			long currentTime = new Date().getTime();
-			Map<String, Object> params = new HashMap<String, Object>();
 			for (UserInvestment investment : p.getData()) {
-				String productSN = investment.getProductSN();
-				params = new HashMap<String, Object>();
-				params.put("productSN", productSN);
-				AssetProduct product = assetProductService.unique(params);
- 
 				if (investment.getStatus() >= 2) {
 					investment.setLeftDays(0);
 				} else {
@@ -113,12 +111,12 @@ public class UserInvestmentController extends BaseController<UserInvestment, Str
 					}
 					cal = Calendar.getInstance();
 					cal.setTime(incomeDate);
-					if (product.getUnit().equals("年")) {
-						cal.add(Calendar.YEAR, product.getPeriod());
-					} else if (product.getUnit().indexOf("月") > 0) {
-						cal.add(Calendar.MONTH, product.getPeriod());
+					if (investment.getUnit().equals("年")) {
+						cal.add(Calendar.YEAR, investment.getPeriod());
+					} else if (investment.getUnit().indexOf("月") > 0) {
+						cal.add(Calendar.MONTH, investment.getPeriod());
 					} else {
-						cal.add(Calendar.DATE, product.getPeriod());
+						cal.add(Calendar.DATE, investment.getPeriod());
 					}
 					int leftDays = (int) ((cal.getTimeInMillis() - currentTime) / (24 * 3600 * 1000)) + 1;
 					investment.setLeftDays(leftDays);
@@ -129,12 +127,15 @@ public class UserInvestmentController extends BaseController<UserInvestment, Str
 			data.put("count", p.getTotal());
 			data.put("message", "");
 			data.put("status", 1);
+			return data;
 		} catch (Exception e) {
+			e.getStackTrace();
              
 			data.put("status", 0);
-			log.error("失败:"+e.getStackTrace());
+			log.error("失败:"+e.getMessage());
+			return data;
 		}
-		return data;
+		
 	}
 	
 	/**
@@ -292,9 +293,19 @@ public class UserInvestmentController extends BaseController<UserInvestment, Str
 		params.put("productSN", bid.getProductSN());
 		AssetProduct product = assetProductService.unique(params);
 		
+
+		
 		params = new HashMap<String, Object>();
-		params.put("rateId", addRateId);
-		AddRate addRate = addRateService.unique(params);
+		params.put("recordId", addRateId);
+		UserAddrate useraddRate = userAddrateService.unique(params); // 用户的加息劵
+		
+		AddRate addRate=null;
+		if(useraddRate!=null){
+			params = new HashMap<String, Object>();
+			params.put("rateId", useraddRate.getRateId());
+			addRate = addRateService.unique(params);//加息劵
+		}
+
 
 		
 
@@ -379,7 +390,13 @@ public class UserInvestmentController extends BaseController<UserInvestment, Str
         }
 		result.put("RedeemDate", cal.getTime());
 		int days = (int) ((cal.getTimeInMillis() - entity.getIncomeDate().getTime()) / (24 * 3600 * 1000));
-		double everyIncome = Functions.calEveryIncome(investmentAmount, addRate.getAnnualizedRate()+product.getAnnualizedRate());  // 获取每日收益
+		double everyIncome =0.0;
+		if(addRate != null){
+			everyIncome = Functions.calEveryIncome(investmentAmount, addRate.getAnnualizedRate() + product.getAnnualizedRate());  // 获取每日收益
+		}else{
+			everyIncome = Functions.calEveryIncome(investmentAmount,   product.getAnnualizedRate());  // 获取每日收益
+		}
+		  
 		result.put("LastIncome", everyIncome * days); 
 		
 		entity.setTotalIncome(everyIncome * days);// 预期收益
@@ -446,7 +463,7 @@ public class UserInvestmentController extends BaseController<UserInvestment, Str
 		
 		
 		try {
-			userInvestmentService.processSave(entity, redpacketId,addRate,product.getAnnualizedRate());  // 保存投资
+			userInvestmentService.processSave(entity, redpacketId,addRate,product.getAnnualizedRate(),useraddRate);  // 保存投资
 		} catch (Exception e) {
 			log.error("失败"+e.getStackTrace());
 			data.put("status", 0);

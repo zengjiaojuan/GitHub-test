@@ -23,9 +23,9 @@ public class UserInvestment {
 	private Double totalIncome;//total_income  预期总收益
 	
 	private String userName;
+ 
 	
-	
-	
+ 
 	public String getUserName() {
 		return userName;
 	}

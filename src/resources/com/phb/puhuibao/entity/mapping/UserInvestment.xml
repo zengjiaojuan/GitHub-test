@@ -21,6 +21,9 @@
     <result property="expireDate" column="expire_date" jdbcType="DATE" />
     <result property="totalIncome" column="total_income" jdbcType="DECIMAL" />
     <result property="userName" column="m_user_name" jdbcType="VARCHAR" />
+    <result property="unit" column="unit" jdbcType="VARCHAR" />
+    <result property="annualizedRate" column="annualized_rate" jdbcType="DECIMAL" />
+    
     
   </resultMap>
 
@@ -109,6 +112,7 @@
 	a.income_date,
 	a.last_income,
 	a.status,
+	a.annualized_rate,
 	b.product_sn,
 	b.product_name,
 	b.guarantee_method,
