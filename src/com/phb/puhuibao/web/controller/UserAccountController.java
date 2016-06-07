@@ -127,7 +127,7 @@ public class UserAccountController extends BaseController<UserAccount, String> {
 		return data;
 	}
 
- 
+ // 提现申请 接口
 	@RequestMapping(value="saveForIOS")
 	@ResponseBody
 	public Map<String, Object> saveForIOS(@RequestParam String muid,
@@ -143,10 +143,7 @@ public class UserAccountController extends BaseController<UserAccount, String> {
 			data.put("status", 0);
 			return data;
 		}
-		UserCard c = new UserCard();
-		c.setBankAccount(card.getBankAccount());
-		 
-
+ 
 		MobileUser user = mobileUserService.getById("" + muid);
 		if (StringUtils.isEmpty(user.getPayPassword())) {
 			data.put("message", "请设置支付密码！");
@@ -177,8 +174,10 @@ public class UserAccountController extends BaseController<UserAccount, String> {
  
 		try {
 		    entity = userAccountService.processSave(entity);
-			baseUserCardService.update(c);
+
 		} catch (Exception e) {
+			LOG.error("提现申请失败:"+e.getLocalizedMessage());
+			e.getStackTrace();
 			data.put("message", "提现申请失败！" + e.getMessage());
 			data.put("status", 0);			
 			return data;

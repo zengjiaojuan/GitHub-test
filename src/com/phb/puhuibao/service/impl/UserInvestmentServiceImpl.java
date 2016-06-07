@@ -23,6 +23,7 @@ import com.phb.puhuibao.entity.MobileUser;
 import com.phb.puhuibao.entity.MobileUserExtra;
 import com.phb.puhuibao.entity.ProductBid;
 import com.phb.puhuibao.entity.UserAccountLog;
+import com.phb.puhuibao.entity.UserAddrate;
 import com.phb.puhuibao.entity.UserInvestment;
 import com.phb.puhuibao.entity.UserLoan;
 import com.phb.puhuibao.entity.UserMessage;
@@ -68,6 +69,8 @@ public class UserInvestmentServiceImpl extends DefaultBaseService<UserInvestment
 	private JdbcTemplate jdbcTemplate;
 	@Resource(name = "appContext")
 	private AppContext appContext;
+	@Resource(name = "userAddrateDao")
+	private IBaseDao<UserAddrate, String> userAddrateDao;
 
 	@Override
 	@Deprecated
@@ -275,7 +278,7 @@ public class UserInvestmentServiceImpl extends DefaultBaseService<UserInvestment
 
 	// 投资  带红包 带加息劵
 	@Override
-	public void processSave(UserInvestment entity, String redpacketId, AddRate addRate,Double productAnnualizedRate) {
+	public void processSave(UserInvestment entity, String redpacketId, AddRate addRate,Double productAnnualizedRate,UserAddrate useraddRate) {
 
 		double deductionAmount = 0;
 		
@@ -310,7 +313,12 @@ public class UserInvestmentServiceImpl extends DefaultBaseService<UserInvestment
 		productBidDao.update(bid);
 		
 		entity.setCreateTime(new Date());
-		entity.setAnnualizedRate(productAnnualizedRate +  addRate.getAnnualizedRate()); // 产品年利率+加息劵利率
+		if(addRate !=null){
+			entity.setAnnualizedRate(productAnnualizedRate +  addRate.getAnnualizedRate()); // 产品年利率+加息劵利率
+		}else{
+			entity.setAnnualizedRate(productAnnualizedRate);
+		}
+		
 		this.getBaseDao().save(entity); // 保存投资
 
 		UserAccountLog log = new UserAccountLog();
@@ -322,6 +330,12 @@ public class UserInvestmentServiceImpl extends DefaultBaseService<UserInvestment
 		log.setChangeDesc("投资id: " + entity.getInvestmentId());
 		log.setAccountType(4);
 		userAccountLogDao.save(log);
+		if(useraddRate != null){// 加息劵使用后置为无效
+			UserAddrate rate = new UserAddrate();
+			rate.setRecordId(useraddRate.getRecordId());
+			rate.setRateStatus(0);
+			userAddrateDao.update(rate);
+		}
 
 		if (deductionAmount > 0) {
 			UserRedpacket r = new UserRedpacket();

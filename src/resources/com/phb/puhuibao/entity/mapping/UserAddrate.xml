@@ -61,7 +61,7 @@
 		select
 		count(1)
 		from
-		phb_muser_addrate m
+		phb_muser_addrate m left join phb_add_rate r on( m.rate_id =r.rate_id) 
 		<include refid="dynamicWhere" />
 		    
 	</select>
@@ -69,13 +69,13 @@
 			select
 			<include refid="allColumn" />
 			 from
-			 phb_muser_addrate  m
+			 phb_muser_addrate  m left join phb_add_rate r on( m.rate_id =r.rate_id) 
 	</select>
 	<select id="unique" parameterType="java.util.Map" resultMap="UserAddrate" >
 			select
 			<include refid="allColumn" />
 			 from
-			 phb_muser_addrate m
+			 phb_muser_addrate m left join phb_add_rate r on( m.rate_id =r.rate_id) 
 			<include refid="dynamicWhere" />
 			limit 1
 	</select>

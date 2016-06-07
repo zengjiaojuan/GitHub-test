@@ -34,9 +34,7 @@ public class AddRateJob {
 			List<Map<String, Object>> l = this.jdbcTemplate.queryForList(sql);
 			UserAddrate addrate = new UserAddrate();
 			 int recordid;
-			 int i=l.size()+1;
 			for (Map<String, Object> m : l) {
-				System.out.println(i + "to process");
 				recordid = Integer.parseInt( m.get("record_id").toString());
 				addrate.setRecordId(recordid);
 				addrate.setRateStatus(0);
