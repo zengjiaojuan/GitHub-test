@@ -23,6 +23,7 @@
 		<property name="triggers">
 			<list>
 				<ref bean="redeemJob"></ref>
+				<ref bean="addRateJobInvoke"></ref>
 			</list>
 		</property>
 	</bean>
@@ -34,6 +35,14 @@
 			<value>0 0 0 * * ?</value>
 		</property>
 	</bean>
+	<bean name="addRateJobInvoke" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean" >
+		<property name="jobDetail">
+			<ref bean="invokeAddRateJob"></ref>
+		</property>
+		<property name="cronExpression">
+			<value>0 0 23 * * ?</value>
+		</property>
+	</bean>
 	<bean id="invokeRedeemJob" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
 		<property name="targetObject">
 			<ref bean="fredeemjob"></ref>
@@ -42,7 +51,16 @@
 			<value>redeem</value>
 		</property>
 	</bean>
+	<bean id="invokeAddRateJob" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject">
+			<ref bean="addRateJob"></ref>
+		</property>
+		<property name="targetMethod">
+			<value>process</value>
+		</property>
+	</bean>
 	<bean id="fredeemjob" class="com.phb.puhuibao.job.RedeemJob"></bean>
+	<bean id="addRateJob" class="com.phb.puhuibao.job.AddRateJob"></bean>
 
 	<!-- 自定义扩展属性数据类型转换扩展点 -->
 	<bean id="conversionService"
