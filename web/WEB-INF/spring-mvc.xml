@@ -1,17 +1,15 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:mvc="http://www.springframework.org/schema/mvc"
 	xmlns:context="http://www.springframework.org/schema/context"
-	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:p="http://www.springframework.org/schema/p"
-	xmlns:tx="http://www.springframework.org/schema/tx"
-	xmlns:task="http://www.springframework.org/schema/task"
+	xmlns:p="http://www.springframework.org/schema/p"
+
 	xsi:schemaLocation="
         http://www.springframework.org/schema/beans 
-        http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+        http://www.springframework.org/schema/beans/spring-beans.xsd
         http://www.springframework.org/schema/mvc 
-        http://www.springframework.org/schema/mvc/spring-mvc-3.2.xsd
-	http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-3.2.xsd
+        http://www.springframework.org/schema/mvc/spring-mvc.xsd
         http://www.springframework.org/schema/context 
-        http://www.springframework.org/schema/context/spring-context-3.2.xsd">
+        http://www.springframework.org/schema/context/spring-context.xsd">
 
 	<context:component-scan base-package="com.idap.web.**.controller,com.phb.puhuibao.web.**.controller,com.phb.puhuibao.job">
 		<context:include-filter type="annotation"
@@ -21,7 +19,48 @@
 	</context:component-scan>
 	<!--配置controller映射数据转换策略，还可使用高级自定义方式(RequestMappingHandlerMapping\RequestMappingHandlerAdapter)但需先删除此项 -->
 	<mvc:annotation-driven conversion-service="conversionService" />
-	<task:annotation-driven />
+	<bean name="startJob" class="org.springframework.scheduling.quartz.SchedulerFactoryBean" autowire="no" lazy-init="false">
+		<property name="triggers">
+			<list>
+				<ref bean="redeemJob"></ref>
+				<ref bean="addRateJobInvoke"></ref>
+			</list>
+		</property>
+	</bean>
+	<bean name="redeemJob" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean" >
+		<property name="jobDetail">
+			<ref bean="invokeRedeemJob"></ref>
+		</property>
+		<property name="cronExpression">
+			<value>0 0 0 * * ?</value>
+		</property>
+	</bean>
+	<bean name="addRateJobInvoke" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean" >
+		<property name="jobDetail">
+			<ref bean="invokeAddRateJob"></ref>
+		</property>
+		<property name="cronExpression">
+			<value>0 0 23 * * ?</value>
+		</property>
+	</bean>
+	<bean id="invokeRedeemJob" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject">
+			<ref bean="fredeemjob"></ref>
+		</property>
+		<property name="targetMethod">
+			<value>redeem</value>
+		</property>
+	</bean>
+	<bean id="invokeAddRateJob" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject">
+			<ref bean="addRateJob"></ref>
+		</property>
+		<property name="targetMethod">
+			<value>process</value>
+		</property>
+	</bean>
+	<bean id="fredeemjob" class="com.phb.puhuibao.job.RedeemJob"></bean>
+	<bean id="addRateJob" class="com.phb.puhuibao.job.AddRateJob"></bean>
 
 	<!-- 自定义扩展属性数据类型转换扩展点 -->
 	<bean id="conversionService"
