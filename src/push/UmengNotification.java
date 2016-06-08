@@ -1,15 +1,11 @@
 package push;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import java.util.HashSet;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
@@ -66,12 +62,13 @@ public abstract class UmengNotification {
         url = url + "?sign=" + sign;
         HttpPost post = new HttpPost(url);
         post.setHeader("User-Agent", USER_AGENT);
-        StringEntity se = null;
-		se = new StringEntity(postBody, "UTF-8");
-        post.setEntity(se);
-        // Send the post request and get the response
-        HttpResponse response;
+
 		try {
+	        StringEntity se = null;
+			se = new StringEntity(postBody, "UTF-8");
+	        post.setEntity(se);
+	        // Send the post request and get the response
+	        HttpResponse response;
 			response = client.execute(post);
 	        int status = response.getStatusLine().getStatusCode();
 //	        System.out.println("Response Code : " + status);

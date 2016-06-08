@@ -43,6 +43,7 @@ public class UserAddrateController extends BaseController<UserAddrate, String> {
 		Map<String,Object> hmap=new HashMap<String,Object>();
 		hmap.put("orderBy", "m.last_date desc");
 		hmap.put("rateStatus", "0,1");
+		hmap.put("muserId", muid);
 		Map<String, Object> data = new HashMap<String, Object>();
 		
 		try {
