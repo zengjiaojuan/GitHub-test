@@ -33,10 +33,11 @@ import com.idp.pub.context.AppContext;
 import com.idp.pub.entity.Pager;
 import com.idp.pub.service.IBaseService;
 import com.idp.pub.web.controller.BaseController;
+import com.opensymphony.oscache.util.StringUtil;
 import com.phb.puhuibao.common.Functions;
 import com.phb.puhuibao.entity.AssetProduct;
-import com.phb.puhuibao.entity.ProductBid;
 import com.phb.puhuibao.entity.MobileUser;
+import com.phb.puhuibao.entity.ProductBid;
 
 @Controller
 @RequestMapping(value = "/productBid")
@@ -46,6 +47,7 @@ public class ProductBidController extends BaseController<ProductBid, String> {
 	@Resource(name = "appContext")
 	private AppContext appContext;
 
+	@Override
 	@Resource(name = "productBidService")
 	public void setBaseService(IBaseService<ProductBid, String> baseService) {
 		super.setBaseService(baseService);
@@ -186,6 +188,49 @@ public class ProductBidController extends BaseController<ProductBid, String> {
 		data.put("status", 1);
 		return data;
 	}
+	
+	
+	/**
+	 * 推荐
+	 * @param muid 用户id 
+	 * @return
+	 */
+	@RequestMapping(value="recommendation")
+	@ResponseBody
+	public Map<String, Object> recommendation( @RequestParam String muid) {
+		Map<String,Object> retobj = null;
+		Map<String, Object> data = new HashMap<String, Object>();
+		List <Map<String, Object>> list = null;
+		String sql="";
+		if(StringUtil.isEmpty(muid)){// 用户未登陆
+				sql = "SELECT b.bid_id, b.bid_sn, a.product_name, a.annualized_rate, a.period, a.unit FROM phb_product_bid b LEFT JOIN phb_asset_product a ON b.product_sn = a.product_sn where b.STATUS = 1 and a.product_sn='P888'";
+				list = this.jdbcTemplate.queryForList(sql);
+				if (list.isEmpty()) {// 没有可以投资的新手标
+					data.put("result", retobj);
+					data.put("status", 1);
+				}else{
+					retobj = list.get(0);
+					data.put("result", retobj);
+					data.put("status", 1);
+				}			  
+		} else{
+			sql = "SELECT b.bid_id, b.bid_sn, a.product_name, a.annualized_rate, a.period, a.unit FROM phb_product_bid b LEFT JOIN phb_asset_product a ON b.product_sn = a.product_sn where b. STATUS = 1 order by a.important desc";
+			list = this.jdbcTemplate.queryForList(sql);
+			if (list.isEmpty()) {// 没有可以投资的了
+				data.put("result", retobj);
+				data.put("status", 1);
+			}else{
+				retobj = list.get(0);
+				data.put("result", retobj);
+				data.put("status", 1);
+			}
+			
+		}
+
+		return data;
+ 
+	}
+	
 	
 	/**
 	 * 当前投资量
@@ -806,6 +851,7 @@ public class ProductBidController extends BaseController<ProductBid, String> {
 	/**
 	 * 可理财标
 	 */
+	@Override
 	@RequestMapping(params = "isArray=true", method = RequestMethod.GET)
 	@ResponseBody
 	public List<ProductBid> findByList(@RequestParam String muid) {
