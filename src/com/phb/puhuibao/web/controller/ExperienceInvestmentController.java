@@ -68,22 +68,29 @@ public class ExperienceInvestmentController extends BaseController<ExperienceInv
 				SimpleDateFormat df = new SimpleDateFormat("EEE MMM dd HH:mm:ss Z yyyy", Locale.UK);
 				Date dt;
 				try {
-					dt = df.parse(investment.getIncomeDate().toString());
+					dt = df.parse(investment.getIncomeDate().toString()); // 起息日
 					Long time = dt.getTime();// 这就是距离1970年1月1日0点0分0秒的毫秒数
 					Long time2 = System.currentTimeMillis();// 与上面的相同,获取系统当前时间毫秒数
 
-					int currentTime_income = Integer.parseInt(Long.toString(((time2 - time) / (1000 * 60 * 60 * 24))));
+					int currentTime_income = Integer.parseInt(Long.toString(((time2 - time) / (1000 * 60 * 60 * 24))));  //
 					double amount = investment.getInvestmentAmount();
 					double everyIncome = Functions.calEveryIncome(amount, investment.getAnnualizedRate());
 
-					if (currentTime_income > investment.getPeriod()) {
-						investment.setLeftDays(0);
+					if(currentTime_income<=0){// 如果今天在起息日之前
+						investment.setLeftDays(investment.getPeriod());
 						investment.setLastIncome(everyIncome * investment.getPeriod());
-					} else {
-						investment.setLeftDays(currentTime_income);
-						investment.setLastIncome(everyIncome * currentTime_income);
+					}else{
+						if (currentTime_income > investment.getPeriod()) {
+							investment.setLeftDays(0);
+							investment.setLastIncome(everyIncome * investment.getPeriod());
+						} else {
+							investment.setLeftDays(currentTime_income);
+							investment.setLastIncome(everyIncome * currentTime_income);
 
+						}
+						
 					}
+					
 					investment.setTotalIncome(everyIncome * investment.getPeriod());// 总收益
 
 				} catch (ParseException e) {
