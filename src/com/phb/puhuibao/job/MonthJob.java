@@ -43,7 +43,7 @@ public class MonthJob {
 	@Resource(name = "userLoanService")
 	private IBaseService<UserLoan, String> baseUserLoanService;
 	
-	@Scheduled(cron="0 0 2 1 * *") // 每月1日2点，在自动赎回后  
+	//@Scheduled(cron="0 0 2 1 * *") // 每月1日2点，在自动赎回后
 //	@Scheduled(cron="0 26 20 * * *")
     public void process() {
 		Calendar cal = Calendar.getInstance();

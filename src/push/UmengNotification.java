@@ -67,11 +67,7 @@ public abstract class UmengNotification {
         HttpPost post = new HttpPost(url);
         post.setHeader("User-Agent", USER_AGENT);
         StringEntity se = null;
-		try {
-			se = new StringEntity(postBody, "UTF-8");
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		}
+		se = new StringEntity(postBody, "UTF-8");
         post.setEntity(se);
         // Send the post request and get the response
         HttpResponse response;

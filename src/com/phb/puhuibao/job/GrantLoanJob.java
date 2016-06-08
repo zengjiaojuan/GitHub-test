@@ -32,7 +32,7 @@ public class GrantLoanJob {
 	@Resource(name = "mobileUserService")
 	private IBaseService<MobileUser, String> baseMobileUserService;
 
-	@Scheduled(cron="0 0 2 * * *") // 2点
+	//@Scheduled(cron="0 0 2 * * *") // 2点
     public void process() {
 		long currentTime = new Date().getTime();
 		Map<String,Object> params = new HashMap<String,Object>();

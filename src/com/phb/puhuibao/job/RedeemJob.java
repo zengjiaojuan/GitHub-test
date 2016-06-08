@@ -50,7 +50,7 @@ public class RedeemJob {
 	@Resource(name = "mobileUserService")
 	private IBaseService<MobileUser, String> baseMobileUserService;
 
-	@Scheduled(cron="0 0 0 * * *") // 0点
+	//@Scheduled(cron="0 0 0 * * *") // 0点
 //    public void redeem() {
 //		String sql = "select 1 from phb_muser_investment where status=1 for update";
 //		this.jdbcTemplate.execute(sql);
