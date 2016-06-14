@@ -708,31 +708,44 @@ public class MobileUserController extends BaseController<MobileUser, String> {
 		return data;
 	}
 
- 
-	@RequestMapping(value="modifyPayPasswordForIOS")
+ // 旧密码是否正确
+	@RequestMapping(value="checkOldPayPasswordIsRight")
 	@ResponseBody
-	public Map<String, Object> modifyPayPasswordForIOS(@RequestParam String muid, @RequestParam String oldPayPassword, @RequestParam String payPassword) {
+	public Map<String, Object> checkOldPayPasswordIsRight(@RequestParam String muid, @RequestParam String oldPayPassword) {
 		MobileUser u = this.getBaseService().getById(muid);
+		Map<String, Object> data = new HashMap<String, Object>();
 		if (!DESUtils.decrypt(oldPayPassword).equals(u.getPayPassword())) {
-			Map<String, Object> data = new HashMap<String, Object>();
 			data.put("message", "旧支付密码不正确！");
 			data.put("status", 0);
 			return data;
+		}else{
+			data.put("message", "旧支付密码正确!");
+			data.put("status", 1);			
+			return data;
 		}
+		 
+	}
+	//更新新的支付密码
+	@RequestMapping(value="updateNewPayPassword")
+	@ResponseBody
+	public Map<String, Object> updateNewPayPassword(@RequestParam String muid, @RequestParam String payPassword) {
+		MobileUser u = this.getBaseService().getById(muid);
 		MobileUser entity = new MobileUser();
 		entity.setmUserId(u.getmUserId());
 		entity.setPayPassword(DESUtils.decrypt(payPassword));
 		Map<String, Object> data = new HashMap<String, Object>();
 		try {
 			entity = this.getBaseService().update(entity);
+			data.put("message", "支付密码修改成功！");
+			data.put("status", 1);
+			return data;
 		} catch (Exception e) {
+			log.error(e);
 			data.put("message", "支付密码修改失败！" + e.getMessage());
 			data.put("status", 0);			
 			return data;
 		}
-		data.put("message", "支付密码修改成功！");
-		data.put("status", 1);
-		return data;
+		
 	}
 	
  
@@ -852,14 +865,16 @@ public class MobileUserController extends BaseController<MobileUser, String> {
 		Map<String, Object> data = new HashMap<String, Object>();
 		try {
 			entity = this.getBaseService().update(entity);
+			data.put("message", "支付密码修改成功！");
+			data.put("status", 1);
+			return data;
 		} catch (Exception e) {
 			data.put("message", "支付密码修改失败！" + e.getMessage());
+			log.error("修改密码失败:"+e);
 			data.put("status", 0);			
 			return data;
 		}
-		data.put("message", "支付密码修改成功！");
-		data.put("status", 1);
-		return data;
+
 	}
 
  
@@ -1169,67 +1184,7 @@ public class MobileUserController extends BaseController<MobileUser, String> {
 	}
 
  
-	
 	 
-	
-	/**
-	 * 读取用户的经验离下一个等级的差别 当前的等级和头像
-	 * @param muid
-	 * @return
-	 */
-	@RequestMapping(value="getInfoForPerfectLevels")
-	@ResponseBody
-	public Map<String, Object> getInfoForPerfectLevels(@RequestParam String muid){
-		String sql = "select sum(experience_value) experienceValue from phb_muser_experiencevalue where m_user_id=" + muid;
-		Map<String, Object> experience = this.jdbcTemplate.queryForMap(sql);
-		MobileUser user = this.getBaseService().getById(muid);
-		experience.put("level", user.getLevel());
-	
-		experience.put("photo", user.getPhoto());
-		Double gap=0.00;
-		if( experience.get("experienceValue") == null){//没有任何积分的用户
-			experience.put("difference", 20);
-			experience.put("experienceValue", 0);
-		}else{
-		 
-				double e = Double.parseDouble(experience.get("experienceValue").toString());
-				if(e>=0 && e<20){
-					gap = 20-e;
-				}else if(e>=20 && e <50){
-					gap = 50-e;
-				} else if(e>=50 && e <100){
-					gap = 100-e;
-				} else if(e>=100 && e <200){
-					gap = 200-e;
-				} else if(e>=200 && e <500){
-					gap = 500-e;
-				} else if(e>=500 && e <800){
-					gap = 800-e;
-				} else if(e>=800 && e <1200){
-					gap = 1200-e;
-				} else if(e>=1200 && e <1700){
-					gap = 1700-e;
-				} else if(e>=1700 && e <2500){
-					gap = 2500-e;
-				} else if(e>=2500 && e <4000){
-					gap = 2500-e;
-				} else if(e>=4000){
-					gap = 9999999.00;
-				} 
-		 
-			experience.put("difference", gap);
-			
-		}
-	 
-
-		
-
-		Map<String, Object> data = new HashMap<String, Object>();
-		data.put("result", experience);
-		data.put("message", "");
-		data.put("status", 1);
-		return data;
-	}
 
 	/**
 	 * 开户
