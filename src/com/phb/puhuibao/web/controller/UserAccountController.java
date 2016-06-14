@@ -657,10 +657,7 @@ public class UserAccountController extends BaseController<UserAccount, String> {
             resp.getWriter().flush();
             return;
         }
-        retBean.setRet_code("0000");
-        retBean.setRet_msg("交易成功");
-        resp.getWriter().write(JSON.toJSONString(retBean));
-        resp.getWriter().flush();                                    // 通知连连交易成功
+
 
 
 
@@ -698,11 +695,21 @@ public class UserAccountController extends BaseController<UserAccount, String> {
 		
 
 		try {
-		     userAccountService.chargeCallBack(cardno,identitynumber,username,usertel,amount,oid_paybill,reqStr);
-		} catch (Exception e) {
+		        userAccountService.chargeCallBack(cardno,identitynumber,username,usertel,amount,oid_paybill,reqStr);
+		        retBean.setRet_code("0000");
+		        retBean.setRet_msg("交易成功");
+		        resp.getWriter().write(JSON.toJSONString(retBean));
+		        resp.getWriter().flush();                                    // 通知连连交易成功
+		        
+		} catch (Exception e) {//   存储
 			LOG.error(e);
 			e.printStackTrace();
-			return;
+			
+			 retBean.setRet_code("9999");
+             retBean.setRet_msg("交易失败");
+             resp.getWriter().write(JSON.toJSONString(retBean));
+             resp.getWriter().flush();
+             return;                                 // 通知连连交易失败
 		}
 	}
 	
