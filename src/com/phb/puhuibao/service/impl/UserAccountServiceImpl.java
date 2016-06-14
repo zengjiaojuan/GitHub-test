@@ -263,6 +263,8 @@ public class UserAccountServiceImpl extends DefaultBaseService<UserAccount, Stri
 	public void chargeCallBack(String cardno, String identitynumber, String username, String usertel, String amount,
 			String oid_paybill,String reqStr) {
 		
+		
+		// 第三方支付 log, 记录参数和连连返回
         ThirdPayLog log = new ThirdPayLog();
         String uuid = UUID.randomUUID().toString().replace("-", "");
 		log.setLogId(uuid);
@@ -275,40 +277,55 @@ public class UserAccountServiceImpl extends DefaultBaseService<UserAccount, Stri
 		Map<String,Object> params = new HashMap<String,Object>();
 		params = new HashMap<String,Object>();
 		params.put("mUserTel", usertel);
-		MobileUser user = mobileUserDao.unique(params);
+		MobileUser u = mobileUserDao.unique(params);
 		
+ 
+		//维护用户的卡号信息,以便下次充值不用输入卡号
 		params = new HashMap<String,Object>();
 		params.put("bankAccount", cardno);
-  
 		UserCard card = userCardDao.unique(params);
 		if (card == null) { // 第一次充值
 			card = new UserCard();
 			card.setBankAccount(cardno);
-			card.setmUserId(user.getmUserId());
+			card.setmUserId(u.getmUserId());
 			card.setBankPhone("");
 			userCardDao.save(card);
 		}
-		if(StringUtil.isBlank(user.getIdNumber()) ){// 用户还没有实名认证,说明是第一次充值,则把用户的 id 和名字补全
+		//维护用户实名认证信息
+		if(StringUtil.isBlank(u.getIdNumber()) ){// 用户还没有实名认证,说明是第一次充值,则把用户的 id 和名字补全
 			MobileUser muser = new MobileUser();
-			muser.setmUserId(user.getmUserId());
+			muser.setmUserId(u.getmUserId());
 			muser.setmUserName(username);
 			muser.setIdNumber(identitynumber);
 			mobileUserDao.update(muser);
 		}
 		 
- 
+       //维护用户账号金额充值信息
 		UserAccount entity = new UserAccount();
-		entity.setmUserId(user.getmUserId());
+		entity.setmUserId(u.getmUserId());
 		entity.setAmount(((Double.valueOf(amount))));
 		entity.setProcessType(0);
 		entity.setUserNote("LLPAY");
 		entity.setOrderId(oid_paybill);
 		entity.setIsPaid(1);
         save(entity);
- 
+      
+  	    // 改动用户余额
+		MobileUser user = new MobileUser();
+		user.setmUserId(u.getmUserId());
+		user.setmUserMoney(u.getmUserMoney() + Double.valueOf(amount)); // 本次充值的金额累加
+		mobileUserDao.update(user);
+		
+		//用户账号余额变动明细
+		UserAccountLog accountlog = new UserAccountLog();
+		accountlog.setmUserId(u.getmUserId());
+		accountlog.setBalanceAmount(user.getmUserMoney() - u.getFrozenMoney());
+		accountlog.setAmount(Double.valueOf(amount));
+		accountlog.setChangeType("充值完成");
+		accountlog.setAccountType(1);
+        accountlog.setChangeDesc("LLPAY");
+		userAccountLogDao.save(accountlog);
  
 	}
-
- 
  
 }
