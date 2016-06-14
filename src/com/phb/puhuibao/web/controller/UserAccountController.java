@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.SortedMap;
@@ -186,159 +185,7 @@ public class UserAccountController extends BaseController<UserAccount, String> {
 		data.put("status", 1);
 		return data;
 	}
-	public Map<String, Object> saveForIOS(@RequestParam String muid,
-			@RequestParam String payPassword,
-			@RequestParam double amount,
-			@RequestParam int processType,
-			@RequestParam String userNote,
-			@RequestParam String cardTop,
-			@RequestParam String cardLast,
-			HttpServletRequest request) {
-		Map<String, Object> data = new HashMap<String, Object>();
-		MobileUser user = mobileUserService.getById("" + muid);
-		if (StringUtils.isEmpty(user.getPayPassword())) {
-			data.put("message", "请设置支付密码！");
-			data.put("status", 8);
-			return data;
-		}
-		if (!DESUtils.decrypt(payPassword).equals(user.getPayPassword())) {
-			data.put("message", "支付密码不正确！");
-			data.put("status", 0);
-			return data;
-		}
-
-//		Map<String,Object> map = new HashMap<String,Object>();
-//		map.put("mUserId", muid);
-//		List<UserCard> list = userCardService.findList(map);
-//		if (list.isEmpty()) {
-//			data.put("message", "请先绑定银行卡！");
-//			data.put("status", 0);
-//			return data;
-//		}
-		
-		if (processType == 1) { // 提现
-//			Map<String, Object> params = new HashMap<String, Object>();
-//			params.put("mUserId", muid);
-//			params.put("type", 0);
-//			params.put("status", 1);
-//			List<UserLoan> loans = baseUserLoanService.findList(params);
-//			if (loans.size() > 0) {
-//				if (user.getmUserMoney() - user.getFrozenMoney() < 0) {
-//					data.put("message", "可用余额必须》0，才可授信提现！");
-//					data.put("status", 0);
-//					return data;
-//				}
-//				double grantAmount = 0;
-//				for (UserLoan loan : loans) {
-//					grantAmount += loan.getAmount();
-//				}
-//				if (amount != grantAmount) {
-//					data.put("message", "授信贷款" + grantAmount + "元必须一次提取！");
-//					data.put("status", 0);
-//					return data;
-//				}
-//			} else if (user.getmUserMoney() - user.getFrozenMoney() < amount) {
-			if (user.getmUserMoney() - user.getFrozenMoney() < amount) {
-				data.put("message", "用户余额不足！");
-				data.put("status", 0);
-				return data;
-			}
-			if (amount < appContext.getWithdrawAmount() &&  amount < user.getmUserMoney() - user.getFrozenMoney()) {
-				data.put("message", "一次提现不得少于" + appContext.getWithdrawAmount() + "或全部提取！");
-				data.put("status", 0);
-				return data;
-			}
-			
-//			data = withdraw(user.getmUserTel(), amount, cardTop, cardLast);
-//			if ((int) data.get("status") == 1) {
-//				String orderId = (String) data.get("result");
-				UserAccount entity = new UserAccount();
-				entity.setmUserId(user.getmUserId());
-				entity.setAmount(amount);
-				entity.setProcessType(processType);
-				entity.setUserNote(userNote);
-//				entity.setOrderId(orderId);
-				try {
-				    entity = userAccountService.processSave(entity);
-				} catch (Exception e) {
-					data.put("message", "提现申请失败！" + e.getMessage());
-					data.put("status", 0);			
-					return data;
-				}
-				data.put("message", "提现申请成功！");
-				data.put("status", 1);
-				return data;
-//			} else {
-//				return data;
-//			}
-		} else { // 充值
-			if (amount > 9999999) {
-				data.put("message", "一次充值最多9999999元。");
-				data.put("status", 0);
-				return data;
-			}
-		
-			data = directBindPay(user.getmUserTel(), amount, cardTop, cardLast, request);
-			if ((int) data.get("status") == 1) {
-				String orderId = (String) data.get("result");
-				ThirdPayLog log = null;
-				int i = 0;
-				while (log == null) {
-					if (i > 9) {
-						data.put("message", "充值失败，请联系金朗理财客服！");
-						data.put("status", 0);
-						return data;
-					}
-					i++;
-					try {
-						Thread.sleep(2000);
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
-					log = thirdPayLogService.getById(orderId);
-				}
-				if (log.getStatus() == 0) {
-					data.put("message", log.getError());
-					data.put("status", 0);
-					return data;
-				}
-				
-				Map<String,Object> params=new HashMap<String, Object>();
-				params.put("orderId", orderId);
-				UserAccount entity = null;
-				i = 0;
-				while (entity == null) {
-					if (i > 9) {
-						data.put("message", "充值失败，请联系金朗理财客服！");
-						data.put("status", 0);
-						return data;
-					}
-					i++;
-					try {
-						Thread.sleep(2000);
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
-					entity = baseUserAccountService.unique(params);
-				}
-				
-				entity.setIsPaid(1);
-				entity.setUserNote(entity.getUserNote() + userNote);
-				try {
-				    userAccountService.confirm(entity);
-				} catch (Exception e) {
-					data.put("message", "充值失败！" + e.getMessage());
-					data.put("status", 0);
-					return data;
-				}
-				data.put("message", "充值成功！");
-				data.put("status", 1);
-				return data;
-			} else {
-				return data;
-			}
-		}
-	}
+ 
 	
 	@RequestMapping(value="cancel")
 	@ResponseBody
@@ -396,162 +243,8 @@ public class UserAccountController extends BaseController<UserAccount, String> {
 		return results;
 	}
 	
-	/**
-	 * 充值请求 已废弃
-	 * @param muid
-	 * @param amount
-	 * @param cardTop
-	 * @param cardLast
-	 * @return
-	 */
-	@Deprecated
-	@RequestMapping(value="directBindPay")
-	@ResponseBody
-	public Map<String, Object> directBindPay(@RequestParam String phone, @RequestParam double amount, @RequestParam String cardTop, @RequestParam String cardLast, HttpServletRequest request) {
-		Map<String, String> params 	= new HashMap<String, String>();
-		String uuid = UUID.randomUUID().toString().replace("-", "");
-		params.put("orderid", 			uuid);
-		Calendar cal = Calendar.getInstance();
-		params.put("transtime", 		cal.getTimeInMillis() / 1000 + "");
-		params.put("identityid", 		phone);
-		params.put("amount", 			(int) (amount * 100) + "");
-		//String jsonStr = JSON.toJSONString(params);
-		params.put("productname", 		"phb");
-		params.put("card_top", 			cardTop);
-		params.put("card_last", 		cardLast);
-
-//		String url = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath() + "/userAccount/callback.shtml";
-		String url = request.getScheme() + "://182.92.179.84:81" + request.getContextPath() + "/userAccount/callback.shtml";
-		//String url = "/userAccount/callback.shtml";
-		params.put("callbackurl", 		url);
-		params.put("identitytype", 		"4");
-		params.put("userip", 			appContext.getUserIP());
-		params.put("currency", 			"156");
-//		params.put("productdesc", 		"");
-//		params.put("orderexpdate", 		"");
-//		params.put("imei", 				"");
-//		params.put("ua", 				"");
-
-		Map<String, String> result			= TZTService.directBindPay(params);
-//		String merchantaccount				= StringUtils.trimToEmpty(result.get("merchantaccount")); 
-//	    String orderidFromYeepay 	   		= StringUtils.trimToEmpty(result.get("orderid")); 
-//	    String yborderid 			   		= StringUtils.trimToEmpty(result.get("yborderid")); 
-//	    String amountFromYeepay 			= StringUtils.trimToEmpty(result.get("amount")); 
-//	    String signFromYeepay 		   		= StringUtils.trimToEmpty(result.get("sign")); 
-	    String error_code	   				= StringUtils.trimToEmpty(result.get("error_code")); 
-	    String error_msg	   				= StringUtils.trimToEmpty(result.get("error_msg")); 
-	    String customError	   				= StringUtils.trimToEmpty(result.get("customError")); 
-
-//		ThirdPayLog log = new ThirdPayLog();
-//		log.setLogId(uuid);
-//		log.setAction("directBindPay");
-//		log.setParams(JSON.toJSONString(params) + JSON.toJSONString(result));
-//		int status = 0;
-//		if("".equals(error_code) && "".equals(customError)) {
-//			status = 1;
-//		}
-//		log.setStatus(status);
-//		thirdPayLogService.save(log);
-
-	    Map<String, Object> data = new HashMap<String, Object>();
-		if(!"".equals(error_code)) {
-			data.put("message", error_code + ": " + error_msg);
-			data.put("status", 0);
-			return data;
-		} else if(!"".equals(customError)) {
-			data.put("message", customError);
-			data.put("status", 0);
-			return data;
-		}
-		data.put("result", uuid);
-		data.put("message", "请求提交成功。");
-		data.put("status", 1);
-		return data;
-	}
-	
-//	@RequestMapping(params = "method=callback", method = RequestMethod.POST)
-//	@ResponseBody
-//	public void callback(@RequestParam String muid) {
-//		ThirdPayLog log = new ThirdPayLog();
-//		log.setLogId(UUID.randomUUID().toString().replace("-", ""));
-//		log.setAction(muid);
-//		log.setParams("test");
-//		log.setStatus(2);
-//		thirdPayLogService.save(log);
-//	}
-	
-	@RequestMapping(value="callback")
-	@ResponseBody
-	public String callback(@RequestParam String data, @RequestParam String encryptkey) {
-		Map<String, String>	result	= TZTService.decryptCallbackData(data, encryptkey);
-//		String merchantaccount 		= StringUtils.trimToEmpty(result.get("merchantaccount"));
-		String orderid              = StringUtils.trimToEmpty(result.get("orderid"));
-
-		Map<String,Object> params = new HashMap<String,Object>();
-		params.put("orderId", orderid);
-		UserAccount entity = baseUserAccountService.unique(params);
-		if (entity != null) {
-			return "SUCCESS";
-		}
-
-//		String yborderid            = StringUtils.trimToEmpty(result.get("yborderid"));
-		String amount               = StringUtils.trimToEmpty(result.get("amount"));
-		String identityid           = StringUtils.trimToEmpty(result.get("identityid"));
-//		String card_top	            = StringUtils.trimToEmpty(result.get("card_top"));
-//		String card_last            = StringUtils.trimToEmpty(result.get("card_last"));
-		String status               = StringUtils.trimToEmpty(result.get("status"));
-//		String bankcode             = StringUtils.trimToEmpty(result.get("bankcode"));
-//		String bank		            = StringUtils.trimToEmpty(result.get("bank"));
-//		String bankcardtype         = StringUtils.trimToEmpty(result.get("bankcardtype"));
-//		String sign					= StringUtils.trimToEmpty(result.get("sign"));
-		String errorcode            = StringUtils.trimToEmpty(result.get("errorcode"));
-		String errormsg             = StringUtils.trimToEmpty(result.get("errormsg"));
-		String customError			= StringUtils.trimToEmpty(result.get("customError"));
-		
-		ThirdPayLog log = new ThirdPayLog();
-//		log.setLogId(UUID.randomUUID().toString().replace("-", ""));
-		log.setLogId(orderid);
-		log.setAction("callback");
-		log.setParams(data + encryptkey + JSON.toJSONString(result));
-		String error = customError;
-		if(!"".equals(errorcode)) {
-			error =  errorcode + ": " + errormsg;
-		}
-
-		int logStatus = 0;
-		if("".equals(error)) {
-			logStatus = 1;
-		}
-		log.setError(error);
-		log.setStatus(logStatus);
-		thirdPayLogService.save(log);
-		
-		if(!"".equals(errorcode)) {
-			return errorcode + errormsg;		
-		} else if(!"".equals(customError)) {
-			return customError;		
-		}
-		
-		if ("1".equals(status)) {
-			params = new HashMap<String,Object>();
-			params.put("mUserTel", identityid);
-			MobileUser user = mobileUserService.unique(params);
-			entity = new UserAccount();
-			entity.setmUserId(user.getmUserId());
-			entity.setAmount(((Double.valueOf(amount) / 100)));
-			entity.setProcessType(0);
-			entity.setUserNote("YEEPAY");
-			entity.setOrderId(orderid);
-			try {
-			    entity = userAccountService.processSave(entity);
-				return "SUCCESS";
-			} catch (Exception e) {
-				LOG.error(e);
-				e.printStackTrace();
-			}
-		}
-		return "FAILED";
-	}
+ 
+ 
 	
 	/**
 	 * 提现
@@ -830,45 +523,7 @@ public class UserAccountController extends BaseController<UserAccount, String> {
 		
 		return result;
 	}
-	
-	/**
-	 * 易宝退款详细
-	 * @param orderId
-	 * @return
-	 */
-	@RequestMapping(params = "method=queryRefund", method = RequestMethod.GET)
-	@ResponseBody
-	public Map<String, String> queryRefund(@RequestParam String orderId) {
-		Map<String, String> result	= TZTService.refundQuery(orderId);
-//		String merchantaccount		= StringUtils.trimToEmpty(result.get("merchantaccount"));
-//		String orderidFromYeepay	= StringUtils.trimToEmpty(result.get("orderid"));
-//		String yborderid			= StringUtils.trimToEmpty(result.get("yborderid"));
-//		String origyborderid		= StringUtils.trimToEmpty(result.get("origyborderid"));
-//		String amount           	= StringUtils.trimToEmpty(result.get("amount"));
-//		String fee					= StringUtils.trimToEmpty(result.get("fee"));
-//		String currency         	= StringUtils.trimToEmpty(result.get("currency"));
-//		String ordertime        	= StringUtils.trimToEmpty(result.get("ordertime"));
-//		String closetime        	= StringUtils.trimToEmpty(result.get("closetime"));
-//		String status           	= StringUtils.trimToEmpty(result.get("status"));
-//		String cause     			= StringUtils.trimToEmpty(result.get("cause"));
-//		String sign             	= StringUtils.trimToEmpty(result.get("sign"));
-		String error_code       	= StringUtils.trimToEmpty(result.get("error_code"));
-		String error            	= StringUtils.trimToEmpty(result.get("error"));
-		String customError        	= StringUtils.trimToEmpty(result.get("customError"));
-
-		Map<String, String> data = new HashMap<String, String>();
-		if(!"".equals(error_code)) {
-			data.put(Constants.SUCCESS, Constants.FALSE);
-			data.put(Constants.MESSAGE, error_code + ": " + error);
-			return data;
-		} else if(!"".equals(customError)) {
-			data.put(Constants.SUCCESS, Constants.FALSE);
-			data.put(Constants.MESSAGE, customError);
-			return data;
-		}
-		
-		return result;
-	}
+ 
 
 	/**
 	 * 退款
@@ -971,21 +626,23 @@ public class UserAccountController extends BaseController<UserAccount, String> {
 		return results;
 	}
 	
-	// llpay
+	// llpay 回调函数
 	@RequestMapping(value="notify")
 	@ResponseBody
 	public void notify(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         resp.setCharacterEncoding("UTF-8");
         RetBean retBean = new RetBean();
         String reqStr = LLPayUtil.readReqStr(req);
-        if (LLPayUtil.isnull(reqStr)) {
-            retBean.setRet_code("9999");
-            retBean.setRet_msg("交易失败");
-            resp.getWriter().write(JSON.toJSONString(retBean));
-            resp.getWriter().flush();
-            return;
-        }
+
         try {
+            if (LLPayUtil.isnull(reqStr)) { // 连连的返回字符串是空  
+                retBean.setRet_code("9999");
+                retBean.setRet_msg("交易失败");
+                resp.getWriter().write(JSON.toJSONString(retBean));
+                resp.getWriter().flush();
+                return;
+            }
+            
             if (!LLPayUtil.checkSign(reqStr, PartnerConfig.YT_PUB_KEY)) {
                 retBean.setRet_code("9999");
                 retBean.setRet_msg("交易失败");
@@ -1003,16 +660,9 @@ public class UserAccountController extends BaseController<UserAccount, String> {
         retBean.setRet_code("0000");
         retBean.setRet_msg("交易成功");
         resp.getWriter().write(JSON.toJSONString(retBean));
-        resp.getWriter().flush();
+        resp.getWriter().flush();                                    // 通知连连交易成功
 
-        ThirdPayLog log = new ThirdPayLog();
-        String uuid = UUID.randomUUID().toString().replace("-", "");
-		log.setLogId(uuid);
-		log.setAction("notify");
-		log.setParams(reqStr);
-		log.setError("");
-		log.setStatus(1);
-		thirdPayLogService.save(log);
+
 
         PayDataBean payDataBean = JSON.parseObject(reqStr, PayDataBean.class);
         if (!"SUCCESS".equals(payDataBean.getResult_pay())) {
@@ -1023,51 +673,36 @@ public class UserAccountController extends BaseController<UserAccount, String> {
 		Map<String,Object> params = new HashMap<String,Object>();
 		params.put("orderId", oid_paybill);
 		UserAccount entity = baseUserAccountService.unique(params);
-		if (entity != null) {
+		if (entity != null) {// 如果这个订单已经插进来了
 			return;
 		}
 
-		String identityid = payDataBean.getInfo_order();
-		String cardno = null;
-		if (identityid.indexOf(",") > 0) {
-			String[] info_order = identityid.split(",");
-			identityid = info_order[0];
-			cardno = info_order[1];
-		}
-		
-		params = new HashMap<String,Object>();
-		params.put("mUserTel", identityid);
-		MobileUser user = mobileUserService.unique(params);
-
-		if (cardno != null) {
-			UserCard card = baseUserCardService.getById(cardno);
-			if (card == null) {
-				card = new UserCard();
-				card.setBankAccount(cardno);
-				card.setmUserId(user.getmUserId());
-				card.setBankPhone("");
-				baseUserCardService.save(card);
-			} else {
-				card = new UserCard();
-				card.setBankAccount(cardno);
-				card.setmUserId(user.getmUserId());
-				card.setBankPhone("");
-				baseUserCardService.update(card);
+		String info_order = payDataBean.getInfo_order(); //例如: 13842555226, 6214990610044647,张三,421125167897637263
+		String cardno = null;  //银行卡号
+		String identitynumber = null;// 身份证 id
+		String username = null;//用户名
+		String usertel = null;//用户手机号
+		if (info_order.indexOf(",") > 0) {
+			String[] info_orderarr = info_order.split(",");
+			if (info_orderarr.length != 4) {// 返回的值不够
+				return;
 			}
+			usertel = info_orderarr[0];
+			cardno = info_orderarr[1];
+			username = info_orderarr[2];
+			identitynumber = info_orderarr[3];
 		}
+		String amount = payDataBean.getMoney_order();
+		
+		
+		
 
-		entity = new UserAccount();
-		entity.setmUserId(user.getmUserId());
-        String amount = payDataBean.getMoney_order();
-		entity.setAmount(((Double.valueOf(amount))));
-		entity.setProcessType(0);
-		entity.setUserNote("LLPAY");
-		entity.setOrderId(oid_paybill);
 		try {
-		    entity = userAccountService.processSave(entity);
+		     userAccountService.chargeCallBack(cardno,identitynumber,username,usertel,amount,oid_paybill,reqStr);
 		} catch (Exception e) {
 			LOG.error(e);
 			e.printStackTrace();
+			return;
 		}
 	}
 	

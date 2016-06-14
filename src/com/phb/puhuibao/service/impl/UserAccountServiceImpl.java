@@ -3,7 +3,9 @@ package com.phb.puhuibao.service.impl;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
+import org.jsoup.helper.StringUtil;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,8 +15,10 @@ import com.idp.pub.dao.IBaseDao;
 import com.idp.pub.dao.IPagerDao;
 import com.idp.pub.service.impl.DefaultBaseService;
 import com.phb.puhuibao.entity.MobileUser;
+import com.phb.puhuibao.entity.ThirdPayLog;
 import com.phb.puhuibao.entity.UserAccount;
 import com.phb.puhuibao.entity.UserAccountLog;
+import com.phb.puhuibao.entity.UserCard;
 import com.phb.puhuibao.entity.UserLoan;
 import com.phb.puhuibao.service.UserAccountService;
 
@@ -38,9 +42,17 @@ public class UserAccountServiceImpl extends DefaultBaseService<UserAccount, Stri
 
 	@javax.annotation.Resource(name = "userLoanDao")
 	private IBaseDao<UserLoan, String> baseUserLoanDao;
+	
+	@javax.annotation.Resource(name = "thirdPayLogDao")
+	private IBaseDao<ThirdPayLog, String> thirdPayLogDao;
+	
+	@javax.annotation.Resource(name = "userCardDao")
+	private IBaseDao<UserCard, String> userCardDao;
 
 	@javax.annotation.Resource(name = "userAccountLogDao")
 	private IBaseDao<UserAccountLog, String> userAccountLogDao;
+ 
+	
 	@javax.annotation.Resource(name = "jdbcTemplate")
 	private JdbcTemplate jdbcTemplate;
  
@@ -53,7 +65,7 @@ public class UserAccountServiceImpl extends DefaultBaseService<UserAccount, Stri
 	}
 
 	@javax.annotation.Resource(name = "mobileUserDao")
-	IBaseDao<MobileUser, String> mobileUserDao;
+	private IBaseDao<MobileUser, String> mobileUserDao;
 	@Override
 	public void confirm(UserAccount entity) {
 		if (entity.getIsPaid() == 1) {
@@ -72,6 +84,12 @@ public class UserAccountServiceImpl extends DefaultBaseService<UserAccount, Stri
 				log.setAmount(entity.getAmount());
 				log.setChangeType("充值完成");
 				log.setAccountType(1);
+				
+				if(u.getIdNumber().length()==0){// 用户第一次充值  进行实名认证
+					
+				}
+				
+				
 			} else {
 //				Map<String, Object> params = new HashMap<String, Object>();
 //				params.put("mUserId", entity.getmUserId());
@@ -117,19 +135,8 @@ public class UserAccountServiceImpl extends DefaultBaseService<UserAccount, Stri
 			MobileUser u = mobileUserDao.get("" + entity.getmUserId());
 			MobileUser user = new MobileUser();
 			user.setmUserId(entity.getmUserId());
-			//user.setmUserMoney(u.getmUserMoney());
-//			Map<String, Object> params = new HashMap<String, Object>();
-//			params.put("mUserId", entity.getmUserId());
-//			params.put("type", 0);
-//			params.put("status", 1);
-//			UserLoan loan = baseUserLoanDao.unique(params);
-//			if (loan == null) {
-				user.setFrozenMoney(u.getFrozenMoney() + entity.getAmount());
-//			} else {
-//				user.setFrozenMoney(u.getFrozenMoney());
-//			}
+			user.setFrozenMoney(u.getFrozenMoney() + entity.getAmount());
 			mobileUserDao.update(user);
-			
 			UserAccountLog log = new UserAccountLog();
 			log.setmUserId(entity.getmUserId());
 			log.setAmount(entity.getAmount());
@@ -139,27 +146,11 @@ public class UserAccountServiceImpl extends DefaultBaseService<UserAccount, Stri
 			log.setAccountType(8);
 			userAccountLogDao.save(log);
 		}
-		
-		// amount=999999999 可以捕捉到DataIntegrityViolationException
-		// amount=99999999  捕捉不到MysqlDataTruncation
-//		try {
+ 
 			save(entity);
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
+ 
 		
 		if (appContext.getPayOnline() == 1) {
-//			// 银行接口
-//			if (entity.getProcessType() == 1) {
-//				Map<String, Object> params = new HashMap<String, Object>();
-//				params.put("mUserId", entity.getmUserId());
-//				UserCard card = baseUserCardDao.unique(params);
-//				Map<String, Object> data = withdraw(card.getBankPhone(), entity.getAmount(), card.getBankAccount().substring(0, 5), card.getBankAccount().substring(card.getBankAccount().length() - 4));
-//				if ((int) data.get("status") == 1) {
-//					String orderId = (String) data.get("result");
-//					entity.setOrderId(orderId);
-//				}
-//			}
 			if (entity.getProcessType() == 0) {
 				entity.setIsPaid(1);
 				confirm(entity);
@@ -265,5 +256,59 @@ public class UserAccountServiceImpl extends DefaultBaseService<UserAccount, Stri
 		account.setAdminNote(entity.getAdminNote());
 		this.update(account);
 	}
+
+ 
+
+	@Override
+	public void chargeCallBack(String cardno, String identitynumber, String username, String usertel, String amount,
+			String oid_paybill,String reqStr) {
+		
+        ThirdPayLog log = new ThirdPayLog();
+        String uuid = UUID.randomUUID().toString().replace("-", "");
+		log.setLogId(uuid);
+		log.setAction("notify");
+		log.setParams(reqStr);//{"bank_code":"01050000","dt_order":"20160613114218","info_order":"13842555226,6214990610044647","money_order":"1000.0","no_order":"4b650c32f58546c0bfef4aaae0212a4d","oid_partner":"201510191000543502","oid_paybill":"2016061300902349","pay_type":"D","result_pay":"SUCCESS","settle_date":"20160613","sign":"G2XQp8CJ99YMotKi0yUP1K9EipjjR/FA+1d/HFZGntnuVw3cJcyD+zpfBZJa/O2zNUom/i55QxlmT5+pGx0s/n5oHa/eBeKJTIZd+PGP/mnINU8kz0Ix27LTyrMRRitrifChVmmSSoAEtIyv3wtgDm8jP9GBGDUgNpTTqyEyMOs=","sign_type":"RSA"}
+		log.setError("");
+		log.setStatus(1);
+		thirdPayLogDao.save(log);
+ 
+		Map<String,Object> params = new HashMap<String,Object>();
+		params = new HashMap<String,Object>();
+		params.put("mUserTel", usertel);
+		MobileUser user = mobileUserDao.unique(params);
+		
+		params = new HashMap<String,Object>();
+		params.put("bankAccount", cardno);
+  
+		UserCard card = userCardDao.unique(params);
+		if (card == null) { // 第一次充值
+			card = new UserCard();
+			card.setBankAccount(cardno);
+			card.setmUserId(user.getmUserId());
+			card.setBankPhone("");
+			userCardDao.save(card);
+		}
+		if(StringUtil.isBlank(user.getIdNumber()) ){// 用户还没有实名认证,说明是第一次充值,则把用户的 id 和名字补全
+			MobileUser muser = new MobileUser();
+			muser.setmUserId(user.getmUserId());
+			muser.setmUserName(username);
+			muser.setIdNumber(identitynumber);
+			mobileUserDao.update(muser);
+		}
+		 
+ 
+		UserAccount entity = new UserAccount();
+		entity.setmUserId(user.getmUserId());
+		entity.setAmount(((Double.valueOf(amount))));
+		entity.setProcessType(0);
+		entity.setUserNote("LLPAY");
+		entity.setOrderId(oid_paybill);
+		entity.setIsPaid(1);
+        save(entity);
+ 
+ 
+	}
+
+ 
  
 }

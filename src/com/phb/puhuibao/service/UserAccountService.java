@@ -16,4 +16,9 @@ public interface UserAccountService {
 
  
 
+	void chargeCallBack(String cardno, String identitynumber, String username, String usertel, String amount,
+			String oid_paybill,String reqStr);
+
+ 
+
 }
