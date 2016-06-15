@@ -26,6 +26,7 @@ import com.phb.puhuibao.common.Functions;
 import com.phb.puhuibao.entity.ExperienceInvestment;
 import com.phb.puhuibao.entity.ExperienceProduct;
 import com.phb.puhuibao.entity.UserExperience;
+import com.phb.puhuibao.service.ExperienceInvestmentService;
 
 
 
@@ -45,6 +46,9 @@ public class ExperienceInvestmentController extends BaseController<ExperienceInv
 
 	@Resource(name = "userExperienceService")
 	private IBaseService<UserExperience, String> userExperienceService;
+	
+	@Resource(name = "experienceInvestmentService")
+	private ExperienceInvestmentService experienceInvestmentService;
 
 	@Resource(name = "jdbcTemplate")
 	private JdbcTemplate jdbcTemplate;
@@ -114,32 +118,15 @@ public class ExperienceInvestmentController extends BaseController<ExperienceInv
 		Map<String, Object> data = new HashMap<String, Object>();
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("mUserId", muid);
-		params.put("status", 1);
-		params.put("gelastDate", new Date());
-		// List<UserExperience> result = userExperienceService.findList(params);
-		// if (result.isEmpty()) {
-		// data.put("message", "您的体验金已用完！");
-		// data.put("status", 0);
-		// return data;
-		// }
+		params.put("status", 3);   // 获得用户所有奖金总和
+ 
 		UserExperience experience = userExperienceService.unique(params);
 		if (experience.getExperienceAmount() < investmentAmount) {
 			data.put("message", "您的体验金不足！");
 			data.put("status", 0);
 			return data;
 		}
-
-		// int amount = 0;
-		// for (UserExperience experience : result) {
-		// amount += experience.getExperienceAmount();
-		// }
-
-		// if (amount != investmentAmount) {
-		// data.put("message", "体验金须一次性全投入！");
-		// data.put("status", 0);
-		// return data;
-		// }
-
+ 
 		ExperienceInvestment entity = new ExperienceInvestment();
 		entity.setmUserId(muid);
 		entity.setProductSN(productSN);
@@ -165,14 +152,15 @@ public class ExperienceInvestmentController extends BaseController<ExperienceInv
 
 		entity.setIncomeDate(cal.getTime()); // short date
 		try {
-			entity = this.getBaseService().save(entity);
+			    experienceInvestmentService.processSave(entity);
+				data.put("message", "投资成功！");
+				data.put("status", 1);
+				return data;
 		} catch (Exception e) {
 			data.put("message", "投资失败！" + e.getMessage());
 			data.put("status", 0);
 			return data;
 		}
-		data.put("message", "投资成功！");
-		data.put("status", 1);
-		return data;
+
 	}
 }

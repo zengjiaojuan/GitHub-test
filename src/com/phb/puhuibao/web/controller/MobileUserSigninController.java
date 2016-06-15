@@ -1,7 +1,6 @@
 package com.phb.puhuibao.web.controller;
 
 import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -9,6 +8,8 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -18,138 +19,103 @@ import com.idp.pub.context.AppContext;
 import com.idp.pub.service.IBaseService;
 import com.idp.pub.web.controller.BaseController;
 import com.phb.puhuibao.entity.MobileUser;
-import com.phb.puhuibao.entity.MobileUserExtra;
 import com.phb.puhuibao.entity.MobileUserSignin;
 import com.phb.puhuibao.entity.UserExperience;
+import com.phb.puhuibao.service.MobileUserSigninService;
 
 @Controller
 @RequestMapping(value = "/mobileUserSignin")
 public class MobileUserSigninController extends BaseController<MobileUserSignin, String> {
-	private final static boolean[] CHANCE = {true, true, true, false, false, false, false, false, false, false};
+	private static final Log LOG = LogFactory.getLog(MobileUserSigninController.class);
 	
 	@Override
 	@Resource(name = "mobileUserSigninService")
 	public void setBaseService(IBaseService<MobileUserSignin, String> baseService) {
 		super.setBaseService(baseService);
 	}
-
-	@Resource(name = "mobileUserExtraService")
-	private IBaseService<MobileUserExtra, String> mobileUserExtraService;
+ 
 
 	@Resource(name = "mobileUserService")
 	private IBaseService<MobileUser, String> mobileUserService;
 
 	@Resource(name = "userExperienceService")
 	private IBaseService<UserExperience, String> userExperienceService;
+ 
+	
+	@javax.annotation.Resource(name = "mobileUserSigninService")
+	private MobileUserSigninService mobileUserSigninService;
+	
 
 	@Resource(name = "appContext")
 	private AppContext appContext;
 	
-	@RequestMapping(value="getChanceAward")
-	@ResponseBody
-	public Map<String, Object> getChanceAward(@RequestParam int muid) {
-		Map<String, Object> data = new HashMap<String, Object>();
-		MobileUserSignin entity = this.getBaseService().getById("" + muid);
-		if (entity == null ) { // 第一次刮奖,必中
-			int[] firstoption = {123,666,888};
-			int first =  (int)(Math.random()*(3));
-			int retmoney = firstoption[first];
-			data.put("result", retmoney);
-			data.put("message", "恭喜中奖！");
-			data.put("status", 0);
-			return data;
-		}else if (entity.getTotalIntegral() <= entity.getUsedIntegral()) {
-			data.put("message", "您没有可用的积分！");
-			data.put("status", 0);
-			return data;
-		}else{
-			int award = 0;
-			int i = (int) (Math.random() * 10);
-			int upMoney = appContext.getUpMoney();
-			if (CHANCE[i]) {// 20%的概率获得大数目奖金
-				award = (int) (Math.random() * upMoney) + 1;
-			}else{// 80%概率获得小数目奖金
-				award = (int) (Math.random() * 100) + 1;
-			}
 
-			data.put("result", award);
-			data.put("message", "");
+	// 保存刮奖其实是把那个无效刮奖置为有效
+	@RequestMapping(value="saveChanceAward")
+	@ResponseBody
+	public Map<String, Object> saveChanceAward(@RequestParam int experienceid) {
+		Map<String, Object> data = new HashMap<String, Object>();
+		UserExperience experience = userExperienceService.getById(experienceid+"");
+		if (experience == null) {//不存在这个刮奖
+			data.put("message", "已保存到您的体验金");
 			data.put("status", 1);
 			return data;
 			
-			
-		}
-		
-	}
-	
-	@RequestMapping(value="saveChanceAward")
-	@ResponseBody
-	public Map<String, Object> saveChanceAward(@RequestParam int muid, @RequestParam int amount) {
-		Map<String,Object> params = new HashMap<String,Object>();
-		params.put("mUserId", muid);
-		params.put("status", 1);
-		params.put("lastDate", "9999-01-01");
-		UserExperience experience = userExperienceService.unique(params);
-		if (experience == null) {
-			experience = new UserExperience();
-			experience.setmUserId(muid);
-			experience.setStatus(1);
-			experience.setExperienceAmount(amount);
-			DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-		    try {
-				Date date = format.parse("9999-01-01");
-				experience.setLastDate(date);
-			} catch (ParseException e) {
-				e.printStackTrace();
-			}
-		    userExperienceService.save(experience);
 		} else {
-			UserExperience e = new UserExperience();
-			e.setExperienceId(experience.getExperienceId());
-			e.setExperienceAmount(experience.getExperienceAmount() + amount);
-			userExperienceService.update(e);
+			try {
+				mobileUserSigninService.processUpdate(experience);
+				data.put("message", "已保存到您的体验金");
+				data.put("status", 1);
+				return data;
+			} catch (Exception e) {
+				LOG.error(e.getStackTrace());
+				data.put("message", "失败"+e.getMessage());
+				data.put("status", 1);
+				return data;
+			}
 		}
-
-		MobileUserSignin entity = this.getBaseService().getById("" + muid);
-		entity.setmUserId(muid);
-		entity.setUsedIntegral(entity.getUsedIntegral() + 1);
-		this.getBaseService().update(entity);
-
-		Map<String, Object> data = new HashMap<String, Object>();
-		data.put("message", "已保存到您的体验金");
-		data.put("status", 1);
-		return data;
 	}
 
+	
+	/* 保存签到
+	 *
+	*/
 	@RequestMapping(value="save")
 	@ResponseBody
 	public Map<String, Object> save(@RequestParam int muid) {
 		Map<String, Object> data = new HashMap<String, Object>();
 		MobileUserSignin entity = this.getBaseService().getById("" + muid);
-		if (entity == null) {
-			entity = new MobileUserSignin();
-			entity.setmUserId(muid);
-			entity.setTotalIntegral(1);
-			entity.setSigninDate(new Date());
-			this.getBaseService().save(entity);
-		} else {
-			DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-			String signinDate = format.format(entity.getSigninDate());
-			String today = format.format(new Date());
-			if (signinDate.equals(today)) {
-				data.put("message", "今天您已签到！");
-				data.put("status", 1);
-				return data;
+		try {
+			if (entity == null) {
+				entity = new MobileUserSignin();
+				entity.setmUserId(muid);
+				entity.setTotalIntegral(1);
+				entity.setSigninDate(new Date());
+				this.getBaseService().save(entity);
+			} else {
+				DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+				String signinDate = format.format(entity.getSigninDate());
+				String today = format.format(new Date());
+				if (signinDate.equals(today)) {
+					data.put("message", "今天您已签到！");
+					data.put("status", 1);
+					return data;
+				}
+				entity.setmUserId(muid);
+				entity.setTotalIntegral(entity.getTotalIntegral() + 1);
+				entity.setSigninDate(new Date());
+				this.getBaseService().update(entity);
 			}
-			entity.setmUserId(muid);
-			entity.setTotalIntegral(entity.getTotalIntegral() + 1);
-			entity.setSigninDate(new Date());
-			this.getBaseService().update(entity);
+			data.put("message", "签到成功");
+			data.put("status", 1);
+			return data;
+		} catch (Exception e) {
+			e.getStackTrace();
+			LOG.error(e.getStackTrace());
+			data.put("message", "签到失败");
+			data.put("status", 0);
+			return data;
 		}
-
-		data.put("message", "签到成功");
-		data.put("status", 1);
-		return data;
 	}
 
 	/**

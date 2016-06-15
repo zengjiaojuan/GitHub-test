@@ -11,16 +11,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.idp.pub.dao.IBaseDao;
+import com.idp.pub.service.IBaseService;
 import com.idp.pub.service.impl.DefaultBaseService;
 import com.phb.puhuibao.entity.ExperienceInvestment;
 import com.phb.puhuibao.entity.ExperienceProduct;
 import com.phb.puhuibao.entity.MobileUser;
 import com.phb.puhuibao.entity.UserAccountLog;
 import com.phb.puhuibao.entity.UserExperience;
+import com.phb.puhuibao.service.ExperienceInvestmentService;
 
 @Transactional
 @Service("experienceInvestmentService")
-public class ExperienceInvestmentServiceImpl extends DefaultBaseService<ExperienceInvestment, String> {
+public class ExperienceInvestmentServiceImpl extends DefaultBaseService<ExperienceInvestment, String> implements ExperienceInvestmentService {
 	@Override
 	@Resource(name = "experienceInvestmentDao")
 	public void setBaseDao(IBaseDao<ExperienceInvestment, String> baseDao) {
@@ -32,25 +34,28 @@ public class ExperienceInvestmentServiceImpl extends DefaultBaseService<Experien
 	
 	@Resource(name = "userExperienceDao")
 	private IBaseDao<UserExperience, String> userExperienceDao;
+	
+	@Resource(name = "userExperienceService")
+	private IBaseService<UserExperience, String> userExperienceService;
+	
+ 
 
 	@Override
-	public ExperienceInvestment save(ExperienceInvestment entity) {
-		Map<String,Object> params = new HashMap<String,Object>();
+	public void processSave(ExperienceInvestment entity) {
+	 
+	    //修改用户奖金总额
+	    Map<String, Object> params = new HashMap<String, Object>();
 		params.put("mUserId", entity.getmUserId());
-		params.put("status", 1);
-		params.put("gelastDate", new Date());
-//		List<UserExperience> result = userExperienceDao.find(params);
-//		for (UserExperience experience : result) {
-//			experience.setStatus(0);
-//			userExperienceDao.update(experience);
-//		}
-		UserExperience experience = userExperienceDao.unique(params);
-		experience.setExperienceAmount(experience.getExperienceAmount() - entity.getInvestmentAmount());;
-		userExperienceDao.update(experience);
+		params.put("status", 3);                // 获得用户所有奖金总和
+		UserExperience usersumexperience = userExperienceService.unique(params);
+		UserExperience updateusersum = new UserExperience();
+		updateusersum.setExperienceId(usersumexperience.getExperienceId());
+		updateusersum.setExperienceAmount(usersumexperience.getExperienceAmount() - entity.getInvestmentAmount());  //原值-投资额
+		userExperienceDao.update(updateusersum);
 
 		entity.setCreateTime(new Date());
 		this.getBaseDao().save(entity);
-		return entity;
+		 
 	}
 	
 	@Resource(name = "jdbcTemplate")
@@ -83,4 +88,6 @@ public class ExperienceInvestmentServiceImpl extends DefaultBaseService<Experien
 		entity.setmUserId(null);
 		return this.getBaseDao().update(entity);
 	}
+
+ 
 }

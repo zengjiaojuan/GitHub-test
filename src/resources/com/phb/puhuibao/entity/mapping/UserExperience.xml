@@ -16,7 +16,7 @@
   </resultMap>
 
   <!-- RESOURCE INSERT -->
-  <insert id="insert" parameterType="com.phb.puhuibao.entity.UserExperience">
+  <insert id="insert" useGeneratedKeys="true" keyProperty="experienceId" parameterType="com.phb.puhuibao.entity.UserExperience">
     insert into phb_muser_experience (<include refid="allapplColumn"/>) <include refid="allapplColumnVar"/>
   </insert>
   <!-- RESOURCE UPDATE -->
