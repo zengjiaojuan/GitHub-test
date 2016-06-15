@@ -243,6 +243,9 @@
 		<if test="level != null">
 			AND level = #{level}
 		</if>
+		<if test="idNumber != null">
+			AND id_number = #{idNumber}
+		</if>
 	</trim>
   </sql>
   <sql id="dynamicOrderBy">

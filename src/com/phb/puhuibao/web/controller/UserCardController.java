@@ -360,13 +360,23 @@ public class UserCardController extends BaseController<UserCard, String> {
 	}
 
 	/**
-	 * 判断银行卡bin判断是否有效
+	 * 判断银行卡bin判断是否有效  判断用户是否已经绑卡
 	 * @param card_no
 	 * @return
 	 */
 	@RequestMapping(value="validBankCard")
 	@ResponseBody
-	public Map<String, Object> validBankCard(@RequestParam String cardno) {
+	public Map<String, Object> validBankCard(@RequestParam String cardno,@RequestParam String idnamber) {
+		Map<String, Object> data = new HashMap<String, Object>();
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("idNumber", idnamber);
+		List<MobileUser> userlist = mobileUserService.findList(params);
+		if(userlist.size()>0){// 用户已经绑卡  同一个身份证绑一张卡
+			data.put("message","此身份证已经绑定了银行卡");
+			data.put("status", 0);
+			return data;
+		}
+		
         JSONObject reqObj = new JSONObject();
         reqObj.put("oid_partner", PartnerConfig.OID_PARTNER);
         reqObj.put("card_no", cardno);
@@ -376,7 +386,7 @@ public class UserCardController extends BaseController<UserCard, String> {
         String reqJSON = reqObj.toString();
         String resJSON = HttpRequestSimple.getInstance().postSendHttp(ServerURLConfig.QUERY_BANKCARD_URL, reqJSON);
         
-		Map<String, Object> data = new HashMap<String, Object>();
+		
 		try {
 			org.json.JSONObject object = new org.json.JSONObject(resJSON);
 			String ret_code = object.getString("ret_code");
