@@ -114,7 +114,7 @@ public class UserExperienceController extends BaseController<UserExperience, Str
 		    	data.put("result", award);
 				data.put("experienceid", experienceid);
 				data.put("message", "恭喜中奖！");
-				data.put("status", 0);
+				data.put("status", 1);
 				return data;
 		    	
 		    }
