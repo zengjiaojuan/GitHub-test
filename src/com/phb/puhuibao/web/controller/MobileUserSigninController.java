@@ -53,14 +53,22 @@ public class MobileUserSigninController extends BaseController<MobileUserSignin,
 	// 保存刮奖其实是把那个无效刮奖置为有效
 	@RequestMapping(value="saveChanceAward")
 	@ResponseBody
-	public Map<String, Object> saveChanceAward(@RequestParam int experienceid) {
+	public Map<String, Object> saveChanceAward(@RequestParam int experienceid,@RequestParam int muid) {
 		Map<String, Object> data = new HashMap<String, Object>();
 		UserExperience experience = userExperienceService.getById(experienceid+"");
 		if (experience == null) {//不存在这个刮奖
-			data.put("message", "已保存到您的体验金");
-			data.put("status", 1);
+			data.put("message", "不存在这个奖!");
+			data.put("status", 0);
 			return data;
 			
+		}else if(experience.getStatus()!=0){
+			data.put("message", "状态错误!");
+			data.put("status", 0);
+			return data;
+		}else if(experience.getmUserId()!=muid){
+			data.put("message", "不是你的彩金!");
+			data.put("status", 0);
+			return data;
 		} else {
 			try {
 				mobileUserSigninService.processUpdate(experience);
@@ -69,8 +77,8 @@ public class MobileUserSigninController extends BaseController<MobileUserSignin,
 				return data;
 			} catch (Exception e) {
 				LOG.error(e.getStackTrace());
-				data.put("message", "失败"+e.getMessage());
-				data.put("status", 1);
+				data.put("message", "失败!");
+				data.put("status", 0);
 				return data;
 			}
 		}
