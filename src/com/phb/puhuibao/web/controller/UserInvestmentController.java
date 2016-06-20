@@ -121,6 +121,7 @@ public class UserInvestmentController extends BaseController<UserInvestment, Str
 					int leftDays = (int) ((cal.getTimeInMillis() - currentTime) / (24 * 3600 * 1000)) + 1;
 					investment.setLeftDays(leftDays);
 				}
+				investment.setTotalIncomeString(investment.getTotalIncome()+"");
 			}
 			 
 			data.put("result", p.getData());

@@ -23,9 +23,16 @@ public class UserInvestment {
 	private Double totalIncome;//total_income  预期总收益
 	
 	private String userName;
+	private String totalIncomeString;
  
 	
  
+	public String getTotalIncomeString() {
+		return totalIncomeString;
+	}
+	public void setTotalIncomeString(String totalIncomeString) {
+		this.totalIncomeString = totalIncomeString;
+	}
 	public String getUserName() {
 		return userName;
 	}
