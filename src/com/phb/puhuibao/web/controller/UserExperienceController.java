@@ -80,9 +80,14 @@ public class UserExperienceController extends BaseController<UserExperience, Str
 	public Map<String, Object> getChanceAward(@RequestParam int muid) {
 		Map<String, Object> data = new HashMap<String, Object>();
 		MobileUserSignin entity = mobileUserSigninService.getById("" + muid);
+		if(entity==null){
+			data.put("message", "用户不存在！");
+			data.put("status", 0);
+			return data;
+		}
 		if (entity.getTotalIntegral() <= entity.getUsedIntegral()) {
 			data.put("message", "您没有可用的积分！");
-			data.put("status", 0);
+			data.put("status", 1);
 			return data;
 		}
 		Map<String,Object> params = new HashMap<String,Object>();
