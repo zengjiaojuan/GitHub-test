@@ -84,30 +84,11 @@ public class UserAccountServiceImpl extends DefaultBaseService<UserAccount, Stri
 				log.setAmount(entity.getAmount());
 				log.setChangeType("充值完成");
 				log.setAccountType(1);
-				
-				if(u.getIdNumber().length()==0){// 用户第一次充值  进行实名认证
-					
-				}
-				
+ 
 				
 			} else {
-//				Map<String, Object> params = new HashMap<String, Object>();
-//				params.put("mUserId", entity.getmUserId());
-//				params.put("type", 0);
-//				params.put("status", 1);
-//				List<UserLoan> loans = baseUserLoanDao.find(params);
-//				if (loans.size() > 0) {
-//					for (UserLoan loan : loans) {
-//						UserLoan l = new UserLoan();
-//						l.setLoanId(loan.getLoanId());
-//						l.setStatus(2);
-//						baseUserLoanDao.update(l);
-//					}
-//					user.setFrozenMoney(u.getFrozenMoney());
-//				} else {
-					user.setmUserMoney(u.getmUserMoney() - entity.getAmount());
-					user.setFrozenMoney(u.getFrozenMoney() - entity.getAmount());
-//				}
+				user.setmUserMoney(u.getmUserMoney() - entity.getAmount());
+				user.setFrozenMoney(u.getFrozenMoney() - entity.getAmount());
 				log.setBalanceAmount(user.getmUserMoney() - user.getFrozenMoney());
 				log.setAmount(- entity.getAmount());
 				log.setChangeType("提现完成");
