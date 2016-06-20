@@ -203,7 +203,7 @@ public class ProductBidController extends BaseController<ProductBid, String> {
 		List <Map<String, Object>> list = null;
 		String sql="";
 		if(StringUtil.isEmpty(muid)){// 用户未登陆
-				sql = "SELECT b.bid_id, b.bid_sn, a.product_name, a.annualized_rate, a.period, a.unit FROM phb_product_bid b LEFT JOIN phb_asset_product a ON b.product_sn = a.product_sn where b.STATUS = 1 and a.product_sn='P888'";
+				sql = "SELECT b.bid_id, b.bid_sn, a.product_name, a.annualized_rate, a.period, a.unit,CASE WHEN b.status = 3 THEN  b.total_amount ELSE b.current_amount END as currentAmount,b.total_amount totalAmount FROM phb_product_bid b LEFT JOIN phb_asset_product a ON b.product_sn = a.product_sn WHERE b. STATUS = 1 AND a.product_sn = 'P888'";
 				list = this.jdbcTemplate.queryForList(sql);
 				if (list.isEmpty()) {// 没有可以投资的新手标
 					data.put("result", retobj);
@@ -214,7 +214,7 @@ public class ProductBidController extends BaseController<ProductBid, String> {
 					data.put("status", 1);
 				}			  
 		} else{
-			sql = "SELECT b.bid_id, b.bid_sn, a.product_name, a.annualized_rate, a.period, a.unit FROM phb_product_bid b LEFT JOIN phb_asset_product a ON b.product_sn = a.product_sn where b. STATUS = 1 order by a.important desc";
+			sql = " SELECT b.bid_id, b.bid_sn, a.product_name, a.annualized_rate, a.period, a.unit  ,CASE WHEN b.status = 3 THEN  b.total_amount ELSE b.current_amount END as currentAmount,b.total_amount totalAmount  FROM phb_product_bid b LEFT JOIN phb_asset_product a ON b.product_sn = a.product_sn where b. STATUS = 1 order by a.important desc";
 			list = this.jdbcTemplate.queryForList(sql);
 			if (list.isEmpty()) {// 没有可以投资的了
 				data.put("result", retobj);
