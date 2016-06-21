@@ -101,13 +101,13 @@ public class UserInvestmentController extends BaseController<UserInvestment, Str
 				if (investment.getStatus() >= 2) {
 					investment.setLeftDays(0);
 				} else {
-					Date incomeDate = investment.getIncomeDate();
+					Date incomeDate = investment.getIncomeDate();// 起息日
 					Long incomeTime = incomeDate.getTime();
-					if (currentTime > incomeTime) {
+					if (currentTime > incomeTime) {   // 当前日大于起息日
 						double amount = investment.getInvestmentAmount();
 						double everyIncome = Functions.calEveryIncome(amount, investment.getAnnualizedRate());
 						long days = (currentTime - incomeTime) / (24 * 3600 * 1000) + 1;
-						investment.setLastIncome(everyIncome * days);
+						investment.setLastIncome(everyIncome * days); // 累计收益
 					}
 					cal = Calendar.getInstance();
 					cal.setTime(incomeDate);
@@ -118,8 +118,8 @@ public class UserInvestmentController extends BaseController<UserInvestment, Str
 					} else {
 						cal.add(Calendar.DATE, investment.getPeriod());
 					}
-					int leftDays = (int) ((cal.getTimeInMillis() - currentTime) / (24 * 3600 * 1000)) + 1;
-					investment.setLeftDays(leftDays);
+					int leftDays = (int) ((cal.getTimeInMillis() - currentTime) / (24 * 3600 * 1000));
+					investment.setLeftDays(leftDays);    //剩余利息日
 				}
 				investment.setTotalIncomeString(investment.getTotalIncome()+"");
 			}
@@ -228,6 +228,7 @@ public class UserInvestmentController extends BaseController<UserInvestment, Str
 				m.put("createTime", investment.getCreateTime());
 				m.put("investmentAmount", investment.getInvestmentAmount());
 				result.add(m);
+				m = new HashMap<String, Object>();
 			}
 			data.put("result", result);
 			data.put("count", p.getTotal());
