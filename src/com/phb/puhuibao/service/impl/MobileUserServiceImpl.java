@@ -87,6 +87,10 @@ public class MobileUserServiceImpl extends DefaultBaseService<MobileUser, String
 		entity.setCreateTime(new Date());
 		entity = this.getBaseDao().save(entity);
 		
+		UserMessage message =  new UserMessage();
+		
+		
+		// 新手红包
 		UserRedpacket redpacket = new UserRedpacket();
 		redpacket.setmUserId(entity.getmUserId());
 		redpacket.setDeductionRate(appContext.getDeductionRate());
@@ -97,13 +101,30 @@ public class MobileUserServiceImpl extends DefaultBaseService<MobileUser, String
 		redpacket.setLastDate(cal.getTime());
 		userRedpacketDao.save(redpacket);
 		
+		// 新手红包通知
+		 message =  new UserMessage();
+		 message.setmUserId(entity.getmUserId());
+		 message.setTitle("获得新手红包");
+		 message.setContent("您于" + new SimpleDateFormat("yyyy年MM月dd日").format(new Date()) + "获得新手红包"+appContext.getRedpacketAmount()+"元");
+		 userMessageDao.save(message);
+		
+		 //推荐人
 		if (entity.getParentId() != null && entity.getParentId() > 0) {
 			redpacket.setmUserId(entity.getParentId());
 			redpacket.setRedpacketAmount(appContext.getInviteRedpacketAmount());			
 			userRedpacketDao.save(redpacket);
+			
+			 message =  new UserMessage();
+			 message.setmUserId(entity.getmUserId());
+			 message.setTitle("获得推荐红包");
+			 message.setContent("因为推荐"+ entity.getmUserTel()+"您于" + new SimpleDateFormat("yyyy年MM月dd日").format(new Date()) + "获得推荐红包"+appContext.getInviteRedpacketAmount()+"元");
+			 userMessageDao.save(message);
+			
+			
+			
 		}
 
-		UserMessage message =  new UserMessage();
+		 message =  new UserMessage();
 		message.setmUserId(entity.getmUserId());
 		message.setTitle("系统消息");
 		message.setContent("启奏陛下，您于" + new SimpleDateFormat("yyyy年MM月dd日").format(new Date()) + "开启了金朗理财之旅！");
