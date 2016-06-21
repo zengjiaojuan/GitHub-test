@@ -10,6 +10,7 @@ public class ExperienceInvestment {
 	private Date createTime;
 	private Integer status;
 	private Date incomeDate;
+	private Date expireDate;
 	//private Double todayIncome;
 	private Double lastIncome;
 	private String productName; // 产品名称
@@ -23,6 +24,13 @@ public class ExperienceInvestment {
 	
 	
 	
+ 
+	public Date getExpireDate() {
+		return expireDate;
+	}
+	public void setExpireDate(Date expireDate) {
+		this.expireDate = expireDate;
+	}
 	public Double getTotalIncome() {
 		return totalIncome;
 	}

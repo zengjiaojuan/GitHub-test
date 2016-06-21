@@ -1,13 +1,11 @@
 package com.phb.puhuibao.web.controller;
 
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 import javax.annotation.Resource;
@@ -20,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.idp.pub.context.AppContext;
 import com.idp.pub.service.IBaseService;
 import com.idp.pub.web.controller.BaseController;
 import com.phb.puhuibao.common.Functions;
@@ -49,6 +48,9 @@ public class ExperienceInvestmentController extends BaseController<ExperienceInv
 	
 	@Resource(name = "experienceInvestmentService")
 	private ExperienceInvestmentService experienceInvestmentService;
+	
+	@Resource(name = "appContext")
+	private AppContext appContext;
 
 	@Resource(name = "jdbcTemplate")
 	private JdbcTemplate jdbcTemplate;
@@ -69,38 +71,39 @@ public class ExperienceInvestmentController extends BaseController<ExperienceInv
 			if (investment.getStatus() >= 2) {
 				investment.setLeftDays(0);
 			} else {
-				SimpleDateFormat df = new SimpleDateFormat("EEE MMM dd HH:mm:ss Z yyyy", Locale.UK);
-				Date dt;
-				try {
-					dt = df.parse(investment.getIncomeDate().toString()); // 起息日
-					Long time = dt.getTime();// 这就是距离1970年1月1日0点0分0秒的毫秒数
-					Long time2 = System.currentTimeMillis();// 与上面的相同,获取系统当前时间毫秒数
+				 
+				Date startday = investment.getIncomeDate();// 起息日
+				  Date nowday =  new Date() ;
+				  long diff = nowday.getTime() - startday.getTime();//这样得到的差值是微秒级别
+				 
+				int currentTime_income = (int) (diff / (1000 * 60 * 60 * 24));  // 天数
+				double amount = investment.getInvestmentAmount();
+				double everyIncome = Functions.calEveryIncome(amount, investment.getAnnualizedRate());
 
-					int currentTime_income = Integer.parseInt(Long.toString(((time2 - time) / (1000 * 60 * 60 * 24))));  //
-					double amount = investment.getInvestmentAmount();
-					double everyIncome = Functions.calEveryIncome(amount, investment.getAnnualizedRate());
-
-					if(currentTime_income<=0){// 如果今天在起息日之前
-						investment.setLeftDays(investment.getPeriod());
+				if(currentTime_income<=0){// 如果今天在起息日之前
+					investment.setLeftDays(investment.getPeriod());
+					investment.setLastIncome(0.0);
+				}else{
+					if (currentTime_income > investment.getPeriod()) {
+						investment.setLeftDays(0);
 						investment.setLastIncome(everyIncome * investment.getPeriod());
-					}else{
-						if (currentTime_income > investment.getPeriod()) {
-							investment.setLeftDays(0);
-							investment.setLastIncome(everyIncome * investment.getPeriod());
-						} else {
-							investment.setLeftDays(currentTime_income);
-							investment.setLastIncome(everyIncome * currentTime_income);
+					} else {
+						investment.setLeftDays(appContext.getExperiencePeriod() -  currentTime_income);
+						investment.setLastIncome(everyIncome * currentTime_income);
 
-						}
-						
 					}
 					
-					investment.setTotalIncome(everyIncome * investment.getPeriod());// 总收益
-
-				} catch (ParseException e) {
-					logger.error("日期格式化错误");
-					logger.error(e.getMessage());
 				}
+ 
+				//获得截止日期
+				Calendar calendar = Calendar.getInstance();
+				calendar.setTime(startday);
+				calendar.add(Calendar.DAY_OF_MONTH, appContext.getExperiencePeriod());
+				Date expiredDate = calendar.getTime();
+				investment.setExpireDate(expiredDate);
+				
+				
+				investment.setTotalIncome(everyIncome * investment.getPeriod());// 总收益
 				result.add(investment);
 			}
 		}
