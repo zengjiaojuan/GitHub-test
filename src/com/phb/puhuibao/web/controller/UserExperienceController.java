@@ -32,7 +32,7 @@ public class UserExperienceController extends BaseController<UserExperience, Str
 		super.setBaseService(baseService);
 	}
 	
-	private final static boolean[] CHANCE = {true, false, false, false, false, false, false, false, false, false};
+	private final static boolean[] CHANCE = {true, true, false, false, false, false, false, false, false, false};
 	@javax.annotation.Resource(name = "jdbcTemplate")
 	private JdbcTemplate jdbcTemplate;
 	
@@ -81,8 +81,8 @@ public class UserExperienceController extends BaseController<UserExperience, Str
 		Map<String, Object> data = new HashMap<String, Object>();
 		MobileUserSignin entity = mobileUserSigninService.getById("" + muid);
 		if(entity==null){
-			data.put("message", "用户不存在！");
-			data.put("status", 0);
+			data.put("message", "用户尚未签到！");
+			data.put("status", 1);
 			return data;
 		}
 		if (entity.getTotalIntegral() <= entity.getUsedIntegral()) {
