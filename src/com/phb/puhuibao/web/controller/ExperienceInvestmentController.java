@@ -98,7 +98,7 @@ public class ExperienceInvestmentController extends BaseController<ExperienceInv
 				//获得截止日期
 				Calendar calendar = Calendar.getInstance();
 				calendar.setTime(startday);
-				calendar.add(Calendar.DAY_OF_MONTH, appContext.getExperiencePeriod());
+				calendar.add(Calendar.DAY_OF_MONTH, appContext.getExperiencePeriod()-1);
 				Date expiredDate = calendar.getTime();
 				investment.setExpireDate(expiredDate);
 				
