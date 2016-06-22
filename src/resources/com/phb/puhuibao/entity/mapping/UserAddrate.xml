@@ -51,7 +51,7 @@
 		select
 			<include refid="allColumn" />
 			 from
-			 phb_muser_addrate m
+			 phb_muser_addrate m left join phb_add_rate r on( m.rate_id =r.rate_id) 
 			<include refid="dynamicWhere" />
 		 
 	</select>

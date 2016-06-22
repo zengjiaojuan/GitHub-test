@@ -1,5 +1,6 @@
 package com.phb.puhuibao.web.controller;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
@@ -20,6 +21,8 @@ import com.phb.puhuibao.entity.UserAddrate;
 @Controller
 @RequestMapping(value = "/userAddrate")
 public class UserAddrateController extends BaseController<UserAddrate, String> {
+	final Log log = LogFactory.getLog(UserAddrateController.class);
+	
 	@Override
 	@Resource(name = "userAddrateService")
 	public void setBaseService(IBaseService<UserAddrate, String> baseService) {
@@ -35,7 +38,6 @@ public class UserAddrateController extends BaseController<UserAddrate, String> {
 	@RequestMapping(value="myUserAddrateList")
 	@ResponseBody
 	public Map<String, Object> myUserAddrateList(@RequestParam int pageno, @RequestParam String muid){
-		final Log log = LogFactory.getLog(UserAddrateController.class);
 		Pager<UserAddrate> pdoctorResult=new Pager<UserAddrate>();
 		pdoctorResult.setReload(true);
 		pdoctorResult.setCurrent(pageno);
@@ -63,6 +65,38 @@ public class UserAddrateController extends BaseController<UserAddrate, String> {
  
 	}
 	
-	 
+	/**
+	 * 我的有效加息劵 
+	 * @param pageno
+	 * @param clinicId
+	 * @return
+	 */
+	@RequestMapping(value="myAvailableUserAddrates")
+	@ResponseBody
+	public Map<String, Object> myAvailableUserAddrates(  @RequestParam String muid){
+		
+		
+		Map<String,Object> params = new HashMap<String,Object>();
+		params.put("muserId", muid);
+		params.put("status", 1);
+		params.put("orderBy", "m.last_date desc");
+		
+		Map<String, Object> data = new HashMap<String, Object>();
+		try {
+			List<UserAddrate> result = this.getBaseService().findList(params);
+			data.put("result", result);
+			data.put("count", result.size());
+			data.put("message", "");
+			data.put("status", 1);
+			return data;	
+		} catch (Exception e) {
+			log.error("我的加息劵列表出错:"  +e);
+			data.put("message", "查询出错!");
+			data.put("status", 0);
+			return data;
+			 
+		}
+ 
+	}
 
 }
