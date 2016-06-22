@@ -55,7 +55,28 @@ public class UserRedpacketController extends BaseController<UserRedpacket, Strin
 		return data;
 	}
 	
-	
+	/**
+	 * 所有有效红包 不分页
+	 * @param pageno
+	 * @param muid
+	 * @return
+	 */
+	@RequestMapping(value="allAvailableRedpackets")
+	@ResponseBody
+	public Map<String, Object> allAvailableRedpackets( @RequestParam String muid) {
+		Map<String,Object> params = new HashMap<String,Object>();
+		params.put("mUserId", muid);
+		params.put("status", 1);
+		params.put("glastDate", new Date());
+		List<UserRedpacket> result = this.getBaseService().findList(params);
+		Map<String, Object> data = new HashMap<String, Object>();
+ 
+		data.put("result", result);
+		data.put("count", result.size());
+		data.put("message", "");
+		data.put("status", 1);
+		return data;
+	}
 	
 	
 	/**
