@@ -1227,14 +1227,25 @@ public class MobileUserController extends BaseController<MobileUser, String> {
 		@ResponseBody
 		public Map<String, Object> checkPasswordExist(@RequestParam String muid) {
 			Map<String, Object> data = new HashMap<String, Object>();
-			MobileUser user = this.getBaseService().getById(muid);
-			if (StringUtils.isEmpty(user.getPayPassword()) ) {
-				data.put("message", "支付密码不存在!");
+			
+			try {
+				MobileUser user = this.getBaseService().getById(muid);
+				if (StringUtils.isEmpty(user.getPayPassword()) ) {
+					data.put("message", "支付密码不存在!");
+					data.put("status", 2);
+				} else {
+					data.put("message", "支付密码存在!");
+					data.put("status", 1);
+				}
+				 
+			} catch (Exception e) {
+				data.put("message", "错误!");
 				data.put("status", 0);
-			} else {
-				data.put("message", "支付密码存在!");
-				data.put("status", 1);
+			 
 			}
+			
+			
+
 			return data;
 		}
 	
