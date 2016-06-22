@@ -59,6 +59,8 @@ public class UserCardController extends BaseController<UserCard, String> {
 
 	@Resource(name = "jdbcTemplate")
 	private JdbcTemplate jdbcTemplate;
+	
+	
 
 	 
  
@@ -341,13 +343,21 @@ public class UserCardController extends BaseController<UserCard, String> {
 //邮政储蓄银行   01000000
 //光大银行     03030000
 				map.put("prcptcd", prcptcd);
+				
+				
+				MobileUser user = mobileUserService.getById(muid);
+				map.put("userName", user.getmUserName());// 姓名
+				map.put("userIdNo", user.getIdNumber()); // 身份证
+				
 				result.add(map);
 				data.put("result", result);
 				data.put("status", 1);
 			} else if ("8901".endsWith(ret_code)) { // 没有绑定卡
-				data.put("status", 1);
+				data.put("message", "没有绑卡");
+				data.put("status", 0);
 			} else if ("3007".endsWith(ret_code)) { // [user_id]查询不存在
-				data.put("status", 1);
+				data.put("message", "muid没有在LLPAY注册");
+				data.put("status", 0);
 			} else {
 				data.put("status", 0);
 			}
