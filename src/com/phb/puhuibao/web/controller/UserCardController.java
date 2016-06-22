@@ -356,7 +356,7 @@ public class UserCardController extends BaseController<UserCard, String> {
 				data.put("message", "没有绑卡");
 				data.put("status", 0);
 			} else if ("3007".endsWith(ret_code)) { // [user_id]查询不存在
-				data.put("message", "muid没有在LLPAY注册");
+				data.put("message", "用户没有绑卡");
 				data.put("status", 0);
 			} else {
 				data.put("status", 0);
