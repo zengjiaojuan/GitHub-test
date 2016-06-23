@@ -61,33 +61,33 @@ public class UserLoanServiceImpl extends DefaultBaseService<UserLoan, String> im
 		this.getBaseDao().save(entity);
 		return entity;
 	}
-	
+	// 本版本不用贷款
 	@Override
 	public void processLoan(UserLoan entity) {
-		String sql = "select 1 from phb_mobile_user where m_user_id=" + entity.getmUserId() + " for update";
-		this.jdbcTemplate.execute(sql);
-		
-		MobileUser u = mobileUserDao.get("" + entity.getmUserId());
-		MobileUser user = new MobileUser();
-		user.setmUserId(u.getmUserId());
-		user.setmUserMoney(u.getmUserMoney() + entity.getAmount());
-
-		UserAccountLog log = new UserAccountLog();
-		log.setmUserId(user.getmUserId());
-		log.setAmount(0.0 + entity.getAmount());
-		log.setBalanceAmount(user.getmUserMoney() - u.getFrozenMoney());
-		log.setChangeType("授信贷款");
-		log.setChangeDesc("贷款id: " + entity.getLoanId());
-		log.setAccountType(11);
-		userAccountLogDao.save(log);
-		
-		UserLoan loan = new UserLoan();
-		loan.setLoanId(entity.getLoanId());
-		loan.setStatus(2); // 放款
-		loan.setGiveDate(new Date());
-		update(loan);
-		
-		mobileUserDao.update(user);
+//		String sql = "select 1 from phb_mobile_user where m_user_id=" + entity.getmUserId() + " for update";
+//		this.jdbcTemplate.execute(sql);
+//		
+//		MobileUser u = mobileUserDao.get("" + entity.getmUserId());
+//		MobileUser user = new MobileUser();
+//		user.setmUserId(u.getmUserId());
+//		user.setmUserMoney(u.getmUserMoney() + entity.getAmount());
+//
+//		UserAccountLog log = new UserAccountLog();
+//		log.setmUserId(user.getmUserId());
+//		log.setAmount(0.0 + entity.getAmount());
+//		log.setBalanceAmount(user.getmUserMoney() - u.getFrozenMoney());
+//		log.setChangeType("授信贷款");
+//		log.setChangeDesc("贷款id: " + entity.getLoanId());
+//		log.setAccountType(11);
+//		userAccountLogDao.save(log);
+//		
+//		UserLoan loan = new UserLoan();
+//		loan.setLoanId(entity.getLoanId());
+//		loan.setStatus(2); // 放款
+//		loan.setGiveDate(new Date());
+//		update(loan);
+//		
+//		mobileUserDao.update(user);
 	}
 
 	@Resource(name = "mobileUserExtraDao")

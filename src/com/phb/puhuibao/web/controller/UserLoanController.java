@@ -28,6 +28,7 @@ import com.phb.puhuibao.service.UserLoanService;
 @Controller
 @RequestMapping(value = "/userLoan")
 public class UserLoanController extends BaseController<UserLoan, String> {
+	@Override
 	@Resource(name = "userLoanService")
 	public void setBaseService(IBaseService<UserLoan, String> baseService) {
 		super.setBaseService(baseService);
@@ -184,7 +185,7 @@ public class UserLoanController extends BaseController<UserLoan, String> {
 //			return data;
 //		}
 		try {
-			userLoanService.processLoan(loan);
+		//	userLoanService.processLoan(loan);  本版本屏蔽贷款功能
 		} catch (Exception e) {
 			data.put("message", "网络异常！");
 			data.put("status", 0);
