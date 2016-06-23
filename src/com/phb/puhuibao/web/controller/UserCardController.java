@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import javax.annotation.Resource;
 
@@ -23,13 +22,12 @@ import com.alibaba.fastjson.JSONObject;
 //import com.alibaba.fastjson.TypeReference;
 import com.idp.pub.context.AppContext;
 import com.idp.pub.service.IBaseService;
-import com.idp.pub.utils.DESUtils;
 import com.idp.pub.web.controller.BaseController;
 import com.llpay.client.config.PartnerConfig;
 import com.llpay.client.config.ServerURLConfig;
 import com.llpay.client.conn.HttpRequestSimple;
 import com.llpay.client.utils.LLPayUtil;
-import com.phb.puhuibao.common.Functions;
+import com.opensymphony.oscache.util.StringUtil;
 import com.phb.puhuibao.entity.MobileUser;
 //import com.phb.puhuibao.entity.ThirdPayLog;
 import com.phb.puhuibao.entity.UserCard;
@@ -64,47 +62,7 @@ public class UserCardController extends BaseController<UserCard, String> {
 
 	 
  
-
-	@RequestMapping(value="saveForIOS")
-	@ResponseBody
-	public Map<String, Object> saveForIOS(@RequestParam String muid, @RequestParam String bankAccount, @RequestParam String phone) {
-		Map<String, Object> data = new HashMap<String, Object>();
-		
-		MobileUser user = mobileUserService.getById(muid);
-		String errorInfo = Functions.idCardValidate(user.getIdNumber());
-		if (StringUtils.isNotEmpty(errorInfo)) {
-			data.put("message", errorInfo);
-			data.put("status", 0);
-			return data;
-		}
-
-		bankAccount = DESUtils.decrypt(bankAccount);
-//		Map<String, Object> params = new HashMap<String, Object>();
-//		params.put("mUserId", muid);
-//		params.put("bankAccount", bankAccount);
-//		UserCard entity = this.getBaseService().unique(params);
-//		if (entity != null) {
-//			data.put("message", "该银行卡已绑定！");
-//			data.put("status", 0);			
-//			return data;
-//		}
-//
-		return bindBankCard(muid, bankAccount, phone);
-//		if ((Integer) data.get("status") == 1) {
-//			entity = new UserCard();
-//			entity.setmUserId(muid);
-//			entity.setBankName(DESUtils.decrypt(bankName));
-//			entity.setBankAccount(bankAccount);
-//			try {
-//			    entity = this.getBaseService().save(entity);
-//			} catch (Exception e) {
-//				e.printStackTrace();
-//				data.put("message", "网络异常！");
-//				data.put("status", 0);			
-//				return data;
-//			}
-//		}
-	}
+ 
 	
 	public Map<String, Object> authenticate(int muid) {
 		Map<String, Object> data = new HashMap<String, Object>();
@@ -143,99 +101,7 @@ public class UserCardController extends BaseController<UserCard, String> {
 		}
 		return data;
 	}
-
-	/**
-	 * 绑定测试用
-	 * @param muid
-	 * @param cardno
-	 * @return
-	 */
-	@RequestMapping(value="bindBankCard")
-	@ResponseBody
-	public Map<String, Object> bindBankCard(@RequestParam String muid, @RequestParam String cardno, @RequestParam String phone) {
-		MobileUser user = mobileUserService.getById(muid);
-		if ("".equals(phone)) {
-			phone = user.getmUserTel();
-		}
-				
-		Map<String, String> params 	= new HashMap<String, String>();
-		params.put("identityid", 		user.getmUserTel());
-		params.put("cardno", 			cardno); // 银行卡号
-		//String jsonStr = JSON.toJSONString(params);
-		String uuid = UUID.randomUUID().toString().replace("-", "");
-		params.put("requestid", 		uuid);
-		params.put("identitytype", 		"4"); // 用户手机号
-		params.put("username", 			user.getmUserName()); // 持卡人姓名 
-		params.put("phone", 			phone); // 银行预留手机号
-		params.put("idcardtype", 		"01");
-		params.put("idcardno", 			user.getIdNumber()); // 证件号
-		params.put("userip", 			appContext.getUserIP());
-//		params.put("registerphone", 	"");
-//		params.put("registerdate",	 	"");
-//		params.put("registerip", 		"");
-//		params.put("registeridcardno", 	"");
-//		params.put("registercontact", 	"");
-//		params.put("os", 				"");
-//		params.put("imei", 				"");
-//		params.put("ua", 				"");
-//		params.put("registeridcardtype", "");
-
-		Map<String, String> result			= TZTService.bindBankcard(params);
-//		String merchantaccount				= StringUtils.trimToEmpty(result.get("merchantaccount"));
-	    String requestidFromYeepay 	   		= StringUtils.trimToEmpty(result.get("requestid"));
-//	    String codesender 			   		= StringUtils.trimToEmpty(result.get("codesender"));
-//	    String signFromYeepay 		   		= StringUtils.trimToEmpty(result.get("sign"));
-	    String error_code	   				= StringUtils.trimToEmpty(result.get("error_code"));
-	    String error_msg	   				= StringUtils.trimToEmpty(result.get("error_msg"));
-	    String customError	   				= StringUtils.trimToEmpty(result.get("customError"));
-
-//		ThirdPayLog log = new ThirdPayLog();
-//		log.setLogId(uuid);
-//		log.setAction("bindBankcard");
-//		log.setParams(jsonStr + JSON.toJSONString(result));
-//		int status = 0;
-//		if("".equals(error_code) && "".equals(customError)) {
-//			status = 1;
-//		}
-//		log.setStatus(status);
-//		thirdPayLogService.save(log);
-
-		Map<String, Object> data = new HashMap<String, Object>();
-		if ("600301".equals(error_code)) {
-			data.put("message", "您姓名或身份证号与银行卡不匹配。如果实名认证有误，请联系客服修改。");
-			data.put("status", 0);
-			return data;		
-		}
-		if (!"".equals(error_code)) {
-			data.put("message", error_code + ": " + error_msg);
-			data.put("status", 0);
-			return data;		
-		} else if (!"".equals(customError)) {
-			data.put("message", customError);
-			data.put("status", 0);
-			return data;		
-		}
-
-		UserCard card = baseUserCardService.getById(cardno);
-		if (card == null) {
-			card = new UserCard();
-			card.setBankAccount(cardno);
-			card.setmUserId(user.getmUserId());
-			card.setBankPhone(phone);
-			baseUserCardService.save(card);
-		} else {
-			card = new UserCard();
-			card.setBankAccount(cardno);
-			card.setmUserId(user.getmUserId());
-			card.setBankPhone(phone);
-			baseUserCardService.update(card);
-		}
-
-		data.put("result", requestidFromYeepay);
-		data.put("message", "");
-		data.put("status", 1);
-		return data;		
-	}
+ 
 	
 	/**
 	 * 绑定确认
@@ -305,22 +171,31 @@ public class UserCardController extends BaseController<UserCard, String> {
 	        String reqJSON = reqObj.toString();
 	        String resJSON = HttpRequestSimple.getInstance().postSendHttp(ServerURLConfig.QUERY_USER_BANKCARD_URL, reqJSON);
 	        
-			Map<String, Object> params = new HashMap<String, Object>();
-			params.put("mUserId", muid);
-			UserCard card = this.getBaseService().unique(params);
-	        String cardno = "";
-	        String prcptcd = "";
-	        if (card != null) {
-	        	cardno = card.getBankAccount();
-	        	prcptcd = card.getPrcptcd();
-	        }
+//			Map<String, Object> params = new HashMap<String, Object>();
+//			params.put("mUserId", muid);
+//			UserCard card = this.getBaseService().unique(params);
+//	        String cardno = "";
+//	        String prcptcd = "";
+//	        if (card != null) {
+//	        	cardno = card.getBankAccount();
+//	        	prcptcd = card.getPrcptcd();
+//	        }
 			org.json.JSONObject object = new org.json.JSONObject(resJSON);
 			String ret_code = object.getString("ret_code");
 			data.put("message", object.getString("ret_msg"));
 			if ("0000".endsWith(ret_code)) {
 				JSONArray o = new JSONArray(object.getString("agreement_list"));
 				String bank_name = o.getJSONObject(0).getString("bank_name"); // 单卡
-				String bank_code = o.getJSONObject(0).getString("bank_code"); // 单卡
+				String bank_code = o.getJSONObject(0).getString("bank_code"); // 银行编码
+				String cardno = o.getJSONObject(0).getString("card_no"); // 单卡
+				
+				
+				if( StringUtil.isEmpty(cardno) ){// 出错了 
+					data.put("message", "LLPAY 返回空卡号");
+					data.put("status", 0);
+					return data;
+				}
+				
 				List<Map<String, String>> result = new ArrayList<Map<String, String>>();
 				Map<String, String> map = new HashMap<String, String>();
 				map.put("bank_name", bank_name);
@@ -342,7 +217,7 @@ public class UserCardController extends BaseController<UserCard, String> {
 //交通银行   03010000
 //邮政储蓄银行   01000000
 //光大银行     03030000
-				map.put("prcptcd", prcptcd);
+			 
 				
 				
 				MobileUser user = mobileUserService.getById(muid);
@@ -354,12 +229,12 @@ public class UserCardController extends BaseController<UserCard, String> {
 				data.put("status", 1);
 			} else if ("8901".endsWith(ret_code)) { // 没有绑定卡
 				data.put("message", "没有绑卡");
-				data.put("status", 0);
+				data.put("status", 1);
 			} else if ("3007".endsWith(ret_code)) { // [user_id]查询不存在
 				data.put("message", "用户没有绑卡");
-				data.put("status", 0);
+				data.put("status", 1);
 			} else {
-				data.put("status", 0);
+				data.put("status", 1);
 			}
 		} catch (JSONException e) {
 			log.error("失败"+e);
