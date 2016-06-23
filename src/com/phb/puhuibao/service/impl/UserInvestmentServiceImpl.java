@@ -71,6 +71,8 @@ public class UserInvestmentServiceImpl extends DefaultBaseService<UserInvestment
 	private AppContext appContext;
 	@Resource(name = "userAddrateDao")
 	private IBaseDao<UserAddrate, String> userAddrateDao;
+	
+ 
 
 	@Override
 	@Deprecated
@@ -320,6 +322,15 @@ public class UserInvestmentServiceImpl extends DefaultBaseService<UserInvestment
 		}
 		
 		this.getBaseDao().save(entity); // 保存投资
+		
+		//修改加息劵状态
+		UserAddrate updateuseraddrate  = new UserAddrate();
+		updateuseraddrate.setRecordId(useraddRate.getRecordId());
+		updateuseraddrate.setRateStatus(0);
+		userAddrateDao.update(updateuseraddrate);
+		   
+	 
+		
 
 		UserAccountLog log = new UserAccountLog();
 		log.setmUserId(entity.getmUserId());
