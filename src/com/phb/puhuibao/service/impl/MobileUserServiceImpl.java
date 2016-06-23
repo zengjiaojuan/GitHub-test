@@ -115,7 +115,7 @@ public class MobileUserServiceImpl extends DefaultBaseService<MobileUser, String
 			userRedpacketDao.save(redpacket);
 			
 			 message =  new UserMessage();
-			 message.setmUserId(entity.getmUserId());
+			 message.setmUserId(entity.getParentId());
 			 message.setTitle("获得推荐红包");
 			 message.setContent("因为推荐"+ entity.getmUserTel()+"您于" + new SimpleDateFormat("yyyy年MM月dd日").format(new Date()) + "获得推荐红包"+appContext.getInviteRedpacketAmount()+"元");
 			 userMessageDao.save(message);
