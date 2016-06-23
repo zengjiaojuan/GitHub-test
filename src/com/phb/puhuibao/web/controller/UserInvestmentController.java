@@ -476,7 +476,7 @@ public class UserInvestmentController extends BaseController<UserInvestment, Str
 		//redeemDate：收入日
 		//LastIncome：预计收益
 		data.put("result", result);
-		data.put("message", "保存成功！");
+		data.put("message", "投资成功！");
 		data.put("status", 1);
 		return data;
 	}
