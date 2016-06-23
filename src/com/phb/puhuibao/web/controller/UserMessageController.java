@@ -35,6 +35,7 @@ public class UserMessageController extends BaseController<UserMessage, String> {
 		Pager<UserMessage> pager = new Pager<UserMessage>();
 		pager.setReload(true);
 		pager.setCurrent(pageno);
+		pager.setLimit(30);
 		Map<String,Object> params = new HashMap<String,Object>();
 		params.put("mUserId", muid);
 		params.put("orderBy", "create_time");
