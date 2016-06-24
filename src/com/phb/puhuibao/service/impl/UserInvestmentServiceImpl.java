@@ -296,13 +296,22 @@ public class UserInvestmentServiceImpl extends DefaultBaseService<UserInvestment
 				deductionAmount = redpacket.getRedpacketAmount();
 			}
 		}
+		//修改红包状态
+		if(redpacket !=null){
+			UserRedpacket updateredpacket = new UserRedpacket();
+			updateredpacket.setRedpacketId(redpacket.getRedpacketId());
+			updateredpacket.setStatus(0);
+			userRedpacketDao.update(updateredpacket);
+		}
 
+		// 用户的红包退回到余额
 		MobileUser u = mobileUserDao.get("" + entity.getmUserId());
 		MobileUser user = new MobileUser();
 		user.setmUserId(entity.getmUserId());
 		user.setmUserMoney(u.getmUserMoney() - entity.getInvestmentAmount() + deductionAmount);
 		mobileUserDao.update(user);
 		
+		// 看是否投满
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("bidSN", entity.getBidSN());
 		ProductBid b = productBidDao.unique(params);
@@ -314,6 +323,7 @@ public class UserInvestmentServiceImpl extends DefaultBaseService<UserInvestment
 		}
 		productBidDao.update(bid);
 		
+		//保存投资
 		entity.setCreateTime(new Date());
 		if(addRate !=null){
 			entity.setAnnualizedRate(productAnnualizedRate +  addRate.getAnnualizedRate()); // 产品年利率+加息劵利率
@@ -324,10 +334,13 @@ public class UserInvestmentServiceImpl extends DefaultBaseService<UserInvestment
 		this.getBaseDao().save(entity); // 保存投资
 		
 		//修改加息劵状态
-		UserAddrate updateuseraddrate  = new UserAddrate();
-		updateuseraddrate.setRecordId(useraddRate.getRecordId());
-		updateuseraddrate.setRateStatus(0);
-		userAddrateDao.update(updateuseraddrate);
+		if(useraddRate!=null){
+			UserAddrate updateuseraddrate  = new UserAddrate();
+			updateuseraddrate.setRecordId(useraddRate.getRecordId());
+			updateuseraddrate.setRateStatus(0);
+			userAddrateDao.update(updateuseraddrate);
+		}
+		
 		   
 	 
 		
