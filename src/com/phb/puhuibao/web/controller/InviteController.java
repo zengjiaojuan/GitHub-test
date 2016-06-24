@@ -22,6 +22,7 @@ import com.phb.puhuibao.entity.Invite;
 @Controller
 @RequestMapping(value = "/invite")
 public class InviteController extends BaseController<Invite, String> {
+	@Override
 	@Resource(name = "inviteService")
 	public void setBaseService(IBaseService<Invite, String> baseService) {
 		super.setBaseService(baseService);
@@ -63,9 +64,9 @@ public class InviteController extends BaseController<Invite, String> {
 //		data.put("count", p.getTotal());
 //		data.put("message", "");
 //		data.put("status", 1);
-		String sql = "select m_user_name,photo,commission,m_user_tel from phb_mobile_user b left join (select from_user,sum(amount) commission from (select from_user,amount from phb_muser_account_log where m_user_id=" + muid + " and from_user>0)a group by from_user)c on b.m_user_id=c.from_user where b.parent_id in(select m_user_id from phb_mobile_user where parent_id=" + muid + ") or b.parent_id=" + muid;
+		String sql = "SELECT m_user_name, photo, ROUND(commission,2) commission,m_user_tel FROM phb_mobile_user b LEFT JOIN ( SELECT from_user, sum(amount) commission FROM phb_muser_account_log WHERE m_user_id = "+muid+" AND account_type = 2 group by from_user ) c ON b.m_user_id = c.from_user WHERE b.parent_id IN ( SELECT m_user_id FROM phb_mobile_user WHERE parent_id = "+muid+" ) OR b.parent_id = "+muid +" and commission>0 ";
 		List<Map<String, Object>> result = this.jdbcTemplate.queryForList(sql);
-		sql = "select count(1) from phb_mobile_user b left join (select from_user,sum(amount) commission from (select from_user,amount from phb_muser_account_log where m_user_id=" + muid + " and from_user>0)a group by from_user)c on b.m_user_id=c.from_user where b.parent_id in(select m_user_id from phb_mobile_user where parent_id=" + muid + ") or b.parent_id=" + muid;
+		sql = "SELECT count(1) FROM phb_mobile_user b LEFT JOIN ( SELECT from_user, sum(amount) commission FROM phb_muser_account_log WHERE m_user_id = "+muid+" AND account_type = 2 group by from_user ) c ON b.m_user_id = c.from_user WHERE b.parent_id IN ( SELECT m_user_id FROM phb_mobile_user WHERE parent_id = "+muid+" ) OR b.parent_id = "+muid +" and commission>0 ";
 		List<Map<String, Object>> count = this.jdbcTemplate.queryForList(sql);
 
 		Map<String, Object> data = new HashMap<String, Object>();
