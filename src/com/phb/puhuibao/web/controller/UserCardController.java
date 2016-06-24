@@ -171,15 +171,15 @@ public class UserCardController extends BaseController<UserCard, String> {
 	        String reqJSON = reqObj.toString();
 	        String resJSON = HttpRequestSimple.getInstance().postSendHttp(ServerURLConfig.QUERY_USER_BANKCARD_URL, reqJSON);
 	        
-//			Map<String, Object> params = new HashMap<String, Object>();
-//			params.put("mUserId", muid);
-//			UserCard card = this.getBaseService().unique(params);
-//	        String cardno = "";
-//	        String prcptcd = "";
-//	        if (card != null) {
-//	        	cardno = card.getBankAccount();
-//	        	prcptcd = card.getPrcptcd();
-//	        }
+			Map<String, Object> params = new HashMap<String, Object>();
+			params.put("mUserId", muid);
+			UserCard card = this.getBaseService().unique(params);
+	        String cardno = "";
+	        //String prcptcd = "";
+	        if (card != null) {
+	        	cardno = card.getBankAccount();
+	        	//prcptcd = card.getPrcptcd();
+	        }
 			org.json.JSONObject object = new org.json.JSONObject(resJSON);
 			String ret_code = object.getString("ret_code");
 			data.put("message", object.getString("ret_msg"));
@@ -187,11 +187,11 @@ public class UserCardController extends BaseController<UserCard, String> {
 				JSONArray o = new JSONArray(object.getString("agreement_list"));
 				String bank_name = o.getJSONObject(0).getString("bank_name"); // 单卡
 				String bank_code = o.getJSONObject(0).getString("bank_code"); // 银行编码
-				String cardno = o.getJSONObject(0).getString("card_no"); // 单卡
+				//String cardno = o.getJSONObject(0).getString("card_no"); //  连连返回的卡号只有末尾4个数字  不能用
 				
 				
 				if( StringUtil.isEmpty(cardno) ){// 出错了 
-					data.put("message", "LLPAY 返回空卡号");
+					data.put("message", "用户卡号表卡号为空.");
 					data.put("status", 0);
 					return data;
 				}
@@ -231,7 +231,7 @@ public class UserCardController extends BaseController<UserCard, String> {
 				data.put("message", "没有绑卡");
 				data.put("status", 1);
 			} else if ("3007".endsWith(ret_code)) { // [user_id]查询不存在
-				data.put("message", "用户没有绑卡");
+				data.put("message", "LLPAY没有此用户绑卡信息");
 				data.put("status", 1);
 			} else {
 				data.put("status", 1);
@@ -277,6 +277,16 @@ public class UserCardController extends BaseController<UserCard, String> {
 			String ret_code = object.getString("ret_code");
 			if ("0000".endsWith(ret_code)) {
 				String bank_name = object.getString("bank_name");
+				String card_type = object.getString("card_type");//card_type:2 储蓄卡 3:信用卡
+				System.out.println("card_type------->"+card_type);
+				if(StringUtil.isEmpty(card_type) || "3".equals(card_type) ){
+					data.put("message", "本公司不支持信用卡支付！");
+					data.put("status", 0);
+					return data;
+				}
+				 
+				
+				
 				String sql = "select count(1) from phb_bank where position(bank_name in '" + bank_name + "')>0";
 				List<Map<String, Object>> result = this.jdbcTemplate.queryForList(sql);
 				long count = (long) result.get(0).get("count(1)");
