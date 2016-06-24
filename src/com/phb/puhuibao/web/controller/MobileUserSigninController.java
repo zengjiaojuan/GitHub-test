@@ -55,6 +55,21 @@ public class MobileUserSigninController extends BaseController<MobileUserSignin,
 	@ResponseBody
 	public Map<String, Object> saveChanceAward(@RequestParam int experienceid,@RequestParam int muid) {
 		Map<String, Object> data = new HashMap<String, Object>();
+		
+		
+		MobileUserSignin entity = this.getBaseService().getById("" + muid);
+		if(entity==null){
+			data.put("message", "用户尚未签到！");
+			data.put("status", 0);
+			return data;
+		}
+		if (entity.getTotalIntegral() <= entity.getUsedIntegral()) {
+			data.put("message", "您没有可用的积分！");
+			data.put("status", 0);
+			return data;
+		}
+		
+ 
 		UserExperience experience = userExperienceService.getById(experienceid+"");
 		if (experience == null) {//不存在这个刮奖
 			data.put("message", "不存在这个奖!");
