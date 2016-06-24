@@ -467,6 +467,7 @@ public class UserInvestmentController extends BaseController<UserInvestment, Str
 		try {
 			userInvestmentService.processSave(entity, redpacketId,addRate,product.getAnnualizedRate(),useraddRate);  // 保存投资
 		} catch (Exception e) {
+			e.getStackTrace();
 			log.error("失败"+e.getStackTrace());
 			data.put("status", 0);
 			return data;
