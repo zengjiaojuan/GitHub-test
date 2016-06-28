@@ -38,11 +38,13 @@ import com.idp.pub.utils.DESUtils;
 import com.idp.pub.web.controller.BaseController;
 import com.opensymphony.oscache.util.StringUtil;
 import com.phb.puhuibao.common.Functions;
+import com.phb.puhuibao.common.InitListener;
 import com.phb.puhuibao.entity.Invite;
 import com.phb.puhuibao.entity.MobileUser;
 import com.phb.puhuibao.entity.MobileUserExtra;
 import com.phb.puhuibao.entity.MobileUserSignin;
 import com.phb.puhuibao.entity.UserCard;
+import com.phb.puhuibao.entity.UserSession;
 import com.phb.puhuibao.service.MobileUserService;
 
 @Controller
@@ -65,7 +67,8 @@ public class MobileUserController extends BaseController<MobileUser, String> {
 	@Resource(name = "mobileUserService")
 	private MobileUserService mobileUserService;
  
-	
+	@Resource(name = "userSessionService")
+	private IBaseService<UserSession, String> userSessionService;
   
 	
 	@Resource(name = "commons")
@@ -136,13 +139,19 @@ public class MobileUserController extends BaseController<MobileUser, String> {
 //			}
 			u.setmUserPwd("");
 			u.setPayPassword("");
-//			MobileUserExtra extra = mobileUserExtraService.getById("" + u.getmUserId());
-//			if (extra == null) {
-//				u.setLevel(0);
-//			} else {
-//				u.setLevel(extra.getLevel());
-//			}
+	 
+			// 防止用户两个手机同时登陆两个手机:每次登陆产生一个随机数  每次访问的时候需要带上这个随机数   这个随机数必须在内存和数据库都存在   在用户注册的时候  就会保存这个 所以只需要修改就行
+			int sessionid = (int) (Math.random()*(999999999-100000000)+100000000);  
+			UserSession us = new UserSession();
+			us.setSessionId(sessionid);
+			us.setUserId(u.getmUserId());
+			userSessionService.update(us);
+			
+			InitListener.sessionhash.put(u.getmUserId(),sessionid);// 把这个用户的随机数 更新到内存
+ 
+ 
 			data.put("result", u);
+			data.put("token", sessionid);
 			data.put("message", "登录成功！");
 			data.put("status", 1);
 		}
@@ -232,6 +241,8 @@ public class MobileUserController extends BaseController<MobileUser, String> {
 	}
 
  
+	
+	// 用户注册 不分 ios 和 android
 	@RequestMapping(value="saveMobileUserForIOS")
 	@ResponseBody
 	public Map<String, Object> saveMobileUserForIOS(@RequestParam String mUserTel, @RequestParam String mUserPwd, @RequestParam String inviteCode) {
@@ -261,7 +272,7 @@ public class MobileUserController extends BaseController<MobileUser, String> {
 				Invite result = inviteService.unique(params);
 				if (result == null) {
 					data.put("message", "该邀请码无效！");
-					data.put("status", 0);
+					data.put("status", 2);
 					return data;
 				}
 				parentId = result.getmUserId();
@@ -287,12 +298,17 @@ public class MobileUserController extends BaseController<MobileUser, String> {
 		    }     
 		    entity.setNickname(sb.toString());//生成随机昵称
 			 mobileUserService.userCreate(entity);
+			 
+			 
+			 
 			 entity.setmUserPwd("");
 			data.put("result", entity);
+			data.put("token", entity.getLiveness()); // 存的是有用户的 key
 			data.put("message", "注册成功！");
 			data.put("status", 1);
 			return data;
 		} catch (Exception e) {
+			e.printStackTrace();
 			log.error("注册失败:"+e);
 			data.put("message", "注册保存失败！" );
 			data.put("status", 0);			

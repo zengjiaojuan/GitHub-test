@@ -2,7 +2,6 @@ package com.idp.pub.web.context;
 
 import java.io.IOException;
 
-
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
@@ -27,6 +26,10 @@ public class LogbackConfigListener implements ServletContextListener {
 
 	@Override
 	public void contextInitialized(ServletContextEvent sce) {
+		
+		
+		System.out.println("系统加载开始......--------------------------------------------------------->");
+		
 		String logbackConfigLocation = sce.getServletContext()
 				.getInitParameter(CONFIG_LOCATION);
 		if (logbackConfigLocation != null

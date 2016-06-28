@@ -118,6 +118,20 @@ public class ApplicationContextController {
 		data.put("status", 0);
 		return data;		
 	}
+	
+	
+	/**
+	 * 
+	 * @return
+	 */
+	@RequestMapping(params = "method=wronglogin", method = RequestMethod.GET)
+	@ResponseBody
+	public Map<String, Object> wronglogin(){
+		Map<String, Object> data = new HashMap<String, Object>();
+		data.put("message", "请重新登陆！");
+		data.put("status", 20);
+		return data;		
+	}
 
 	/**
 	 * 获得版本

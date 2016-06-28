@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8" ?>   
+<!DOCTYPE mapper   
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"   
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">   
+    
+<mapper namespace="com.phb.puhuibao.entity.UserSession" >
+    <resultMap id="UserSession" type="com.phb.puhuibao.entity.UserSession">
+            <result property="userId"                 column="user_id"               jdbcType="INTEGER" />
+            <result property="sessionId"              column="session_id"             jdbcType="INTEGER" />
+            
+	</resultMap>
+	
+   
+	
+	
+	<sql id="allColumn">
+	        user_id	 ,
+			session_id	     
+	</sql>
+ 
+	<select id="findByPager" parameterType="java.util.Map" resultMap="UserSession">
+		<include refid="queryBody" />
+	</select>
+	
+	<select id="UserSessionquery" parameterType="java.util.Map" resultMap="UserSession">
+		<include refid="queryBody" />
+	</select>
+	
+	<select id="query" parameterType="java.util.Map" resultMap="UserSession">
+		select
+			<include refid="allColumn" />
+			 from
+			 phb_muser_session  
+			<include refid="dynamicWhere" />
+		 
+	</select>
+	
+		
+	<!-- 3.1.根据对像条件查询记录数 MAP参数 --><select id="findByPagerCount" parameterType="java.util.Map" resultType="int" >
+		select
+		count(1)
+		from
+		phb_muser_session 
+		<include refid="dynamicWhere" />
+		    
+	</select>
+	<select id="getById" parameterType="java.util.Map" resultMap="UserSession">
+			select
+			<include refid="allColumn" />
+			 from
+			 phb_muser_session  
+			 <include refid="dynamicWhere" />
+	</select>
+	<select id="unique" parameterType="java.util.Map" resultMap="UserSession" >
+			select
+			<include refid="allColumn" />
+			 from
+			 phb_muser_session 
+			<include refid="dynamicWhere" />
+			limit 1
+	</select>
+
+	<sql id="dynamicWhere">
+			<trim prefix="WHERE" prefixOverrides="AND|OR">
+				<if test="sessionId !=null">
+					AND session_id = #{sessionId}
+				</if>
+				
+				<if test="userId !=null">
+					AND user_id = #{userId}
+				</if>
+				 
+			</trim>
+	</sql>
+ 
+ 	<!-- order by 排序 -->
+	<sql id="dynamicOrderBy">
+		<if test="orderBy!=null">
+			order by ${orderBy}
+			<if test="order!=null">
+				${order}
+		</if>
+		</if>
+	</sql>
+	
+
+	<insert id="insert" parameterType="com.phb.puhuibao.entity.UserSession" >
+	    INSERT INTO 
+	    phb_muser_session(<include refid="allapplColumn"/>	)
+		<include refid="allapplColumnVar"/>
+	</insert>
+	
+	<sql id="allapplColumn">
+		  
+			user_id	    ,
+			session_id	 
+         
+	</sql>
+	
+	
+ 
+	
+	<sql id="allapplColumnVar">
+		values(
+				  
+		          #{userId,             jdbcType=INTEGER},                 
+		          #{sessionId,         jdbcType=INTEGER} 
+		           
+		         
+		     )
+	</sql>
+	
+	<update id="update" parameterType="com.phb.puhuibao.entity.UserSession">
+			update phb_muser_session
+			<trim prefix=" SET " prefixOverrides=",">
+				<if test="sessionId !=null">
+					  ,session_id=#{sessionId,jdbcType=INTEGER}
+				</if>
+				 
+				
+				
+			</trim>
+			WHERE 
+				user_id=#{userId}
+	</update>
+
+	<delete id="delete" parameterType="java.util.Map">
+		DELETE FROM phb_muser_session 
+		where rate_id =#{rateId}
+	</delete>	
+	
+	<sql id="queryBody">
+		<if test="sno!=null and eno!=null and orderBy!=null">
+			select
+			<include refid="allColumn" />
+			 from
+			  phb_muser_session   
+			<include refid="dynamicWhere" />
+			<include refid="dynamicOrderBy" />
+			limit ${sno-1},${eno}
+		</if>
+		<!-- 无orderby -->
+		<if test="sno!=null and eno!=null and orderBy==null">
+			select
+			<include refid="allColumn" />
+			 from
+			phb_muser_session 
+			<include refid="dynamicWhere" />
+			limit ${sno-1},${eno}
+		</if>
+	</sql>	
+
+</mapper>
+
+
+
+

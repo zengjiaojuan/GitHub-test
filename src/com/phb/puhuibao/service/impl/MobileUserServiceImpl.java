@@ -32,6 +32,7 @@ import com.idp.pub.dao.IBaseDao;
 import com.idp.pub.dao.IPagerDao;
 import com.idp.pub.service.impl.DefaultBaseService;
 import com.phb.puhuibao.common.Functions;
+import com.phb.puhuibao.common.InitListener;
 import com.phb.puhuibao.entity.AssetProduct;
 import com.phb.puhuibao.entity.ExperienceInvestment;
 import com.phb.puhuibao.entity.ExperienceProduct;
@@ -42,6 +43,7 @@ import com.phb.puhuibao.entity.UserInvestment;
 import com.phb.puhuibao.entity.UserLoan;
 import com.phb.puhuibao.entity.UserMessage;
 import com.phb.puhuibao.entity.UserRedpacket;
+import com.phb.puhuibao.entity.UserSession;
 import com.phb.puhuibao.service.MobileUserService;
 
 @Transactional
@@ -81,6 +83,9 @@ public class MobileUserServiceImpl extends DefaultBaseService<MobileUser, String
 	private AppContext appContext;
 	@Resource(name = "userMessageDao")
 	private IBaseDao<UserMessage, String> userMessageDao;
+	
+	@Resource(name = "userSessionDao")
+	private IBaseDao<UserSession, String> userSessionDao;
 
 	@Override
 	public MobileUser save(MobileUser entity) {
@@ -406,6 +411,16 @@ public  String getMobileLocation(String tel) {
 	@Override
 	public MobileUser userCreate(MobileUser entity) {
 		
+		
+		// 防止用户两个手机同时登陆两个手机:每次登陆产生一个随机数  每次访问的时候需要带上这个随机数   这个随机数必须在内存和数据库都存在   在用户注册的时候  就会产生这个
+		int sessionid = (int) (Math.random()*(999999999-100000000)+100000000);  
+		UserSession us = new UserSession();
+		us.setSessionId(sessionid);
+		us.setUserId(entity.getmUserId());
+		userSessionDao.save(us);
+		
+		InitListener.sessionhash.put(entity.getmUserId(), sessionid);// 用户注册的时候把这个用户的随机数 在内存和数据库葛存一分
+		
 		String provinceandcity = getMobileLocation(entity.getmUserTel());
 		if( !StringUtil.isBlank(provinceandcity) && provinceandcity.indexOf(",")>0){ // 正确获取了用户的省市信息
 			String[] array  = provinceandcity.split(",");
@@ -418,7 +433,7 @@ public  String getMobileLocation(String tel) {
 			
 		}
 		this.save(entity);
- 
+        entity.setLiveness(sessionid); // 临时存储
 		return entity;
 		
 	}

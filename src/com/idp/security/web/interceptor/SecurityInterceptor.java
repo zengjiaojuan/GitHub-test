@@ -11,13 +11,16 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.StringUtils;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.idp.pub.constants.Constants;
 import com.idp.security.web.pub.IConstant;
 import com.idp.security.web.utils.SecurityUtils;
+import com.phb.puhuibao.common.InitListener;
 
 /**
  * 访问身份验证拦截器
@@ -26,6 +29,10 @@ import com.idp.security.web.utils.SecurityUtils;
  * 
  */
 public class SecurityInterceptor implements HandlerInterceptor {
+	
+	@Resource(name = "jdbcTemplate")
+	private JdbcTemplate jdbcTemplate;
+	
 	private static String TOKEN = "phb";
 	
 	private List actions;
@@ -47,6 +54,37 @@ public class SecurityInterceptor implements HandlerInterceptor {
 		if("/alipayApi/async.shtml".equals(request.getServletPath())){//特殊处理
 			return true;
 		}
+		if(InitListener.sessionhash.size()==0){
+			String sql= "select  user_id,session_id from phb_muser_session";
+			List <Map<String, Object>> list = this.jdbcTemplate.queryForList(sql);
+			for (Map<String, Object> map : list) {
+				InitListener.sessionhash.put((Integer) map.get("user_id"), (Integer)map.get("session_id"));
+				 
+			}
+		}
+		//保证只有一个用户登录
+		String tokenstr = request.getParameter("token");
+		String muidstr = request.getParameter("muid");
+		int token = 0;
+		int muid = 0;
+		if(!StringUtils.isEmpty(muidstr)){
+		 
+			 
+			if(!StringUtils.isEmpty(tokenstr)){
+				token = Integer.parseInt(tokenstr);
+			}
+			
+			muid = Integer.parseInt(muidstr);
+			if(!InitListener.sessionhash.containsKey(muid)){ // 用户没有登陆或者没有注册
+				response.sendRedirect(request.getContextPath() + "/appContext.shtml?method=wronglogin");
+				return false;
+			}
+			if(InitListener.sessionhash.get(muid) != token){ // 用户重复登陆
+				response.sendRedirect(request.getContextPath() + "/appContext.shtml?method=wronglogin");
+				return false;
+			}
+		}
+		
 		String signature = request.getParameter("signature");
 		String timestamp = request.getParameter("timestamp");
 		if (signature!= null && timestamp != null) {
@@ -59,6 +97,9 @@ public class SecurityInterceptor implements HandlerInterceptor {
 				return false;
 			}
 		}
+		
+
+
 		if (SecurityUtils.isLogInSystem(request)) {
 			return true;
 		} else {
