@@ -1,5 +1,8 @@
 package com.phb.puhuibao.job;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -9,9 +12,9 @@ import java.util.Map;
 import javax.annotation.Resource;
 
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import com.idp.pub.dao.IBaseDao;
 import com.idp.pub.service.IBaseService;
 import com.phb.puhuibao.common.Functions;
 import com.phb.puhuibao.entity.AssetProduct;
@@ -22,6 +25,7 @@ import com.phb.puhuibao.entity.LoanItem;
 import com.phb.puhuibao.entity.MobileUser;
 import com.phb.puhuibao.entity.ProductBid;
 import com.phb.puhuibao.entity.UserInvestment;
+import com.phb.puhuibao.entity.UserMessage;
 import com.phb.puhuibao.service.UserInvestmentService;
 import com.phb.puhuibao.web.controller.SendSMSController;
 
@@ -49,6 +53,9 @@ public class RedeemJob {
 	private SendSMSController sendSMSController;
 	@Resource(name = "mobileUserService")
 	private IBaseService<MobileUser, String> baseMobileUserService;
+	
+	@Resource(name = "userMessageDao")
+	private IBaseDao<UserMessage, String> userMessageDao;
 
 	//@Scheduled(cron="0 0 0 * * *") // 0点
 //    public void redeem() {
@@ -205,6 +212,8 @@ public class RedeemJob {
 		long currentTime = cal.getTimeInMillis();
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("status", 1);
+		
+		UserMessage message = new UserMessage();
 		// 理财
 		List<UserInvestment> investments = baseUserInvestmentService.findList(params);
 		for (UserInvestment investment : investments) {
@@ -244,7 +253,15 @@ public class RedeemJob {
 			        investment.setLastDate(monthCal.getTime());
 					userInvestmentService.monthProcess(investment);
 					MobileUser user = baseMobileUserService.getById(investment.getmUserId() + "");
-					sendSMSController.sendMonthIncome(investment, user.getmUserTel());
+					//sendSMSController.sendMonthIncome(investment, user.getmUserTel());
+					
+					 message =  new UserMessage();
+					 message.setmUserId(user.getmUserId());
+					 message.setTitle("收到月息");
+					 message.setContent(new SimpleDateFormat("yyyy年MM月dd日").format(new Date()) + "获得月息"+investment.getLastIncome()+"元");
+					 userMessageDao.save(message);
+					
+					
 		        } else {
 		        	continue;
 		        }
@@ -290,12 +307,27 @@ public class RedeemJob {
 			if (product.getType() == 2) { // 朗月赢
 				userInvestmentService.monthProcessLast(i);
 				i = baseUserInvestmentService.getById(i.getInvestmentId() + "");
-				sendSMSController.sendMonthProcessLast(i, user.getmUserTel());
+				//sendSMSController.sendMonthProcessLast(i, user.getmUserTel());
+				
+				 message =  new UserMessage();
+				 message.setmUserId(user.getmUserId());
+				 message.setTitle("收回本金");
+				 message.setContent(new SimpleDateFormat("yyyy年MM月dd日").format(new Date()) + "收到"+i.getBidSN()+"本金"+investment.getInvestmentAmount()+"元");
+				 userMessageDao.save(message);
+				 
 			} else {
 				i.setLastDate(new Date());
 				baseUserInvestmentService.update(i);
 				i = baseUserInvestmentService.getById(i.getInvestmentId() + "");
-				sendSMSController.sendIncome(i, user.getmUserTel());
+				//sendSMSController.sendIncome(i, user.getmUserTel());
+				
+				 message =  new UserMessage();
+				 message.setmUserId(user.getmUserId());
+				 message.setTitle("收到本金利息");
+				 message.setContent(new SimpleDateFormat("yyyy年MM月dd日").format(new Date()) + "收到"+i.getBidSN()+"本金利息"+new BigDecimal(i.getInvestmentAmount() + i.getLastIncome()).setScale(2, RoundingMode.HALF_UP)+"元");
+				 userMessageDao.save(message);
+				
+				
 			}
 		}
 		
@@ -334,7 +366,12 @@ public class RedeemJob {
 			itemInvestmentService.update(i);
 			MobileUser user = baseMobileUserService.getById(investment.getmUserId() + "");
 			i = itemInvestmentService.getById(i.getInvestmentId() + "");
-			sendSMSController.sendItemIncome(i, user.getmUserTel());
+			//sendSMSController.sendItemIncome(i, user.getmUserTel());
+			
+			 message.setmUserId(user.getmUserId());
+			 message.setTitle("收到本金利息");
+			 message.setContent(new SimpleDateFormat("yyyy年MM月dd日").format(new Date()) + "收到"+i.getItemSN()+"本金利息"+new BigDecimal(i.getInvestmentAmount() + i.getLastIncome()).setScale(2, RoundingMode.HALF_UP)+"元");
+			 userMessageDao.save(message);
 		}
 		
 		// 到期结清
@@ -399,7 +436,14 @@ public class RedeemJob {
 			experienceInvestmentService.update(i);
 			MobileUser user = baseMobileUserService.getById(investment.getmUserId() + "");
 			i = experienceInvestmentService.getById(i.getInvestmentId() + "");
-			sendSMSController.sendExperienceIncome(i, user.getmUserTel());
+			//sendSMSController.sendExperienceIncome(i, user.getmUserTel());
+			
+			 message.setmUserId(user.getmUserId());
+			 message.setTitle("收到体验金利息");
+			 message.setContent(new SimpleDateFormat("yyyy年MM月dd日").format(new Date()) + "收到"+i.getProductSN()+"本金利息"+i.getLastIncome()+"元");
+			 userMessageDao.save(message);
+			
+			
 		}
 	}
 }
