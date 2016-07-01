@@ -410,7 +410,7 @@ public  String getMobileLocation(String tel) {
 
 	@Override
 	public MobileUser userCreate(MobileUser entity) {
-		
+		this.save(entity);
 		
 		// 防止用户两个手机同时登陆两个手机:每次登陆产生一个随机数  每次访问的时候需要带上这个随机数   这个随机数必须在内存和数据库都存在   在用户注册的时候  就会产生这个
 		int sessionid = (int) (Math.random()*(999999999-100000000)+100000000);  
@@ -432,7 +432,7 @@ public  String getMobileLocation(String tel) {
 		} else{// 省市信息都是空
 			
 		}
-		this.save(entity);
+
         entity.setLiveness(sessionid); // 临时存储
 		return entity;
 		

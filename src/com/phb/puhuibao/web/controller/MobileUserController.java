@@ -107,7 +107,7 @@ public class MobileUserController extends BaseController<MobileUser, String> {
 	
 	
 	
- 
+ //http://localhost:8080/lcb/userInformation/mobileLoginForIOS.shtml?mUserTel=18612499030&mUserPwd=BlhPzCj2YA9M2zGlFyqeqQ==&signature=c1bc53c77324069f0f949d23e710838d&timestamp=1427373821045
 	@RequestMapping(value="mobileLoginForIOS")
 	@ResponseBody
 	public Map<String, Object> mobileLoginForIOS(@RequestParam String mUserTel, @RequestParam String mUserPwd) {
@@ -241,7 +241,7 @@ public class MobileUserController extends BaseController<MobileUser, String> {
 	}
 
  
-	
+	//http://localhost:8080/lcb/userInformation/saveMobileUserForIOS.shtml?mUserTel=18612499030&mUserPwd=BlhPzCj2YA9M2zGlFyqeqQ==&signature=c1bc53c77324069f0f949d23e710838d&timestamp=1427373821045&inviteCode=
 	// 用户注册 不分 ios 和 android
 	@RequestMapping(value="saveMobileUserForIOS")
 	@ResponseBody
