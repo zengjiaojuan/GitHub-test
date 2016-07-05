@@ -44,29 +44,10 @@ public class InviteController extends BaseController<Invite, String> {
 	@RequestMapping(value="query")
 	@ResponseBody
 	public Map<String, Object> query(@RequestParam int pageno, @RequestParam String muid) {
-//		Pager<Invite> pager = new Pager<Invite>();
-//		pager.setReload(true);
-//		pager.setCurrent(pageno);
-//		Map<String, Object> params = new HashMap<String, Object>();
-//		params.put("mUserId", muid);
-//		Pager<Invite> p = this.getBaseService().findByPager(pager, params);
-//		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
-//		for (Invite invite : p.getData()) {
-//			Map<String, Object> map = new HashMap<String, Object>();
-//			map.put("mUserName", invite.getmUserName());
-//			map.put("photo", invite.getPhoto());
-//			map.put("commission", invite.getCommission());
-//			list.add(map);
-//		}
-//
-//		Map<String, Object> data = new HashMap<String, Object>();
-//		data.put("result", list);
-//		data.put("count", p.getTotal());
-//		data.put("message", "");
-//		data.put("status", 1);
-		String sql = "SELECT m_user_name, photo, ROUND(commission,2) commission,m_user_tel FROM phb_mobile_user b LEFT JOIN ( SELECT from_user, sum(amount) commission FROM phb_muser_account_log WHERE m_user_id = "+muid+" AND account_type = 2 group by from_user ) c ON b.m_user_id = c.from_user WHERE b.parent_id IN ( SELECT m_user_id FROM phb_mobile_user WHERE parent_id = "+muid+" ) OR b.parent_id = "+muid +" and commission>0 ";
+
+		String sql = "SELECT m_user_name, photo, CASE  WHEN commission is null THEN 0.00 ELSE ROUND(commission, 2) END as commission,m_user_tel FROM phb_mobile_user b LEFT JOIN ( SELECT from_user, sum(amount) commission FROM phb_muser_account_log WHERE m_user_id = "+muid+" AND account_type = 2 group by from_user ) c ON b.m_user_id = c.from_user WHERE b.parent_id IN ( SELECT m_user_id FROM phb_mobile_user WHERE parent_id = "+muid+" ) OR b.parent_id = "+muid ;
 		List<Map<String, Object>> result = this.jdbcTemplate.queryForList(sql);
-		sql = "SELECT count(1) FROM phb_mobile_user b LEFT JOIN ( SELECT from_user, sum(amount) commission FROM phb_muser_account_log WHERE m_user_id = "+muid+" AND account_type = 2 group by from_user ) c ON b.m_user_id = c.from_user WHERE b.parent_id IN ( SELECT m_user_id FROM phb_mobile_user WHERE parent_id = "+muid+" ) OR b.parent_id = "+muid +" and commission>0 ";
+		sql = "SELECT count(1) FROM phb_mobile_user b LEFT JOIN ( SELECT from_user, sum(amount) commission FROM phb_muser_account_log WHERE m_user_id = "+muid+" AND account_type = 2 group by from_user ) c ON b.m_user_id = c.from_user WHERE b.parent_id IN ( SELECT m_user_id FROM phb_mobile_user WHERE parent_id = "+muid+" ) OR b.parent_id = "+muid  ;
 		List<Map<String, Object>> count = this.jdbcTemplate.queryForList(sql);
 
 		Map<String, Object> data = new HashMap<String, Object>();
