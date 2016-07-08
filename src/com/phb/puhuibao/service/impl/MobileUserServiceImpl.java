@@ -158,7 +158,8 @@ public class MobileUserServiceImpl extends DefaultBaseService<MobileUser, String
 				AssetProduct product = assetProductDao.unique(params);
 				 double rate = investment.getAnnualizedRate();  // 年利率从用户投资表取
 				double amount = investment.getInvestmentAmount();
-				double everyIncome = Functions.calEveryIncome(amount, rate);
+				double everyIncome =  investment.getDailyIncome();
+				//Functions.calEveryIncome(amount, rate);
 				if (currentTime >= investment.getIncomeDate().getTime()) {
 					todayIncome += everyIncome;
 				}
@@ -212,28 +213,28 @@ public class MobileUserServiceImpl extends DefaultBaseService<MobileUser, String
 			}
 		}
 		
-		params = new HashMap<String, Object>();
-		params.put("mUserId", muid);
-		List<ItemInvestment> itemInvestments = itemInvestmentDao.find(params);
-		for (ItemInvestment investment : itemInvestments) {
-			if (investment.getStatus() >= 2) {
-				//totalIncome += investment.getLastIncome();
-			} else {
-				String itemSN = investment.getItemSN();
-				params = new HashMap<String, Object>();
-				params.put("itemSN", itemSN);
-				LoanItem item = loanItemDao.unique(params);
-				double rate = item.getAnnualizedRate();
-				double amount = investment.getInvestmentAmount();
-				double everyIncome = Functions.calEveryIncome(amount, rate);
-				if (currentTime >= investment.getIncomeDate().getTime()) {
-					todayIncome += everyIncome;
-				}
-				investmentAmount += amount;
-				//totalIncome += amount * rate * item.getPeriod() / 12;
-				totalIncome += Functions.calTotalIncome(amount, rate, item.getPeriod(), 12);
-			}
-		}
+//		params = new HashMap<String, Object>();
+//		params.put("mUserId", muid);
+//		List<ItemInvestment> itemInvestments = itemInvestmentDao.find(params);
+//		for (ItemInvestment investment : itemInvestments) {
+//			if (investment.getStatus() >= 2) {
+//				//totalIncome += investment.getLastIncome();
+//			} else {
+//				String itemSN = investment.getItemSN();
+//				params = new HashMap<String, Object>();
+//				params.put("itemSN", itemSN);
+//				LoanItem item = loanItemDao.unique(params);
+//				double rate = item.getAnnualizedRate();
+//				double amount = investment.getInvestmentAmount();
+//				double everyIncome = Functions.calEveryIncome(amount, rate);
+//				if (currentTime >= investment.getIncomeDate().getTime()) {
+//					todayIncome += everyIncome;
+//				}
+//				investmentAmount += amount;
+//				//totalIncome += amount * rate * item.getPeriod() / 12;
+//				totalIncome += Functions.calTotalIncome(amount, rate, item.getPeriod(), 12);
+//			}
+//		}
 
 		BigDecimal todayIncomeBD = new BigDecimal(todayIncome).setScale(2, RoundingMode.HALF_UP);
 		BigDecimal totalIncomeBD = new BigDecimal(totalIncome).setScale(2, RoundingMode.HALF_UP);

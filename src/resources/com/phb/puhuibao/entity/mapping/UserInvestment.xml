@@ -23,6 +23,8 @@
     <result property="userName" column="m_user_name" jdbcType="VARCHAR" />
     <result property="unit" column="unit" jdbcType="VARCHAR" />
     <result property="annualizedRate" column="annualized_rate" jdbcType="DECIMAL" />
+     <result property="dailyIncome" column="daily_income" jdbcType="DECIMAL" />
+    
     
     
   </resultMap>
@@ -86,7 +88,8 @@
 	income_date,
 	expire_date,
 	total_income,
-	annualized_rate
+	annualized_rate,
+	daily_income
   </sql>
   <sql id="allapplColumnVar">
 	values(
@@ -98,7 +101,9 @@
 			#{incomeDate,jdbcType=DATE},
 			#{expireDate,jdbcType=DATE},
 			#{totalIncome,jdbcType=DECIMAL},
-			#{annualizedRate,jdbcType=DECIMAL}
+			#{annualizedRate,jdbcType=DECIMAL},
+			#{dailyIncome,jdbcType=DECIMAL}
+			
 			
 			
 			
@@ -113,6 +118,7 @@
 	a.last_income,
 	a.status,
 	a.annualized_rate,
+	a.daily_income,
 	b.product_sn,
 	b.product_name,
 	b.guarantee_method,

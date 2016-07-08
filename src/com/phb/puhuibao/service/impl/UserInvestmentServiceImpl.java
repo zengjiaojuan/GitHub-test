@@ -280,7 +280,7 @@ public class UserInvestmentServiceImpl extends DefaultBaseService<UserInvestment
 
 	// 投资  带红包 带加息劵
 	@Override
-	public synchronized void processSave(UserInvestment entity, String redpacketId, AddRate addRate,Double productAnnualizedRate,UserAddrate useraddRate) {
+	public  void processSave(UserInvestment entity, String redpacketId, AddRate addRate,Double productAnnualizedRate,UserAddrate useraddRate) {
 
 		double deductionAmount = 0;
 		
