@@ -21,12 +21,18 @@ public class UserInvestment {
 	private Date lastDate; // 最后一次计息的日期  朗月赢每个月都有一天
 	private Date expireDate;//expire_Date  到期日
 	private Double totalIncome;//total_income  预期总收益
-	
+	private Double dailyIncome;//daily_income
 	private String userName;
 	private String totalIncomeString;
  
 	
  
+	public Double getDailyIncome() {
+		return dailyIncome;
+	}
+	public void setDailyIncome(Double dailyIncome) {
+		this.dailyIncome = dailyIncome;
+	}
 	public String getTotalIncomeString() {
 		return totalIncomeString;
 	}
