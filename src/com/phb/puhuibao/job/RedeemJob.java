@@ -223,11 +223,11 @@ public class RedeemJob {
 			AssetProduct product = assetProductService.unique(params);
 			Date incomeDate = investment.getIncomeDate(); // short date
 			if ((product.getType() == 2)) { // 朗月赢
-				if (investment.getLastDate() == null) {
+				if (investment.getLastDate() == null) {   // 第一个月
 					investment.setLastDate(incomeDate); // short date
 				}
 				Calendar monthCal = Calendar.getInstance();
-				monthCal.setTime(investment.getLastDate());
+				monthCal.setTime(investment.getLastDate());// 获取上次计算利息的日期
 				while (investment.getLastDate().getTime() >= monthCal.getTimeInMillis()) {
 			        if (product.getUnit().equals("天")) {
 			        	monthCal.add(Calendar.DATE, 1);
@@ -235,7 +235,7 @@ public class RedeemJob {
 			        	monthCal.add(Calendar.MONTH, 1);
 			        }
 				}
-		        if (currentTime >= monthCal.getTimeInMillis()) {
+		        if (currentTime >= monthCal.getTimeInMillis()) {//又满了一个月 :  每天把上次计息日期加一个月,如果加完后小于当前时间
 //		        if (year == monthCal.get(Calendar.YEAR) && month == monthCal.get(Calendar.MONTH) && date == monthCal.get(Calendar.DATE)) {
 			        double rate = investment.getAnnualizedRate();
 					double amount = investment.getInvestmentAmount();
@@ -248,12 +248,19 @@ public class RedeemJob {
 			        	//lastIncome = amount * rate / 12;
 			        	factor = 12;
 			        }
-					double lastIncome = Functions.calIncomeByUnit(amount, rate, factor);
+					//double lastIncome = Functions.calIncomeByUnit(amount, rate, factor);
+					 
+					//新的计算累计收益的办法
+					Long incomeTime = incomeDate.getTime();
+					long days=0;
+					if (currentTime > incomeTime) {   // 当前日大于起息日
+						 days = (currentTime - incomeTime) / (24 * 3600 * 1000) + 1;
+					}
+					double lastIncome = investment.getDailyIncome() * days; 
 		        	investment.setLastIncome(lastIncome);
 			        investment.setLastDate(monthCal.getTime());
 					userInvestmentService.monthProcess(investment);
 					MobileUser user = baseMobileUserService.getById(investment.getmUserId() + "");
-					//sendSMSController.sendMonthIncome(investment, user.getmUserTel());
 					
 					 message =  new UserMessage();
 					 message.setmUserId(user.getmUserId());
@@ -276,7 +283,7 @@ public class RedeemJob {
 	        } else {
 	            cal.add(Calendar.DATE, product.getPeriod());
 	        }
-	        if (currentTime < cal.getTimeInMillis()) {
+	        if (currentTime < cal.getTimeInMillis()) {// 已经到期赎回了
 //	        if (year != cal.get(Calendar.YEAR) || month != cal.get(Calendar.MONTH) || date != cal.get(Calendar.DATE)) {
 	        	continue;
 	        }
@@ -335,44 +342,40 @@ public class RedeemJob {
 		params = new HashMap<String, Object>();
 		params.put("status", 1);
 		List<ItemInvestment> itemInvestments = itemInvestmentService.findList(params);
-		for (ItemInvestment investment : itemInvestments) {
-			String itemSN = investment.getItemSN();
-			params = new HashMap<String, Object>();
-			params.put("itemSN", itemSN);
-			LoanItem item = loanItemService.unique(params);
-			Date incomeDate = investment.getIncomeDate();
-			cal = Calendar.getInstance();
-			cal.setTime(incomeDate);
-	        cal.add(Calendar.MONTH, item.getPeriod());
-	        if (currentTime < cal.getTimeInMillis()) {
-//	        if (year != cal.get(Calendar.YEAR) || month != cal.get(Calendar.MONTH) || date != cal.get(Calendar.DATE)) {
-	        	continue;
-	        }
-	        
-	        double rate = item.getAnnualizedRate();
-			long amount = investment.getInvestmentAmount();
-//			double lastIncome = amount * rate * item.getPeriod() / 12;
-//			BigDecimal lastIncomeBD = new BigDecimal(lastIncome).setScale(2, RoundingMode.DOWN);
-//			lastIncome = lastIncomeBD.doubleValue();
-	        double lastIncome = Functions.calTotalIncome(amount, rate, item.getPeriod(), 12);
-			
-			ItemInvestment i = new ItemInvestment();
-			i.setLastIncome(lastIncome);
-			i.setInvestmentId(investment.getInvestmentId());
-			i.setStatus(2); // 投资状态status：募集中0、收益中1、到期赎回2、提前赎回3
-			i.setmUserId(investment.getmUserId());
-			i.setInvestmentAmount(amount);
-			i.setLastDate(new Date());
-			itemInvestmentService.update(i);
-			MobileUser user = baseMobileUserService.getById(investment.getmUserId() + "");
-			i = itemInvestmentService.getById(i.getInvestmentId() + "");
-			//sendSMSController.sendItemIncome(i, user.getmUserTel());
-			
-			 message.setmUserId(user.getmUserId());
-			 message.setTitle("收到本金利息");
-			 message.setContent(new SimpleDateFormat("yyyy年MM月dd日").format(new Date()) + "收到"+i.getItemSN()+"本金利息"+new BigDecimal(i.getInvestmentAmount() + i.getLastIncome()).setScale(2, RoundingMode.HALF_UP)+"元");
-			 userMessageDao.save(message);
-		}
+//		for (ItemInvestment investment : itemInvestments) {
+//			String itemSN = investment.getItemSN();
+//			params = new HashMap<String, Object>();
+//			params.put("itemSN", itemSN);
+//			LoanItem item = loanItemService.unique(params);
+//			Date incomeDate = investment.getIncomeDate();
+//			cal = Calendar.getInstance();
+//			cal.setTime(incomeDate);
+//	        cal.add(Calendar.MONTH, item.getPeriod());
+//	        if (currentTime < cal.getTimeInMillis()) {
+//	        	continue;
+//	        }
+//	        
+//	        double rate = item.getAnnualizedRate();
+//			long amount = investment.getInvestmentAmount();
+//	        double lastIncome = Functions.calTotalIncome(amount, rate, item.getPeriod(), 12);
+//			
+//			ItemInvestment i = new ItemInvestment();
+//			i.setLastIncome(lastIncome);
+//			i.setInvestmentId(investment.getInvestmentId());
+//			i.setStatus(2); // 投资状态status：募集中0、收益中1、到期赎回2、提前赎回3
+//			i.setmUserId(investment.getmUserId());
+//			i.setInvestmentAmount(amount);
+//			i.setLastDate(new Date());
+//			itemInvestmentService.update(i);
+//			MobileUser user = baseMobileUserService.getById(investment.getmUserId() + "");
+//			i = itemInvestmentService.getById(i.getInvestmentId() + "");
+//			//sendSMSController.sendItemIncome(i, user.getmUserTel());
+//			
+//			 message.setmUserId(user.getmUserId());
+//			 message.setTitle("收到本金利息");
+//			 message.setContent(new SimpleDateFormat("yyyy年MM月dd日").format(new Date()) + "收到"+i.getItemSN()+"本金利息"+new BigDecimal(i.getInvestmentAmount() + i.getLastIncome()).setScale(2, RoundingMode.HALF_UP)+"元");
+//			 userMessageDao.save(message);
+//		}
 		
 		// 到期结清
 		params = new HashMap<String, Object>();
@@ -389,19 +392,19 @@ public class RedeemJob {
 			}
 		}
 
-		params = new HashMap<String, Object>();
-		params.put("status", 2); // 回款中
-		List<LoanItem> items = loanItemService.findList(params);
-		for (LoanItem item : items) {
-			params = new HashMap<String, Object>();
-			params.put("itemSN", item.getItemSN());
-			params.put("status", 1);
-			itemInvestments = itemInvestmentService.findList(params);
-			if (itemInvestments.size() == 0) {
-				item.setStatus(3);
-				loanItemService.update(item);
-			}
-		}
+//		params = new HashMap<String, Object>();
+//		params.put("status", 2); // 回款中
+//		List<LoanItem> items = loanItemService.findList(params);
+//		for (LoanItem item : items) {
+//			params = new HashMap<String, Object>();
+//			params.put("itemSN", item.getItemSN());
+//			params.put("status", 1);
+//			itemInvestments = itemInvestmentService.findList(params);
+//			if (itemInvestments.size() == 0) {
+//				item.setStatus(3);
+//				loanItemService.update(item);
+//			}
+//		}
 
 		params = new HashMap<String, Object>();
 		params.put("status", 1); // 一直是抢购状态
@@ -415,16 +418,13 @@ public class RedeemJob {
 			cal = Calendar.getInstance();
 			cal.setTime(incomeDate);
 	        cal.add(Calendar.DATE, product.getPeriod());
-	        if (currentTime < cal.getTimeInMillis()) {
-//	        if (year != cal.get(Calendar.YEAR) || month != cal.get(Calendar.MONTH) || date != cal.get(Calendar.DATE)) {
+	        if (currentTime < cal.getTimeInMillis()) { // 还没有到期
 	        	continue;
 	        }
 
+	        //到结算日了
 	        double rate = investment.getAnnualizedRate();
 			double amount = investment.getInvestmentAmount();
-//	        double lastIncome = amount * rate * product.getPeriod() / 365;
-//			BigDecimal lastIncomeBD = new BigDecimal(lastIncome).setScale(2, RoundingMode.DOWN);
-//			lastIncome = lastIncomeBD.doubleValue();
 	        double lastIncome = Functions.calTotalIncome(amount, rate, product.getPeriod(), 365);
 	        
 	        ExperienceInvestment i = new ExperienceInvestment();
@@ -432,7 +432,6 @@ public class RedeemJob {
 			i.setLastIncome(lastIncome);
 			i.setStatus(2); // 投资状态status：募集中0、收益中1、到期赎回2、提前赎回3
 			i.setmUserId(investment.getmUserId());
-			//i.setInvestmentAmount(investment.getInvestmentAmount());
 			experienceInvestmentService.update(i);
 			MobileUser user = baseMobileUserService.getById(investment.getmUserId() + "");
 			i = experienceInvestmentService.getById(i.getInvestmentId() + "");
