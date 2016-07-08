@@ -154,8 +154,13 @@ public class UserAccountController extends BaseController<UserAccount, String> {
 			data.put("status", 0);
 			return data;
 		}
-
-		if (user.getmUserMoney() - user.getFrozenMoney() < amount) {
+		
+		// double 转 string, 再转 bigdecimal, 这样进行计算才不会导致精度损失
+		BigDecimal usermobey = new BigDecimal(user.getmUserMoney().toString()); 
+		BigDecimal frozenmoney = new BigDecimal(user.getFrozenMoney().toString()); 
+		double avaible =   usermobey.subtract(frozenmoney).doubleValue(); 
+	 
+		if (avaible < amount) {
 			data.put("message", "用户余额不足！");
 			data.put("status", 0);
 			return data;
