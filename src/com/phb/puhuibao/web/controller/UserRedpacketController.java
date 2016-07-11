@@ -67,7 +67,7 @@ public class UserRedpacketController extends BaseController<UserRedpacket, Strin
 		Map<String,Object> params = new HashMap<String,Object>();
 		params.put("mUserId", muid);
 		params.put("status", 1);
-		params.put("glastDate", new Date());
+	 
 		List<UserRedpacket> result = this.getBaseService().findList(params);
 		Map<String, Object> data = new HashMap<String, Object>();
  
