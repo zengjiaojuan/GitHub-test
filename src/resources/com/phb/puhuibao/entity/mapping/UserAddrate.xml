@@ -91,7 +91,7 @@
 				</if>
 				
 				<if test="rateStatus !=null">
-					AND m.rate_status in  (${rateStatus})  
+					AND m.rate_status  = #{rateStatus}   
 				</if>
 				 
 			</trim>
