@@ -40,6 +40,8 @@ import com.phb.puhuibao.service.UserInvestmentService;
 public class UserInvestmentController extends BaseController<UserInvestment, String> {
 	private static final Log log = LogFactory.getLog(UserInvestmentController.class);
 	
+	private static String lock = "lock";
+	
 	@Resource(name = "appContext")
 	private AppContext appContext;
 
@@ -272,7 +274,7 @@ public class UserInvestmentController extends BaseController<UserInvestment, Str
 	public Map<String, Object> save(@RequestParam String muid, @RequestParam String bidSN, @RequestParam long investmentAmount,  String redpacketId, String addRateId) {
 		
 		//String 维护一个字符串池。 当调用 intern 方法时，如果池已经包含一个等于此 String 对象的字符串（该对象由 equals(Object) 方法确定），则返回池中的字符串。可见，当String相同时，String.intern()总是返回同一个对象，因此就实现了对同一用户加锁。由于锁的粒度局限于具体用户，使系统获得了最大程度的并发。
-		synchronized(muid.intern()) { 
+		synchronized(lock) { 
 			
 			Map<String, Object> data = new HashMap<String, Object>();
 			Map<String, Object> params = new HashMap<String, Object>();
