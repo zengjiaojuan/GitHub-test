@@ -78,7 +78,7 @@ public class UserAddrateController extends BaseController<UserAddrate, String> {
 		
 		Map<String,Object> params = new HashMap<String,Object>();
 		params.put("muserId", muid);
-		params.put("status", 1);
+		params.put("rateStatus", 1);
 		params.put("orderBy", "m.last_date desc");
 		
 		Map<String, Object> data = new HashMap<String, Object>();
