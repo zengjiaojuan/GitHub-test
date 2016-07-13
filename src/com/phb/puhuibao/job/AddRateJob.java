@@ -6,7 +6,6 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import com.idp.pub.service.IBaseService;
@@ -30,7 +29,7 @@ public class AddRateJob {
 	//@Scheduled(cron="0 0 23 * * ?")
     public void process() {
 		try {
-			String sql = "select record_id from phb_muser_addrate t where   date(t.last_date) =  curdate() and t.rate_status =1";
+			String sql = "select record_id from phb_muser_addrate t where   date(t.last_date) <=   curdate() and t.rate_status =1";
 			List<Map<String, Object>> l = this.jdbcTemplate.queryForList(sql);
 			UserAddrate addrate = new UserAddrate();
 			 int recordid;

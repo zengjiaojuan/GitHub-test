@@ -30,7 +30,7 @@ public class RedPacketJob {
 	@Scheduled(cron="0 0 23 * * ?")
     public void process() {
 		try {
-			String sql = "select  t.redpacket_id  from phb_muser_redpacket t where   date(t.last_date) =  curdate() and t.status =1";
+			String sql = "select  t.redpacket_id  from phb_muser_redpacket t where   date(t.last_date) <=   curdate() and t.status =1";
 			List<Map<String, Object>> l = this.jdbcTemplate.queryForList(sql);
 			UserRedpacket red = new UserRedpacket();
 			 int redid;
