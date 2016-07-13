@@ -1,0 +1,25 @@
+*{border: none;margin: 0;}
+.section-main{background: url(../img/register_background.png); background-size:cover ;height: 11.6rem;}
+.section-sec{background: url(../img/second.png);background-size: cover;height: 16.5rem;}
+.remark{padding-top: 3.8rem;color: rgb(240,240,240);text-align: center;font-size:.24rem ;line-height: .4rem;}
+.reg-box{padding:.25rem;margin-top:.02rem ;line-height: .2rem;list-style: none;}
+.reg-item{width:100%;margin-bottom:.2rem;padding:.02rem 0 .15rem 0;background:rgba(255,255,255,0.08) ;border:solid 1px #c8a556;border-radius: .1rem;}
+.reg-item .label{padding-left:.18rem;padding-right:0 rem;font-size:.3rem;color: rgb(240,240,240);}
+.reg-input{height:100%;font-size:.28rem;padding-left:.0rem;border:none;background:rgba(255,255,255,0.01);}
+.btn-next{width:100%;height:.8rem;line-height:.8rem;text-align:center;font-size:.34rem;color:#383838;background:rgb(215,203,176);margin-top:.3rem;border-radius: .4rem;
+    cursor:pointer;}
+.btn-next:active{background:rgb(215,203,176);border-radius: .4rem;}
+.get-code{margin-bottom: .2rem;}
+.get-code .label{border-left:solid 1px #d7d7d7;border-right:0;min-width:1.88rem;margin-left:.2rem;}
+.text-code{border: none;padding-left:.18rem;padding-right:0 rem;font-size:.3rem;color: rgb(240,240,240);}
+.code-input{padding-left:.18rem;width:2.3rem ;}
+#reg-pwd{width: 3.5rem;}
+.reg-invite,.reg-invite-code{height:.5rem;padding-top: .01rem;margin-bottom: 0.02rem;}
+.reg-invite-code{color: rgb(240,240,240);font-size: .29rem;}
+.notice{text-align: left;color: rgb(240,240,240);font-size:.2rem ;line-height: .3rem;margin-top: 0.03rem;padding-top: ;}
+.reg-regiNotice{margin-top: .2rem; text-align: center;color: rgb(240,240,240);font-size: .24rem;}
+.registerAgreement{text-decoration: none;color: #C8A556;}
+.img-down{margin-top: .2rem; text-align: center;}
+.mobilePhone,.amount{color: #C8A556;}
+
+

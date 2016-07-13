@@ -1,0 +1,124 @@
+/****-globals-功能: 重设浏览器默认样式****/
+
+/* 防止用户自定义背景颜色对网页的影响，添加让用户可以自定义字体 */
+* { -webkit-box-sizing: border-box; box-sizing: border-box; }
+body, html { overflow: hidden; width: 100%; max-width: 768px; height: 100%; margin: 0 auto; color: #494949;
+    background-color: #f2f2f2; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+ul, li { list-style: none; }
+
+/*中文：微软雅黑，英文：Helevetica*/
+body { font-family: 'Microsoft YaHei', '微软雅黑', HELVETICA; position: relative; font-size:16px;}
+
+/* 内外边距通常让各个浏览器样式的表现位置不同 */
+body, dl, dt, dd, ul, ol, li, h1, h2, h3, h4, h5, h6, pre, code, form, fieldset, legend, input, textarea, p, blockquote, th, td, hr, button, article, aside, details, figcaption, figure, footer, header, menu, nav, section { margin: 0; padding: 0; }
+
+/* 重设 HTML5 标签, IE 需要在 js 中 createElement(TAG) */
+article, aside, details, figcaption, figure, footer, header, menu, nav, section { display: block; }
+a, input { outline: none; }
+
+/* 去掉各Table  cell 的边距并让其边重合 */
+table { border-spacing: 0; border-collapse: collapse; }
+label { display: block; }
+
+/* IE bug fixed: th 不继承 text-align*/
+th { text-align: inherit; }
+
+/* 去除默认边框 */
+fieldset, img { border: 0; }
+
+/* ie6 7 8(q) bug 显示为行内表现 */
+iframe { display: block; }
+
+/* 去掉 firefox 下此元素的边框 */
+abbr, acronym { font-variant: normal; border: 0; }
+address, caption, cite, code, dfn, em, th, var { font-weight: 500; font-style: normal; }
+
+/* 去掉列表前的标识, li 会继承 */
+ol, ul { list-style: none; }
+
+/* 对齐是排版最重要的因素, 别让什么都居中 */
+caption, th { text-align: left; }
+
+/* 标题都自定义, 适应多个系统应用 */
+h1, h2, h3, h4, h5, h6 { font-size: 100%; font-weight: 500; }
+select { vertical-align: middle; }
+input, select, textarea { -webkit-appearance: none; }
+* { -webkit-tap-highlight-color: rgba(0, 0, 0, 0); -webkit-focus-ring-color: rgba(0, 0, 0, 0); }
+input::-webkit-input-placeholder, textarea::-webkit-input-placeholder { color: #999; }
+
+/*链接颜色*/
+a { text-decoration: none; color: #494949; }
+a:visited{color:#333;}
+/* 清理浮动 */
+.clear { line-height: 0; display: block; clear: both; overflow: hidden; height: 0; }
+.clearfix:after { font-size: 0; line-height: 0; display: block; visibility: hidden; clear: both; height: 0; content: ''; }
+.clearfix { zoom: 1; }
+.cbo { clear: both; overflow: hidden; }
+
+.fl { float: left; }
+.fr { float: right; }
+
+/*对齐方式*/
+.tl { text-align: left; }
+.tc { text-align: center; }
+.tr { text-align: right; }
+.tj{text-align: justify;}
+.cp { cursor: pointer; }
+.center { position: absolute; top: 50%; left: 50%; -webkit-transform: translate3d(-50%, -50%, 0); transform: translate3d(-50%, -50%, 0); }
+.centerX { position: absolute; left: 50%; -webkit-transform: translate3d(-50%, 0, 0); transform: translate3d(-50%, 0, 0); }
+.centerY { position: absolute; top: 50%; -webkit-transform: translate3d(0, -50%, 0); transform: translate3d(0, -50%, 0); }
+
+/*加粗*/
+.bold{font-weight: bold;}
+
+/*颜色*/
+.bg-w{ background: #fff; }
+
+/*首页头部*/
+.index-head {
+    height:.78rem;line-height:.78rem; position: relative;
+    background: #f8f8f8;border-bottom:solid 2px #e7e7e7;
+    font-size:.34rem;
+}
+.index-head .icon-back { position: absolute; top:.09rem; left: .05rem; width: .6rem; height:.6rem;
+    background: url(../img/icon/goback.png) no-repeat center; background-size: contain; }
+.index-page { position: absolute; top: 0; display: -webkit-box; display: flex; overflow: hidden;
+    flex-direction: column; width: 100%;  height: 100%; -webkit-box-orient: vertical; }
+/*.section-main { overflow: hidden; -webkit-box-flex: 1; flex: 1; }*/
+
+/*显示隐藏*/
+.db { display: block; }
+.dn { display: none!important; }
+.vv { visibility: visible; }
+.vh { visibility: hidden; }
+
+/*定位*/
+.pr { position: relative; }
+.pa { position: absolute; }
+.pf { position: fixed; }
+.ps { position: static; }
+
+/*弹性盒*/
+.box-parent{ display: -webkit-box; display: flex; }
+.box-child{ -webkit-box-flex: 1; flex: 1; }
+/*边框*/
+.be8-b{border-bottom: solid 1px #e8e8e8;}
+.be8-t{border-top: solid 1px #e8e8e8;}
+
+
+.f24 { font-size: .24rem; }
+.f26 { font-size: .26rem; }
+.f28 { font-size: .28rem; }
+.f30 { font-size: .30rem; }
+.f32 { font-size: .32rem; }
+.f34 { font-size: .34rem; }
+
+.c-49{color:#494949;}
+.c-89{color:#898989;}
+.c-red{color:#ff635b;}
+
+.warning{color:#ff635b;text-align:center;font-size:.28rem;line-height:.6rem;height:.6rem;}
+
+
+
+
