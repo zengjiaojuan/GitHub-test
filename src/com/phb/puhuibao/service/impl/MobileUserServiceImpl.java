@@ -36,6 +36,7 @@ import com.phb.puhuibao.common.InitListener;
 import com.phb.puhuibao.entity.AssetProduct;
 import com.phb.puhuibao.entity.ExperienceInvestment;
 import com.phb.puhuibao.entity.ExperienceProduct;
+import com.phb.puhuibao.entity.Invite;
 import com.phb.puhuibao.entity.ItemInvestment;
 import com.phb.puhuibao.entity.LoanItem;
 import com.phb.puhuibao.entity.MobileUser;
@@ -77,6 +78,8 @@ public class MobileUserServiceImpl extends DefaultBaseService<MobileUser, String
 	private IBaseDao<ExperienceInvestment, String> experienceInvestmentDao;
 	@Resource(name = "userRedpacketDao")
 	private IBaseDao<UserRedpacket, String> userRedpacketDao;
+	@Resource(name = "inviteDao")
+	private IBaseDao<Invite, String> InviteDao;
 	@Resource(name = "jdbcTemplate")
 	private JdbcTemplate jdbcTemplate;
 	@Resource(name = "appContext")
@@ -408,6 +411,16 @@ public  String getMobileLocation(String tel) {
  
 }
 	
+private String createRandom(int length) {
+	String retStr = "";
+	String strTable = "abcdefghijkmnpqrstuvwxyz";
+	int len = strTable.length();
+	for (int i = 0; i < length; i++) {
+		int intR = (int) (Math.random() * len);
+		retStr += strTable.charAt(intR);
+	}
+	return retStr;
+}
 
 	@Override
 	public MobileUser userCreate(MobileUser entity) {
@@ -421,6 +434,32 @@ public  String getMobileLocation(String tel) {
 		userSessionDao.save(us);
 		
 		InitListener.sessionhash.put(entity.getmUserId(), sessionid);// 用户注册的时候把这个用户的随机数 在内存和数据库葛存一分
+		
+		
+		
+		
+		//生成用户的邀请码
+		String code = createRandom(4);
+		Map<String, Object> params = new HashMap<String, Object>();
+		params = new HashMap<String, Object>();
+		params.put("code", code);
+		Invite result = InviteDao.unique(params);
+		while (result != null) {
+			code = createRandom(4);
+			params = new HashMap<String,Object>();
+			params.put("code", code);
+			result = InviteDao.unique(params);
+		}
+
+		Invite invite = new Invite();
+		invite.setCode(code);
+		invite.setmUserId(entity.getmUserId());
+		Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.DATE, 10);
+        invite.setLastDate(cal.getTime());
+        InviteDao.save(invite);
+        
+        
 		
 		String provinceandcity = getMobileLocation(entity.getmUserTel());
 		if( !StringUtil.isBlank(provinceandcity) && provinceandcity.indexOf(",")>0){ // 正确获取了用户的省市信息
