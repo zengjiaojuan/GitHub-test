@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -67,6 +68,7 @@ public class MobileUserController extends BaseController<MobileUser, String> {
 	@Resource(name = "mobileUserService")
 	private MobileUserService mobileUserService;
  
+ 
 	@Resource(name = "userSessionService")
 	private IBaseService<UserSession, String> userSessionService;
   
@@ -105,6 +107,75 @@ public class MobileUserController extends BaseController<MobileUser, String> {
 		return data;
 	}
 	
+	
+	
+	@RequestMapping(value="shareApp")
+	@ResponseBody
+	public Map<String, Object> shareApp(@RequestParam int muid) {
+		Map<String, Object> data = new HashMap<String, Object>();
+		Map<String,Object> params=new HashMap<String,Object>();
+		params.put("mUserId", muid);
+		MobileUser muser = this.getBaseService().unique(params);
+		if (muser == null) {
+			data.put("message", "该用户不存在！");
+			data.put("status", 0);
+		}  else {
+			String invitecode = getInviteCode(muid);
+			 
+			StringBuffer url = new StringBuffer(); //localhost:8080/lcb/register/reg.html?tel=13811855184&invitecode=rtxv&amount=30
+			String ipandport = commons.getAddrServerIp();
+			url.append("http://").append(ipandport).append("/lcb/register/reg.html?tel=").append(muser.getmUserTel()).append("&invitecode=").append(invitecode).append("&amount=20");
+			
+			data.put("des", "金朗理财邀请您财富之旅");
+			data.put("url", url.toString());
+			data.put("message", "成功");
+			data.put("status", 1);
+		}
+		return data;
+	}	
+	
+	private String createRandom(int length) {
+		String retStr = "";
+		String strTable = "abcdefghijkmnpqrstuvwxyz";
+		int len = strTable.length();
+		for (int i = 0; i < length; i++) {
+			int intR = (int) (Math.random() * len);
+			retStr += strTable.charAt(intR);
+		}
+		return retStr;
+	}
+	public String getInviteCode( int muid) {
+	 
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("mUserId", muid);
+		Invite entity = inviteService.unique(params);
+		if (entity == null) {
+			String code = createRandom(4);
+			params = new HashMap<String, Object>();
+			params.put("code", code);
+			Invite result = inviteService.unique(params);
+			while (result != null) {
+				code = createRandom(4);
+				params = new HashMap<String,Object>();
+				params.put("code", code);
+				result = inviteService.unique(params);
+			}
+	
+			entity = new Invite();
+			entity.setCode(code);
+			entity.setmUserId(muid);
+			Calendar cal = Calendar.getInstance();
+	        cal.add(Calendar.DATE, 10);
+	        entity.setLastDate(cal.getTime());
+			 inviteService.save(entity);
+			 
+		}
+
+		params = new HashMap<String, Object>();
+		params.put("mUserId", muid);
+		Invite i = inviteService.unique(params);
+		return i.getCode();
+	}
 	
 	
  //http://localhost:8080/lcb/userInformation/mobileLoginForIOS.shtml?mUserTel=18612499030&mUserPwd=BlhPzCj2YA9M2zGlFyqeqQ==&signature=c1bc53c77324069f0f949d23e710838d&timestamp=1427373821045

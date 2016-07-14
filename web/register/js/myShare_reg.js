@@ -1,7 +1,8 @@
 
 $(document).ready(function(){
-//设置页面上显示的 分享者的电话号码 红包钱数 邀请码
-setHostInfo();
+	
+	setTelAndInviteCode();
+ 
 // 点击 获取验证码
  $("#get-reg-code").click(function getRegCode () {
  	   var phoneNum =  $("#reg-tel").val();
@@ -34,13 +35,35 @@ setHostInfo();
     }
    });
 });
+
+//设置页面显示的 好友电话号码 红包钱数 邀请码
+function setTelAndInviteCode(){
+	var urlInfo=window.location.href;  
+	var argsIndex=urlInfo.indexOf("?");  
+	var args=urlInfo.substring((argsIndex+1)).split("&");  
+	var argsInfo="";  
+	var argResult = "";
+	var tel = "";
+	var code ="";
+	var amount="";
+	
+	var telarg =args[0].split("=");
+	var codearg=args[1].split("=");
+	var amountarg=args[2].split("=");
+	tel = telarg[1];
+	code= codearg[1];
+	amount = amountarg[1];
  
- //设置页面显示的 好友电话号码 红包钱数 邀请码
-   function setHostInfo(){
-  	 $("#reg-inviteWords").text("idyk");
-  	 $("#reg-inviteWords").val("idyk");
-  	 
-  }
+	 $("#reg-inviteWords").text(code);
+	 $("#reg-phone").text(tel);
+	 $("#reg-amount").text(amount);
+	 
+	 
+}
+
+
+ 
+ 
   function judgeRegOrNot () {
    	console.log("发送ajax,判断此号码是否注册过");
    	 $.ajax({
