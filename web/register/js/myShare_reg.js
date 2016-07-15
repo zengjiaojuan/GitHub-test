@@ -124,15 +124,6 @@ function setTelAndInviteCode(){
 
  //注册ajax
   function regAjax() {
-//      var data = {
-//          "mUserTel": $("#reg-tel").val(),
-//          "mUserPwd": $("#reg-pwd").val(),
-//          "inviteCode": $("#reg-code").val()
-
-//var url = getPartyUrl() + "party_order.html?partyitemname=" + escape($orderValue) 
-//					+ "&partyitemid=" + $partyitemid + "&partyorderprice=" + $orderprice + "&partyallprice=" + $allprice
-//					+ "&source=" + $_GET["source"];
-//      };
         $.ajax({
             type: "POST",
             url: "http://182.92.179.84:81/lcb/userInformation/saveMobileUserForIOS.shtml?mUserTel="+ $("#reg-tel").val()+"&mUserPwd="+$("#reg-pwd").val()+"&inviteCode="+ $("#reg-inviteWords").val()+"&signature=c1bc53c77324069f0f949d23e710838d&timestamp=1427373821045",
@@ -145,6 +136,8 @@ function setTelAndInviteCode(){
             		alert("您输入的邀请码错误！");
             	} else if (result.status == 1){
             		alert("恭喜您注册成功");
+            		//进入下载界面
+            		window.location.href ="http://182.92.179.84:81/lcb/share.html";
             	}else{
             		alert(result.message);
             	}
