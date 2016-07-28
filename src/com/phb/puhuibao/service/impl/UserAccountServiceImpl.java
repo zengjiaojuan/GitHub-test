@@ -122,7 +122,7 @@ public class UserAccountServiceImpl extends DefaultBaseService<UserAccount, Stri
 			log.setmUserId(entity.getmUserId());
 			log.setAmount(entity.getAmount());
 			log.setBalanceAmount(u.getmUserMoney() - user.getFrozenMoney());
-			log.setChangeType("提现冻结");
+			log.setChangeType("提现中");
 			log.setChangeDesc(entity.getUserNote());
 			log.setAccountType(8);
 			userAccountLogDao.save(log);

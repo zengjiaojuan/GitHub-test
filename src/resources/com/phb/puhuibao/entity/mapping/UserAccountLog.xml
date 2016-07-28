@@ -80,6 +80,10 @@
 		<if test="accountType != null">
 			AND account_type = #{accountType}
 		</if>
+		<if test="accountTypeString != null">
+			AND account_type  in (${accountTypeString})
+		</if>
+		
 		<if test="gecreateTime != null">
 			AND create_time <![CDATA[>=]]> #{gecreateTime}
 		</if>

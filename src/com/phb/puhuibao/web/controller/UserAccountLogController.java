@@ -33,7 +33,8 @@ public class UserAccountLogController extends BaseController<UserAccountLog, Str
 	 */
 	@RequestMapping(value="pageQuery")
 	@ResponseBody
-	public Map<String, Object> pageQuery(@RequestParam int pageno, @RequestParam String muid, Integer type) {
+	public Map<String, Object> pageQuery(@RequestParam int pageno, @RequestParam String muid, String type) {
+		// 提现  0,8
 		Pager<UserAccountLog> pager = new Pager<UserAccountLog>();
 		pager.setReload(true);
 		pager.setCurrent(pageno);
@@ -42,7 +43,10 @@ public class UserAccountLogController extends BaseController<UserAccountLog, Str
 		map.put("mUserId", muid);
 		map.put("orderBy", "create_time");
 		map.put("order", "desc");
-		map.put("accountType", type);
+		//map.put("accountType", type);
+		map.put("accountTypeString", type);
+		//0: 提现 1:充值   2: 下线投资提成 3:理财体验收益 4:投资 5:红包抵资 6:投资收益 7:投资赎回 8:提现中 
+		//9:提现取消 10:退款完成等待入账 11:授信贷款 12授信贷款月息 13:授信贷款还本 14:投资平仓 15:贷款平仓
 		Pager<UserAccountLog> p=this.getBaseService().findByPager(pager, map);
 		Map<String, Object> data = new HashMap<String, Object>();
 		
