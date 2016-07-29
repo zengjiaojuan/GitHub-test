@@ -301,7 +301,9 @@ public class MobileUserServiceImpl extends DefaultBaseService<MobileUser, String
 		result.put("investmentList", investmentMap);
 		BigDecimal balanceAmountBD = new BigDecimal(user.getmUserMoney() - user.getFrozenMoney()).setScale(2, RoundingMode.HALF_UP);
 		result.put("balance", balanceAmountBD.toString());
-		result.put("frozenMoney", user.getFrozenMoney().toString());
+		//处理冻结资金的精度丢失问题 下一行代码
+		BigDecimal frozenMoneyBD = new BigDecimal(user.getFrozenMoney()).setScale(2, RoundingMode.HALF_UP);
+		result.put("frozenMoney", frozenMoneyBD.toString());
 		result.put("creditLoan", creditLoan);
 		return result;
 	}
