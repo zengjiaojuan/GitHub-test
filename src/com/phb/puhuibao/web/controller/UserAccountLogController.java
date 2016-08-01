@@ -1,5 +1,7 @@
 package com.phb.puhuibao.web.controller;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,13 +53,19 @@ public class UserAccountLogController extends BaseController<UserAccountLog, Str
 		Map<String, Object> data = new HashMap<String, Object>();
 		
 		List<UserAccountLog> result = p.getData();
-		for(UserAccountLog log:result){
+		  for(UserAccountLog log:result){
 			if(log.getAccountType() == 1 || log.getAccountType() == 2 || log.getAccountType() ==  3 || log.getAccountType() == 6 || log.getAccountType() == 9 || log.getAccountType() == 14){
-				log.setFlagAmount("+"+log.getAmount());
+				//处理提现冻结 精度丢失问题 
+				BigDecimal amountDB = new BigDecimal(log.getAmount()).setScale(2, RoundingMode.HALF_UP);
+				log.setFlagAmount(""+amountDB);
 			}else if(log.getAccountType() == 0 || log.getAccountType() == 4 || log.getAccountType() == 10 || log.getAccountType() == 11 || log.getAccountType() == 12 || log.getAccountType() == 13 || log.getAccountType() == 15 || log.getAccountType() == 8){
-				log.setFlagAmount(""+log.getAmount());
+				//处理提现冻结 精度丢失问题 
+				BigDecimal amountDB = new BigDecimal(log.getAmount()).setScale(2, RoundingMode.HALF_UP);
+				log.setFlagAmount(""+amountDB);
 			}else if(log.getAccountType() ==  5 || log.getAccountType() == 7){
-				log.setFlagAmount(""+log.getAmount());
+				//处理提现冻结 精度丢失问题 
+				BigDecimal amountDB = new BigDecimal(log.getAmount()).setScale(2, RoundingMode.HALF_UP);
+				log.setFlagAmount(""+amountDB);
 			}
 		}
 		
