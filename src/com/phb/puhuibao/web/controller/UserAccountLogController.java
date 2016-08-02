@@ -8,6 +8,7 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
+import org.jsoup.helper.StringUtil;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -46,7 +47,10 @@ public class UserAccountLogController extends BaseController<UserAccountLog, Str
 		map.put("orderBy", "create_time");
 		map.put("order", "desc");
 		//map.put("accountType", type);
-		map.put("accountTypeString", type);
+		if(!StringUtil.isBlank(type)){
+			map.put("accountTypeString", type);
+		}
+		
 		//0: 提现 1:充值   2: 下线投资提成 3:理财体验收益 4:投资 5:红包抵资 6:投资收益 7:投资赎回 8:提现中 
 		//9:提现取消 10:退款完成等待入账 11:授信贷款 12授信贷款月息 13:授信贷款还本 14:投资平仓 15:贷款平仓
 		Pager<UserAccountLog> p=this.getBaseService().findByPager(pager, map);
