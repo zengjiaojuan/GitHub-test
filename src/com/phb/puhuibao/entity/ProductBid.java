@@ -11,11 +11,18 @@ public class ProductBid implements Serializable {
 	private Integer bidId;
 	private String bidSN; // 编号
 	private String productSN; // 编号
+	private String productName;
 	private Date startDate; // 加入期
 	private Date endDate; // 到期日
 	private Long currentAmount; // 已投资额度
 	private Long totalAmount; // 总投资额度
 	private Integer status; // 投资状态
+	public String getProductName() {
+		return productName;
+	}
+	public void setProductName(String productName) {
+		this.productName = productName;
+	}
 	private Integer type; // 产品类似
 	
 	public Integer getType() {

@@ -18,6 +18,7 @@
             <th width="40">序号</th>
             <th width="100">发标编号</th>
             <th width="80">产品编号</th>
+            <th width="80">产品名称</th>
             <th>起始日期</th>
             <th>结束日期</th>
             <th>已募资金</th>
@@ -31,6 +32,7 @@
             <td>{{current*limit+$index+1}}</td>
             <td>{{item.bidSN}}</td>
             <td>{{item.productSN}}</td>
+             <td>{{item.productName}}</td>
             <td>{{item.startDate|date:'yyyy-MM-dd'}}</td>
             <td>{{item.endDate|date:'yyyy-MM-dd'}}</td>
             <td>{{item.currentAmount}}</td>

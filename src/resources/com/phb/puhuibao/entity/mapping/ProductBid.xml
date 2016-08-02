@@ -8,6 +8,8 @@
     <id property="bidId" column="bid_id" jdbcType="INTEGER" />
     <result property="bidSN" column="bid_sn" jdbcType="VARCHAR"/>
     <result property="productSN" column="product_sn" jdbcType="VARCHAR"/>
+    <result property="productName" column="product_name" jdbcType="VARCHAR"/>
+    
     <result property="startDate" column="start_date" jdbcType="DATE"/>
     <result property="endDate" column="end_date" jdbcType="DATE"/>
     <result property="currentAmount" column="current_amount" jdbcType="BIGINT"/>
@@ -89,6 +91,7 @@
   <sql id="allColumn">
     a.bid_id,
     a.bid_sn,
+    b.product_name,
     a.product_sn,
     a.start_date,
     a.end_date,
@@ -101,6 +104,7 @@
  <sql id="allColumnwithalertflag">
     a.bid_id,
     a.bid_sn,
+    b.product_name,
     a.product_sn,
     a.start_date,
     a.end_date,
