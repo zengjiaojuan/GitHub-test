@@ -27,7 +27,7 @@ public class RedPacketJob {
 	private JdbcTemplate jdbcTemplate;
 
 	 
-	@Scheduled(cron="0 0 23 * * ?")
+	@Scheduled(cron="0 10 23 * * *")
     public void process() {
 		try {
 			String sql = "select  t.redpacket_id  from phb_muser_redpacket t where   date(t.last_date) <=   curdate() and t.status =1";
