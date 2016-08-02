@@ -13,6 +13,7 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.UUID;
 
+import javax.annotation.Resource;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -33,6 +34,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.idap.web.common.controller.Commons;
 import com.idp.pub.constants.Constants;
 import com.idp.pub.context.AppContext;
 import com.idp.pub.entity.Pager;
@@ -100,6 +102,9 @@ public class UserAccountController extends BaseController<UserAccount, String> {
  
 	@javax.annotation.Resource(name = "userCardService")
 	private IBaseService<UserCard, String> userCardService;
+	
+	@Resource(name = "commons")
+	private Commons commons;
 
 	/**
 	 * 翻页
@@ -631,7 +636,7 @@ public class UserAccountController extends BaseController<UserAccount, String> {
 		return results;
 	}
 	
-	// llpay 回调函数
+	// llpay 充值回调函数    2016-08-02 王威
 	@RequestMapping(value="notify")
 	@ResponseBody
 	public void notify(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -719,7 +724,7 @@ public class UserAccountController extends BaseController<UserAccount, String> {
 	}
 	
 	/**
-	 * 提现
+	 * 提现  后台点击提现   2016-08-02 王威
 	 * @param muid
 	 * @param amount
 	 * @return
@@ -744,7 +749,10 @@ public class UserAccountController extends BaseController<UserAccount, String> {
 		MobileUser user = mobileUserService.getById("" + muid);
         reqBean.setAcct_name(user.getmUserName());
         reqBean.setInfo_order("提现");
-        reqBean.setNotify_url(ServerURLConfig.WITHDRAW_NOTIFY_URL);
+        String ipandport = commons.getAddrServerIp();
+        StringBuffer url = new StringBuffer(); // "http://101.200.82.182:7001/lcb/userAccount/withdrawNotify.shtml"
+        url.append("http://").append(ipandport).append("/lcb/userAccount/withdrawNotify.shtml");
+        reqBean.setNotify_url(url.toString());
         reqBean.setApi_version(PartnerConfig.VERSION);
         reqBean.setPrcptcd(card.getPrcptcd());
         String sign = LLPayUtil.addSign(JSON.parseObject(JSON.toJSONString(reqBean)), PartnerConfig.TRADER_PRI_KEY);
@@ -763,7 +771,7 @@ public class UserAccountController extends BaseController<UserAccount, String> {
 		return data;
 	}
 	
-	// withdraw notify
+	//withdrawNotify 连连支付提现回调  2016-08-02  王威
 	@RequestMapping(value="withdrawNotify")
 	@ResponseBody
 	public void withdrawNotify(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
