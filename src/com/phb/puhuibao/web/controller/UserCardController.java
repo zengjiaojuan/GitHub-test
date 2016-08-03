@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.alibaba.fastjson.JSONObject;
+import com.idap.web.common.controller.Commons;
 //import com.alibaba.fastjson.TypeReference;
 import com.idp.pub.context.AppContext;
 import com.idp.pub.service.IBaseService;
@@ -57,6 +58,9 @@ public class UserCardController extends BaseController<UserCard, String> {
 
 	@Resource(name = "jdbcTemplate")
 	private JdbcTemplate jdbcTemplate;
+	
+	@Resource(name = "commons")
+	private Commons commons;
 	
 	
 
@@ -252,6 +256,8 @@ public class UserCardController extends BaseController<UserCard, String> {
 	@RequestMapping(value="validBankCard")
 	@ResponseBody
 	public Map<String, Object> validBankCard(@RequestParam String cardno,@RequestParam String idnamber) {
+ 
+		
 		Map<String, Object> data = new HashMap<String, Object>();
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("idNumber", idnamber);
@@ -278,7 +284,6 @@ public class UserCardController extends BaseController<UserCard, String> {
 			if ("0000".endsWith(ret_code)) {
 				String bank_name = object.getString("bank_name");
 				String card_type = object.getString("card_type");//card_type:2 储蓄卡 3:信用卡
-				System.out.println("card_type------->"+card_type);
 				if(StringUtil.isEmpty(card_type) || "3".equals(card_type) ){
 					data.put("message", "本公司不支持信用卡支付！");
 					data.put("status", 0);
@@ -293,6 +298,14 @@ public class UserCardController extends BaseController<UserCard, String> {
 				if (count == 1) {
 					data.put("message", "");
 					data.put("status", 1);
+					
+					 String ipandport = commons.getAddrServerIp(); 
+					 String projectname = commons.getProjectName();//lcb
+				     StringBuffer url = new StringBuffer(); // "http://ip:7001/lcb/userAccount/withdrawNotify.shtml"
+				     url.append("http://").append(ipandport).append("/").append(projectname).append("/userAccount/notify.shtml");
+				     data.put("chargeCallBack", url.toString());
+					
+					
 				} else {
 					data.put("message", "该卡本公司不支持电子支付！");
 					data.put("status", 0);
