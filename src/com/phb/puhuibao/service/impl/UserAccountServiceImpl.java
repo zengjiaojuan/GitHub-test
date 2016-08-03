@@ -83,7 +83,7 @@ public class UserAccountServiceImpl extends DefaultBaseService<UserAccount, Stri
 				log.setBalanceAmount(user.getmUserMoney() - u.getFrozenMoney());
 				log.setAmount(entity.getAmount());
 				log.setChangeType("充值完成");
-				log.setAccountType(1);
+				log.setAccountType(0);
  
 				
 			} else {
@@ -92,7 +92,7 @@ public class UserAccountServiceImpl extends DefaultBaseService<UserAccount, Stri
 				log.setBalanceAmount(user.getmUserMoney() - user.getFrozenMoney());
 				log.setAmount(- entity.getAmount());
 				log.setChangeType("提现完成");
-				log.setAccountType(0);
+				log.setAccountType(1);
 			}
 			log.setChangeDesc(entity.getUserNote());
 			
@@ -216,13 +216,13 @@ public class UserAccountServiceImpl extends DefaultBaseService<UserAccount, Stri
 			log.setBalanceAmount(user.getmUserMoney() - u.getFrozenMoney());
 			log.setAmount(entity.getAmount());
 			log.setChangeType("充值完成");
-			log.setAccountType(1);
+			log.setAccountType(0);
 		} else {
 			user.setmUserMoney(u.getmUserMoney() - entity.getAmount());
 			log.setBalanceAmount(user.getmUserMoney() - u.getFrozenMoney());
 			log.setAmount(- entity.getAmount());
 			log.setChangeType("提现完成");
-			log.setAccountType(0);
+			log.setAccountType(1);
 		}
 		log.setChangeDesc(entity.getUserNote());
 		
@@ -287,8 +287,10 @@ public class UserAccountServiceImpl extends DefaultBaseService<UserAccount, Stri
 		entity.setAmount(((Double.valueOf(amount))));
 		entity.setProcessType(0);
 		entity.setUserNote("LLPAY");
+		entity.setAdminUser("LLPAY");
+		entity.setAdminNote("LLPAY Charge Succed!");
 		entity.setOrderId(oid_paybill);
-		entity.setIsPaid(1);
+		entity.setIsPaid(1);// 0:未确认 1:已确认
         save(entity);
       
   	    // 改动用户余额
@@ -303,7 +305,7 @@ public class UserAccountServiceImpl extends DefaultBaseService<UserAccount, Stri
 		accountlog.setBalanceAmount(user.getmUserMoney() - u.getFrozenMoney());
 		accountlog.setAmount(Double.valueOf(amount));
 		accountlog.setChangeType("充值完成");
-		accountlog.setAccountType(1);
+		accountlog.setAccountType(0);
         accountlog.setChangeDesc("LLPAY");
 		userAccountLogDao.save(accountlog);
  

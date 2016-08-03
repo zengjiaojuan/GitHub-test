@@ -40,7 +40,7 @@ define(function (require, exports, module) {
             	item.createTime = "";
                 if (item.accountId) {
                 	//item.method = 'update';
-                	UserAccount.save({method:'update','accountId':item.accountId,'adminNote':item.adminNote,'isPaid':item.isPaid,'processType':item.processType,'mUserId':item.mUserId,'amount':item.amount},function(result){
+                	UserAccount.save({method:'update','accountId':item.accountId,'adminNote':item.adminNote,'adminUser':$scope.USER_INFO.id,'isPaid':1,'amount':item.amount},function(result){
      	         		if (result.success == "false"){
     	         		    alert(result.message);
     	         		    return;
@@ -49,19 +49,20 @@ define(function (require, exports, module) {
                         $scope.clearForm();
                       	$('#edit').modal('hide');
                     });
-               	}else{
-               		item.adminUser = $scope.USER_INFO.userName;
-                	item.method = "adminCreate";
-               		UserAccount.put(item,function(result){
-     	         		if (result.success == "false"){
-    	         		    alert(result.message);
-    	         		    return;
-     	         		}
-                       	$scope.refresh('current',true);//refresh listgrid
-                       	//$scope.clearForm();
-                        $('#add').modal('hide');
-                    });
                	}
+//                else{
+//               		item.adminUser = $scope.USER_INFO.userName;
+//                	item.method = "adminCreate";
+//               		UserAccount.put(item,function(result){
+//     	         		if (result.success == "false"){
+//    	         		    alert(result.message);
+//    	         		    return;
+//     	         		}
+//                       	$scope.refresh('current',true);//refresh listgrid
+//                       	//$scope.clearForm();
+//                        $('#add').modal('hide');
+//                    });
+//               	}
             }
  
             
@@ -70,16 +71,7 @@ define(function (require, exports, module) {
                 $scope.tobedeleteId = accountId;
             };
 
-            $scope.comfirmDelete = function() {//confirm to delete on dialog
-	            var params = {
-	            		accountId : $scope.tobedeleteId
-	            };
-	            UserAccount.remove({
-	                params : angular.toJson(params)
-	            }, function(jsonData) {
-	                $scope.refresh('current', true);
-	            });
-            }; 
+ 
 
 //
             $scope.refund = function(orderId) {
