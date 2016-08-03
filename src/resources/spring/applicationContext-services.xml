@@ -108,6 +108,7 @@
 		<property name="fileMatchOutPath" value="${dataproc.datamatch.fileMatchOutPath}"></property>
 		<property name="fileMatchLog" value="${dataproc.datamatch.fileMatchLog}"></property>
 		<property name="adImageUploadPath" value="${ad.image.upload.path}"></property>
+		<property name="projectName" value="${service.projectName}"></property>
 	</bean>
 	<bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
 	    <property name="host" value="${mail.smtp.host}"></property>

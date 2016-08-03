@@ -13,8 +13,6 @@ public interface ServerURLConfig {
     String QUERY_BANKCARD_URL = "https://yintong.com.cn/traderapi/bankcardquery.htm"; //银行卡卡bin信息查询
     String UNBIND_BANKCARD_URL = "https://yintong.com.cn/traderapi/bankcardunbind.htm"; //银行卡解约
     String WITHDRAW_URL = "https://yintong.com.cn/traderapi/cardandpay.htm"; //提现
-    //String WITHDRAW_NOTIFY_URL = "http://101.200.82.182:7001/puhuibao/userAccount/withdrawNotify.shtml"; // 提现回调
     String QUERY_CNAPS_URL = "https://yintong.com.cn/traderapi/CNAPSCodeQuery.htm"; // 行号
     String REFUND_URL = "https://yintong.com.cn/traderapi/refund.htm"; // 退款
-    String REFUND_NOTIFY_URL = "http://101.200.82.182:7001/puhuibao/userAccount/refundNotify.shtml"; // 退款回调
 }

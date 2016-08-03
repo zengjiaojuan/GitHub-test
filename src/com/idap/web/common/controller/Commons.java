@@ -23,7 +23,17 @@ public class Commons {
 
 	public String roleAll;	//【附加的，为了机构管理那能查到所有的省份】查询所有省份
 	
+	public String projectName; // 本工程名字
 	
+	
+	public String getProjectName() {
+		return projectName;
+	}
+
+	public void setProjectName(String projectName) {
+		this.projectName = projectName;
+	}
+
 	public String getAdImageUploadPath() {
 		return adImageUploadPath;
 	}

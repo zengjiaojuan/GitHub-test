@@ -485,136 +485,136 @@ public class UserAccountController extends BaseController<UserAccount, String> {
 		        
 		return new ResponseEntity<byte[]>(baos.toByteArray(), headers, HttpStatus.OK);
 	}
-	
-	/**
-	 * 充值交易详细
-	 * @param orderId
-	 * @return
-	 */
-	@RequestMapping(params = "method=queryTransaction", method = RequestMethod.GET)
-	@ResponseBody
-	public Map<String, String> queryPay(@RequestParam String orderId) {
-		Map<String, String> result	= TZTService.queryByOrder(orderId, "");
-//		String merchantaccount		= StringUtils.trimToEmpty(result.get("merchantaccount"));
-//		String orderidFromYeepay   	= StringUtils.trimToEmpty(result.get("orderid"));
-//		String yborderidFromYeepay  = StringUtils.trimToEmpty(result.get("yborderid"));
-//		String amount           	= StringUtils.trimToEmpty(result.get("amount"));
-//		String currency         	= StringUtils.trimToEmpty(result.get("currency"));
-//		String sourcefee        	= StringUtils.trimToEmpty(result.get("sourcefee"));
-//		String targetfee        	= StringUtils.trimToEmpty(result.get("targetfee"));
-//		String sourceamount     	= StringUtils.trimToEmpty(result.get("sourceamount"));
-//		String targetamount     	= StringUtils.trimToEmpty(result.get("targetamount"));
-//		String ordertime        	= StringUtils.trimToEmpty(result.get("ordertime"));
-//		String closetime        	= StringUtils.trimToEmpty(result.get("closetime"));
-//		String type             	= StringUtils.trimToEmpty(result.get("type"));
-//		String status           	= StringUtils.trimToEmpty(result.get("status"));
-//		String refundtotal      	= StringUtils.trimToEmpty(result.get("refundtotal"));
-//		String productcatalog   	= StringUtils.trimToEmpty(result.get("productcatalog"));
-//		String productname      	= StringUtils.trimToEmpty(result.get("productname"));
-//		String productdesc      	= StringUtils.trimToEmpty(result.get("productdesc"));
-//		String bank             	= StringUtils.trimToEmpty(result.get("bank"));
-//		String bankcardtype      	= StringUtils.trimToEmpty(result.get("bankcardtype"));
-//		String bankcode            	= StringUtils.trimToEmpty(result.get("bankcode"));
-//		String sign             	= StringUtils.trimToEmpty(result.get("sign"));
-		String error_code       	= StringUtils.trimToEmpty(result.get("error_code"));
-		String error            	= StringUtils.trimToEmpty(result.get("error"));
-		String customError        	= StringUtils.trimToEmpty(result.get("customError"));
-
-		Map<String, String> data = new HashMap<String, String>();
-		if(!"".equals(error_code)) {
-			data.put(Constants.SUCCESS, Constants.FALSE);
-			data.put(Constants.MESSAGE, error_code + ": " + error);
-			return data;
-		} else if(!"".equals(customError)) {
-			data.put(Constants.SUCCESS, Constants.FALSE);
-			data.put(Constants.MESSAGE, customError);
-			return data;
-		}
-		
-		return result;
-	}
+//	
+//	/**
+//	 * 充值交易详细
+//	 * @param orderId
+//	 * @return
+//	 */
+//	@RequestMapping(params = "method=queryTransaction", method = RequestMethod.GET)
+//	@ResponseBody
+//	public Map<String, String> queryPay(@RequestParam String orderId) {
+//		Map<String, String> result	= TZTService.queryByOrder(orderId, "");
+////		String merchantaccount		= StringUtils.trimToEmpty(result.get("merchantaccount"));
+////		String orderidFromYeepay   	= StringUtils.trimToEmpty(result.get("orderid"));
+////		String yborderidFromYeepay  = StringUtils.trimToEmpty(result.get("yborderid"));
+////		String amount           	= StringUtils.trimToEmpty(result.get("amount"));
+////		String currency         	= StringUtils.trimToEmpty(result.get("currency"));
+////		String sourcefee        	= StringUtils.trimToEmpty(result.get("sourcefee"));
+////		String targetfee        	= StringUtils.trimToEmpty(result.get("targetfee"));
+////		String sourceamount     	= StringUtils.trimToEmpty(result.get("sourceamount"));
+////		String targetamount     	= StringUtils.trimToEmpty(result.get("targetamount"));
+////		String ordertime        	= StringUtils.trimToEmpty(result.get("ordertime"));
+////		String closetime        	= StringUtils.trimToEmpty(result.get("closetime"));
+////		String type             	= StringUtils.trimToEmpty(result.get("type"));
+////		String status           	= StringUtils.trimToEmpty(result.get("status"));
+////		String refundtotal      	= StringUtils.trimToEmpty(result.get("refundtotal"));
+////		String productcatalog   	= StringUtils.trimToEmpty(result.get("productcatalog"));
+////		String productname      	= StringUtils.trimToEmpty(result.get("productname"));
+////		String productdesc      	= StringUtils.trimToEmpty(result.get("productdesc"));
+////		String bank             	= StringUtils.trimToEmpty(result.get("bank"));
+////		String bankcardtype      	= StringUtils.trimToEmpty(result.get("bankcardtype"));
+////		String bankcode            	= StringUtils.trimToEmpty(result.get("bankcode"));
+////		String sign             	= StringUtils.trimToEmpty(result.get("sign"));
+//		String error_code       	= StringUtils.trimToEmpty(result.get("error_code"));
+//		String error            	= StringUtils.trimToEmpty(result.get("error"));
+//		String customError        	= StringUtils.trimToEmpty(result.get("customError"));
+//
+//		Map<String, String> data = new HashMap<String, String>();
+//		if(!"".equals(error_code)) {
+//			data.put(Constants.SUCCESS, Constants.FALSE);
+//			data.put(Constants.MESSAGE, error_code + ": " + error);
+//			return data;
+//		} else if(!"".equals(customError)) {
+//			data.put(Constants.SUCCESS, Constants.FALSE);
+//			data.put(Constants.MESSAGE, customError);
+//			return data;
+//		}
+//		
+//		return result;
+//	}
  
 
-	/**
-	 * 退款
-	 * @param entity
-	 * @return
-	 */
-	@RequestMapping(params = "method=refund", method = RequestMethod.POST)
-	@ResponseBody
-	public Map<String, String> refundPay(@RequestParam String orderId) {
-		Map<String, String> result	= TZTService.queryByOrder(orderId, "");
-//		String orderidFromYeepay   	= StringUtils.trimToEmpty(result.get("orderid"));
-		String yborderidFromYeepay  = StringUtils.trimToEmpty(result.get("yborderid"));
-		String amount           	= StringUtils.trimToEmpty(result.get("amount"));
-		String error_code       	= StringUtils.trimToEmpty(result.get("error_code"));
-		String error            	= StringUtils.trimToEmpty(result.get("error"));
-		String customError        	= StringUtils.trimToEmpty(result.get("customError"));
-
-		Map<String, String> data = new HashMap<String, String>();
-		if(!"".equals(error_code)) {
-			data.put(Constants.SUCCESS, Constants.FALSE);
-			data.put(Constants.MESSAGE, error_code + ": " + error);
-			return data;
-		} else if(!"".equals(customError)) {
-			data.put(Constants.SUCCESS, Constants.FALSE);
-			data.put(Constants.MESSAGE, customError);
-			return data;
-		}
-
-		Map<String, String> params 	= new HashMap<String, String>();
-		params.put("orderid", 		orderId);
-		params.put("origyborderid",	yborderidFromYeepay);
-//		params.put("amount", 		(int) (entity.getAmount() * 100) + "");
-		params.put("amount", 		amount);
-		params.put("currency", 		"156");
-		params.put("cause", 		"");
-		
-		result = TZTService.refund(params);
-//		String merchantaccountFromYeepay	= StringUtils.trimToEmpty(result.get("merchantaccount")); 
-//		String orderidFromYeepay			= StringUtils.trimToEmpty(result.get("orderid"));
-//		String yborderid					= StringUtils.trimToEmpty(result.get("yborderid"));
-//		String origyborderidFromYeepay		= StringUtils.trimToEmpty(result.get("origyborderid"));
-//		String amountFromYeepay				= StringUtils.trimToEmpty(result.get("amount"));
-//		String fee							= StringUtils.trimToEmpty(result.get("fee"));
-//		String currencyFromYeepay			= StringUtils.trimToEmpty(result.get("currency"));
-//		String timestamp					= StringUtils.trimToEmpty(result.get("timestamp"));
-//		String remain						= StringUtils.trimToEmpty(result.get("remain"));
-//		String signFromYeepay				= StringUtils.trimToEmpty(result.get("sign"));
-		error_code					= StringUtils.trimToEmpty(result.get("error_code"));
-		error						= StringUtils.trimToEmpty(result.get("error"));
-		customError					= StringUtils.trimToEmpty(result.get("customError"));
-
-		if(!"".equals(error_code)) {
-			data.put(Constants.SUCCESS, Constants.FALSE);
-			data.put(Constants.MESSAGE, error_code + ": " + error);
-			if ("100309".equals(error_code)) {
-				Map<String, Object> p = new HashMap<String, Object>();
-				p.put("orderId", orderId);
-				UserAccount entity = this.getBaseService().unique(p);
-				if (entity.getIsPaid() == 2) {
-				    return data;
-				}
-			} else {
-			    return data;
-			}
-		} else if(!"".equals(customError)) {
-			data.put(Constants.SUCCESS, Constants.FALSE);
-			data.put(Constants.MESSAGE, customError);
-			return data;
-		}
-
-		try {
-		    userAccountService.refund(orderId);
-			if ("".equals(error_code)) {
-				data.put(Constants.SUCCESS, Constants.TRUE);
-			}
-		} catch (Exception e) {
-			data.put(Constants.SUCCESS, Constants.FALSE);
-			data.put(Constants.MESSAGE, "请与系统管理员联系！" + e.getMessage());
-		}
-		return data;
-	}
+//	/**
+//	 * 退款
+//	 * @param entity
+//	 * @return
+//	 */
+//	@RequestMapping(params = "method=refund", method = RequestMethod.POST)
+//	@ResponseBody
+//	public Map<String, String> refundPay(@RequestParam String orderId) {
+//		Map<String, String> result	= TZTService.queryByOrder(orderId, "");
+////		String orderidFromYeepay   	= StringUtils.trimToEmpty(result.get("orderid"));
+//		String yborderidFromYeepay  = StringUtils.trimToEmpty(result.get("yborderid"));
+//		String amount           	= StringUtils.trimToEmpty(result.get("amount"));
+//		String error_code       	= StringUtils.trimToEmpty(result.get("error_code"));
+//		String error            	= StringUtils.trimToEmpty(result.get("error"));
+//		String customError        	= StringUtils.trimToEmpty(result.get("customError"));
+//
+//		Map<String, String> data = new HashMap<String, String>();
+//		if(!"".equals(error_code)) {
+//			data.put(Constants.SUCCESS, Constants.FALSE);
+//			data.put(Constants.MESSAGE, error_code + ": " + error);
+//			return data;
+//		} else if(!"".equals(customError)) {
+//			data.put(Constants.SUCCESS, Constants.FALSE);
+//			data.put(Constants.MESSAGE, customError);
+//			return data;
+//		}
+//
+//		Map<String, String> params 	= new HashMap<String, String>();
+//		params.put("orderid", 		orderId);
+//		params.put("origyborderid",	yborderidFromYeepay);
+////		params.put("amount", 		(int) (entity.getAmount() * 100) + "");
+//		params.put("amount", 		amount);
+//		params.put("currency", 		"156");
+//		params.put("cause", 		"");
+//		
+//		result = TZTService.refund(params);
+////		String merchantaccountFromYeepay	= StringUtils.trimToEmpty(result.get("merchantaccount")); 
+////		String orderidFromYeepay			= StringUtils.trimToEmpty(result.get("orderid"));
+////		String yborderid					= StringUtils.trimToEmpty(result.get("yborderid"));
+////		String origyborderidFromYeepay		= StringUtils.trimToEmpty(result.get("origyborderid"));
+////		String amountFromYeepay				= StringUtils.trimToEmpty(result.get("amount"));
+////		String fee							= StringUtils.trimToEmpty(result.get("fee"));
+////		String currencyFromYeepay			= StringUtils.trimToEmpty(result.get("currency"));
+////		String timestamp					= StringUtils.trimToEmpty(result.get("timestamp"));
+////		String remain						= StringUtils.trimToEmpty(result.get("remain"));
+////		String signFromYeepay				= StringUtils.trimToEmpty(result.get("sign"));
+//		error_code					= StringUtils.trimToEmpty(result.get("error_code"));
+//		error						= StringUtils.trimToEmpty(result.get("error"));
+//		customError					= StringUtils.trimToEmpty(result.get("customError"));
+//
+//		if(!"".equals(error_code)) {
+//			data.put(Constants.SUCCESS, Constants.FALSE);
+//			data.put(Constants.MESSAGE, error_code + ": " + error);
+//			if ("100309".equals(error_code)) {
+//				Map<String, Object> p = new HashMap<String, Object>();
+//				p.put("orderId", orderId);
+//				UserAccount entity = this.getBaseService().unique(p);
+//				if (entity.getIsPaid() == 2) {
+//				    return data;
+//				}
+//			} else {
+//			    return data;
+//			}
+//		} else if(!"".equals(customError)) {
+//			data.put(Constants.SUCCESS, Constants.FALSE);
+//			data.put(Constants.MESSAGE, customError);
+//			return data;
+//		}
+//
+//		try {
+//		    userAccountService.refund(orderId);
+//			if ("".equals(error_code)) {
+//				data.put(Constants.SUCCESS, Constants.TRUE);
+//			}
+//		} catch (Exception e) {
+//			data.put(Constants.SUCCESS, Constants.FALSE);
+//			data.put(Constants.MESSAGE, "请与系统管理员联系！" + e.getMessage());
+//		}
+//		return data;
+//	}
 	
 	/**
 	 * 添加申请
@@ -750,8 +750,9 @@ public class UserAccountController extends BaseController<UserAccount, String> {
         reqBean.setAcct_name(user.getmUserName());
         reqBean.setInfo_order("提现");
         String ipandport = commons.getAddrServerIp();
+        String projectname = commons.getProjectName();//lcb
         StringBuffer url = new StringBuffer(); // "http://101.200.82.182:7001/lcb/userAccount/withdrawNotify.shtml"
-        url.append("http://").append(ipandport).append("/lcb/userAccount/withdrawNotify.shtml");
+        url.append("http://").append(ipandport).append("/").append(projectname).append("/userAccount/withdrawNotify.shtml");
         reqBean.setNotify_url(url.toString());
         reqBean.setApi_version(PartnerConfig.VERSION);
         reqBean.setPrcptcd(card.getPrcptcd());
@@ -832,7 +833,7 @@ public class UserAccountController extends BaseController<UserAccount, String> {
 	}
 
 	/**
-	 * 退款
+	 * 连连退款
 	 * @param oid_paybill
 	 * @param money_refund
 	 * @return
@@ -847,7 +848,12 @@ public class UserAccountController extends BaseController<UserAccount, String> {
         reqObj.put("dt_refund", LLPayUtil.getCurrentDateTimeStr());
         reqObj.put("money_refund", amount);
         reqObj.put("oid_paybill", oid_paybill);
-        reqObj.put("notify_url", ServerURLConfig.REFUND_NOTIFY_URL);
+        
+		 String ipandport = commons.getAddrServerIp(); 
+		 String projectname = commons.getProjectName();//lcb
+	     StringBuffer url = new StringBuffer(); // "http://ip:7001/lcb/userAccount/withdrawNotify.shtml"
+	     url.append("http://").append(ipandport).append("/").append(projectname).append("/userAccount/refundNotify.shtml");
+        reqObj.put("notify_url", url.toString());
         reqObj.put("sign_type", PartnerConfig.SIGN_TYPE);
         String sign = LLPayUtil.addSign(reqObj, PartnerConfig.TRADER_PRI_KEY);
         reqObj.put("sign", sign);
