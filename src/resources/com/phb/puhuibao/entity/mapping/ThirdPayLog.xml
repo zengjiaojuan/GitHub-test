@@ -7,7 +7,10 @@
   <resultMap id="resourceResultMap" type="com.phb.puhuibao.entity.ThirdPayLog">
     <result property="logId" column="log_id" jdbcType="CHAR" />
     <result property="action" column="action" jdbcType="VARCHAR" />
-    <result property="params" column="action" jdbcType="LONGVARCHAR" />
+    <result property="params" column="params" jdbcType="LONGVARCHAR" />
+     <result property="orderId" column="order_id" jdbcType="VARCHAR" />
+     <result property="createTime" column="create_time" jdbcType="TIMESTAMP" />
+    
   </resultMap>
   
   <!-- RESOURCE INSERT -->
@@ -43,6 +46,7 @@
     action,
 	params,
 	error,
+	order_id,
 	status
   </sql>
   <sql id="allapplColumnVar">
@@ -51,6 +55,7 @@
 			#{action,jdbcType=VARCHAR},
 			#{params,jdbcType=VARCHAR},
 			#{error,jdbcType=VARCHAR},
+			#{orderId,jdbcType=VARCHAR},
 			#{status,jdbcType=TINYINT}
 	)
   </sql>
@@ -58,7 +63,9 @@
 	log_id,
 	action,
 	params,
-	status
+	order_id,
+	status,
+	create_time
   </sql>
   <sql id="dynamicWhere">
 	<trim prefix="WHERE" prefixOverrides="AND|OR">
@@ -71,6 +78,10 @@
 		<if test="params != null">
 			AND params = #{params}
 		</if>
+		<if test="orderId != null">
+			AND order_id = #{orderId}
+		</if>
+		 
 		<if test="status != null">
 			AND status = #{status}
 		</if>

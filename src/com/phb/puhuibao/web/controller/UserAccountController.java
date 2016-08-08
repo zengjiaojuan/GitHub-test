@@ -486,53 +486,19 @@ public class UserAccountController extends BaseController<UserAccount, String> {
 		return new ResponseEntity<byte[]>(baos.toByteArray(), headers, HttpStatus.OK);
 	}
 //	
-//	/**
-//	 * 充值交易详细
-//	 * @param orderId
-//	 * @return
-//	 */
-//	@RequestMapping(params = "method=queryTransaction", method = RequestMethod.GET)
-//	@ResponseBody
-//	public Map<String, String> queryPay(@RequestParam String orderId) {
-//		Map<String, String> result	= TZTService.queryByOrder(orderId, "");
-////		String merchantaccount		= StringUtils.trimToEmpty(result.get("merchantaccount"));
-////		String orderidFromYeepay   	= StringUtils.trimToEmpty(result.get("orderid"));
-////		String yborderidFromYeepay  = StringUtils.trimToEmpty(result.get("yborderid"));
-////		String amount           	= StringUtils.trimToEmpty(result.get("amount"));
-////		String currency         	= StringUtils.trimToEmpty(result.get("currency"));
-////		String sourcefee        	= StringUtils.trimToEmpty(result.get("sourcefee"));
-////		String targetfee        	= StringUtils.trimToEmpty(result.get("targetfee"));
-////		String sourceamount     	= StringUtils.trimToEmpty(result.get("sourceamount"));
-////		String targetamount     	= StringUtils.trimToEmpty(result.get("targetamount"));
-////		String ordertime        	= StringUtils.trimToEmpty(result.get("ordertime"));
-////		String closetime        	= StringUtils.trimToEmpty(result.get("closetime"));
-////		String type             	= StringUtils.trimToEmpty(result.get("type"));
-////		String status           	= StringUtils.trimToEmpty(result.get("status"));
-////		String refundtotal      	= StringUtils.trimToEmpty(result.get("refundtotal"));
-////		String productcatalog   	= StringUtils.trimToEmpty(result.get("productcatalog"));
-////		String productname      	= StringUtils.trimToEmpty(result.get("productname"));
-////		String productdesc      	= StringUtils.trimToEmpty(result.get("productdesc"));
-////		String bank             	= StringUtils.trimToEmpty(result.get("bank"));
-////		String bankcardtype      	= StringUtils.trimToEmpty(result.get("bankcardtype"));
-////		String bankcode            	= StringUtils.trimToEmpty(result.get("bankcode"));
-////		String sign             	= StringUtils.trimToEmpty(result.get("sign"));
-//		String error_code       	= StringUtils.trimToEmpty(result.get("error_code"));
-//		String error            	= StringUtils.trimToEmpty(result.get("error"));
-//		String customError        	= StringUtils.trimToEmpty(result.get("customError"));
-//
-//		Map<String, String> data = new HashMap<String, String>();
-//		if(!"".equals(error_code)) {
-//			data.put(Constants.SUCCESS, Constants.FALSE);
-//			data.put(Constants.MESSAGE, error_code + ": " + error);
-//			return data;
-//		} else if(!"".equals(customError)) {
-//			data.put(Constants.SUCCESS, Constants.FALSE);
-//			data.put(Constants.MESSAGE, customError);
-//			return data;
-//		}
-//		
-//		return result;
-//	}
+	/**
+	 * 连连充值交易详细
+	 * @param orderId
+	 * @return
+	 */
+	@RequestMapping(params = "method=queryTransaction", method = RequestMethod.GET)
+	@ResponseBody
+	public ThirdPayLog queryPay(@RequestParam String orderId) {
+		Map<String, Object> params 	= new HashMap<String, Object>();
+		params.put("orderId", 		orderId);
+		ThirdPayLog thirdPayLog =  thirdPayLogService.unique(params);
+		return thirdPayLog;
+	}
  
 
 //	/**
@@ -644,6 +610,11 @@ public class UserAccountController extends BaseController<UserAccount, String> {
         RetBean retBean = new RetBean();
         String reqStr = LLPayUtil.readReqStr(req);
 
+//        {"bank_code":"01020000","dt_order":"20160802124349","info_order":"18515895297,6217220200004369074,朱清华,320724198811210053",
+//          "money_order":"100.01","no_order":"1779e8c894934a51b1cd08c44dd8c426","oid_partner":"201510191000543502","oid_paybill":"2016080282821252",
+//          "pay_type":"D","result_pay":"SUCCESS","settle_date":"20160802",
+//          "sign":"DDzdltOEr8W3NqBheDMo1Gx6PBmBB8pwzBsYQB6GVqPLPd1B8LJTephSbep5oXwnfvcdrUwjOsFx3ebUloKtKhX7P7HEWpNncoPkmL4Es70WQ+04/g5ts243YnQZGeWAXAGw1iN3GfmUyARa07f5xT4/8Qh6s6aXexrry5gycdQ=",
+//          "sign_type":"RSA"}
         try {
             if (LLPayUtil.isnull(reqStr)) { // 连连的返回字符串是空  
                 retBean.setRet_code("9999");
@@ -772,7 +743,13 @@ public class UserAccountController extends BaseController<UserAccount, String> {
 		return data;
 	}
 	
-	//withdrawNotify 连连支付提现回调  2016-08-02  王威
+	/**
+	 * 提现回调  后台点击提现回调 withdrawNotify  2016-08-02 王威
+	 * @param muid
+	 * @param amount
+	 * @return
+	 */
+	 
 	@RequestMapping(value="withdrawNotify")
 	@ResponseBody
 	public void withdrawNotify(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -806,14 +783,7 @@ public class UserAccountController extends BaseController<UserAccount, String> {
         resp.getWriter().write(JSON.toJSONString(retBean));
         resp.getWriter().flush();
 
-        ThirdPayLog log = new ThirdPayLog();
-        String uuid = UUID.randomUUID().toString().replace("-", "");
-		log.setLogId(uuid);
-		log.setAction("withdrawNotify");
-		log.setParams(reqStr);
-		log.setError("");
-		log.setStatus(1);
-		thirdPayLogService.save(log);
+
         
 		JSONObject object = JSON.parseObject(reqStr);
         if (!"SUCCESS".equals(object.getString("result_pay"))) {
@@ -827,13 +797,23 @@ public class UserAccountController extends BaseController<UserAccount, String> {
 		if (entity.getIsPaid() == 1) {
 			return;
 		}
+		
+        ThirdPayLog log = new ThirdPayLog();
+        String uuid = UUID.randomUUID().toString().replace("-", "");
+		log.setLogId(uuid);
+		log.setAction("withdrawNotify");
+		log.setParams(reqStr);
+		log.setError("");
+		log.setStatus(1);
+		log.setOrderId(no_order);
+		thirdPayLogService.save(log);
 
 		entity.setIsPaid(1);
 		userAccountService.confirm(entity);
 	}
 
 	/**
-	 * 连连退款
+	 * 连连退款回调   refundNotify
 	 * @param oid_paybill
 	 * @param money_refund
 	 * @return
@@ -868,11 +848,14 @@ public class UserAccountController extends BaseController<UserAccount, String> {
 			data.put(Constants.MESSAGE, object.getString("ret_msg"));
 			if ("0000".endsWith(ret_code)) {
 		        ThirdPayLog log = new ThirdPayLog();
-				log.setLogId(object.getString("oid_refundno")); // phb_muser_account中的order_id保存的是oid_paybill，但oid_paybill无法传到回调
+		        String uuid1 = UUID.randomUUID().toString().replace("-", "");
+				log.setLogId(uuid1);
+				//log.setLogId(object.getString("oid_refundno")); // phb_muser_account中的order_id保存的是oid_paybill，但oid_paybill无法传到回调
 				log.setAction("refund");
 				log.setParams(oid_paybill);
 				log.setError("");
 				log.setStatus(1);
+				log.setOrderId(object.getString("no_order"));
 				thirdPayLogService.save(log);
 				data.put(Constants.SUCCESS, Constants.TRUE);
 			} else {
@@ -924,6 +907,14 @@ public class UserAccountController extends BaseController<UserAccount, String> {
         retBean.setRet_msg("交易成功");
         resp.getWriter().write(JSON.toJSONString(retBean));
         resp.getWriter().flush();
+
+        PayDataBean payDataBean = JSON.parseObject(reqStr, PayDataBean.class);
+        if (!"SUCCESS".equals(payDataBean.getResult_pay())) {
+        	return;
+        }
+        
+        String no_order = payDataBean.getNo_order();
+        
         
         ThirdPayLog log = new ThirdPayLog();
         String uuid = UUID.randomUUID().toString().replace("-", "");
@@ -932,6 +923,7 @@ public class UserAccountController extends BaseController<UserAccount, String> {
 		log.setParams(reqStr);
 		log.setError("");
 		log.setStatus(1);
+		log.setOrderId(no_order);
 		thirdPayLogService.save(log);
 
 		JSONObject object = JSON.parseObject(reqStr);

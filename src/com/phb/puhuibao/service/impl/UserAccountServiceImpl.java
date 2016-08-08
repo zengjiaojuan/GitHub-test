@@ -253,6 +253,7 @@ public class UserAccountServiceImpl extends DefaultBaseService<UserAccount, Stri
 		log.setParams(reqStr);//{"bank_code":"01050000","dt_order":"20160613114218","info_order":"13842555226,6214990610044647","money_order":"1000.0","no_order":"4b650c32f58546c0bfef4aaae0212a4d","oid_partner":"201510191000543502","oid_paybill":"2016061300902349","pay_type":"D","result_pay":"SUCCESS","settle_date":"20160613","sign":"G2XQp8CJ99YMotKi0yUP1K9EipjjR/FA+1d/HFZGntnuVw3cJcyD+zpfBZJa/O2zNUom/i55QxlmT5+pGx0s/n5oHa/eBeKJTIZd+PGP/mnINU8kz0Ix27LTyrMRRitrifChVmmSSoAEtIyv3wtgDm8jP9GBGDUgNpTTqyEyMOs=","sign_type":"RSA"}
 		log.setError("");
 		log.setStatus(1);
+		log.setOrderId(oid_paybill);
 		thirdPayLogDao.save(log);
  
 		Map<String,Object> params = new HashMap<String,Object>();
@@ -288,7 +289,7 @@ public class UserAccountServiceImpl extends DefaultBaseService<UserAccount, Stri
 		entity.setProcessType(0);
 		entity.setUserNote("LLPAY");
 		entity.setAdminUser("LLPAY");
-		entity.setAdminNote("LLPAY Charge Succed!");
+		entity.setAdminNote("LLPAY Charge Succed");
 		entity.setOrderId(oid_paybill);
 		entity.setIsPaid(1);// 0:未确认 1:已确认
         save(entity);

@@ -11,28 +11,40 @@ define(function (require, exports, module) {
             $scope.clearForm = function(){//reset botton
                 $scope.pageitem="";
             }
+ 
+ 
+ 
+            $scope.payInfomation =function(orderId){
+             
+            	UserAccount.get({method:'queryTransaction', 'orderId':orderId},function (result){
+         		    if (result.success == "false"){
+	         			 alert(result.message);
+	         		}
+         		    $scope.llpayparam = angular.fromJson(result.params);  
+         		    $scope.llpayuserinfo = $scope.llpayparam.info_order.split(","); 
+        			$scope.result = result;
+              	});
+            };
+            $scope.withdrawInfomation =function(orderId){
+             
+            	UserAccount.get({method:'queryTransaction', 'orderId':orderId},function (result){
+         		    if (result.success == "false"){
+	         			 alert(result.message);
+	         		}
+         		   $scope.withdrawparam = angular.fromJson(result.params);  
+         		   $scope.withdrawresult = result;
+        			
+              	});
+            };
             
-     //------------------add/edit--------- ----------- 	
-            $scope.preview =function(item){ //click on edit link
-        		$scope.keyv= angular.copy(item);
-            };
-
-            $scope.queryPay =function(orderId){
-        		UserAccount.get({method:'queryTransaction', 'orderId':orderId},function (result){
-         		    if (result.success == "false"){
-	         			 alert(result.message);
-	         		}
-        			$scope.result = result;
-              	});
-            };
-            $scope.queryRefund =function(orderId){
-        		UserAccount.get({method:'queryRefund', 'orderId':orderId},function (result){
-         		    if (result.success == "false"){
-	         			 alert(result.message);
-	         		}
-        			$scope.result = result;
-              	});
-            };
+//            $scope.queryRefund =function(orderId){
+//        		UserAccount.get({method:'queryRefund', 'orderId':orderId},function (result){
+//         		    if (result.success == "false"){
+//	         			 alert(result.message);
+//	         		}
+//        			$scope.result = result;
+//              	});
+//            };
             $scope.edit =function(tobeedit){ //click on edit link
               	$scope.pageitem = tobeedit;
             };
@@ -40,7 +52,8 @@ define(function (require, exports, module) {
             	item.createTime = "";
                 if (item.accountId) {
                 	//item.method = 'update';
-                	UserAccount.save({method:'update','accountId':item.accountId,'adminNote':item.adminNote,'adminUser':$scope.USER_INFO.id,'isPaid':1,'amount':item.amount},function(result){
+                	item.isPaid=1;
+                	UserAccount.save({method:'update','accountId':item.accountId,'adminNote':item.adminNote,'isPaid':item.isPaid,'processType':item.processType,'mUserId':item.mUserId,'adminUser':$scope.USER_INFO.id,'amount':item.amount},function(result){
      	         		if (result.success == "false"){
     	         		    alert(result.message);
     	         		    return;

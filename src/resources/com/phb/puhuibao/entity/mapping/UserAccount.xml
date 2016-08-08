@@ -82,6 +82,7 @@
     amount,
     process_type,
     user_note,
+    is_paid,
     create_time,
     order_id
   </sql>
@@ -91,6 +92,7 @@
 			#{amount,jdbcType=DECIMAL},
 			#{processType,jdbcType=TINYINT},
 			#{userNote,jdbcType=VARCHAR},
+			#{isPaid,jdbcType=TINYINT},
 			#{createTime,jdbcType=TIMESTAMP},
 			#{orderId,jdbcType=CHAR}
 	)

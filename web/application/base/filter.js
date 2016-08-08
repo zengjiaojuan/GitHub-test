@@ -405,6 +405,28 @@ define(function (require) {
         2: '资金周转',
         3: '个人消费'
     });
+    
+    filterFactory('PHB_CHARGEANDWITHDRAW', {
+        'notify': '充值',
+        'withdrawNotify': '取现' 
+    });
+    filterFactory('PHB_BANKCARD', {
+        "01040000" :"中国银行",        
+        "01030000" :"农业银行",        
+        "01020000" :"工商银行",        
+        "01050000" :"建设银行",        
+        "03080000" :"招商银行",        
+        "03020000" :"中信银行",        
+        "03040000" :"华夏银行",        
+        "03050000" :"民生银行",        
+        "03060000" :"广发银行",        
+        "03070000" :"平安银行",        
+        "03090000" :"兴业银行",        
+        "03010000" :"交通银行",        
+        "01000000" :"邮政储蓄银行",     
+        "03030000" :"光大银行" 
+    });
+    
     app.filter('makenumberformat' , function(){
         return function(str){
         	var val = parseInt(str);
