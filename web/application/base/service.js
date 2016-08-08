@@ -588,6 +588,9 @@ define(function() {
 	app.factory('RedpacketReceive', ['$resource', function($resource) {
 		return $resource('redpacketReceive.shtml');
 	}]);
+	app.factory('ThirdPayLog', ['$resource', function($resource) {
+		return $resource('thirdPayLog.shtml');
+	}]);
 	
 	
 	
