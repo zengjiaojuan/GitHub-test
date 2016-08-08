@@ -240,6 +240,13 @@ public class UserCardController extends BaseController<UserCard, String> {
 			} else {
 				data.put("status", 1);
 			}
+			
+			 String ipandport = commons.getAddrServerIp(); 
+			 String projectname = commons.getProjectName();//lcb
+		     StringBuffer url = new StringBuffer(); // "http://ip:7001/lcb/userAccount/withdrawNotify.shtml"
+		     url.append("http://").append(ipandport).append("/").append(projectname).append("/userAccount/notify.shtml");
+		     data.put("chargeCallBack", url.toString());
+			
 		} catch (JSONException e) {
 			log.error("失败"+e);
 			data.put("message", e.getMessage());
@@ -298,7 +305,6 @@ public class UserCardController extends BaseController<UserCard, String> {
 				if (count == 1) {
 					data.put("message", "");
 					data.put("status", 1);
-					
 					 String ipandport = commons.getAddrServerIp(); 
 					 String projectname = commons.getProjectName();//lcb
 				     StringBuffer url = new StringBuffer(); // "http://ip:7001/lcb/userAccount/withdrawNotify.shtml"
