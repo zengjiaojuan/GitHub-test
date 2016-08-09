@@ -1,10 +1,17 @@
 <div style="color:red">充值+投资收益-贷款月息或本金=月末用户总资产-上月月末用户总资产+提现</div>
-截止现在本月公司账户收入(充值): {{formatNumber(item.payAmount)}}<br/>
-截止现在本月投资收益: {{formatNumber(item.investmentIncome)}}<br/>
-截止现在本月授信贷款月息或本金: {{formatNumber(item.loanInterest)}}<br/>
-截止现在本月用户总资产: {{formatNumber(item.totalAsset)}}<br/>
-上月月末用户总资产: {{formatNumber(item.totalAssetLast)}}<br/>
-截止现在本月公司账户支出(提现): {{formatNumber(item.withdrawAmount)}}<br/>
-账务状态: {{item.status}}<br/>
-上月月末公司账户余额: {{formatNumber(item.balance-item.payAmount+item.withdrawAmount)}}<br/>
-截止现在公司账户余额: {{formatNumber(item.balance)}}<br/>
+
+<table class="table table-striped table-bordered table-condensed index-center  table-costom">
+						       
+		        <tbody>
+						<tr><td>截止现在本月公司账户收入(充值)</td><td>{{formatNumber(item.payAmount)}}</td></tr>
+						<tr><td>截止现在本月投资收益 </td><td>{{formatNumber(item.investmentIncome)}}</td></tr>
+						<tr><td>截止现在本月授信贷款月息或本金</td><td>{{formatNumber(item.loanInterest)}}</td></tr>
+						<tr><td>截止现在本月用户总资产</td><td>{{formatNumber(item.totalAsset)}}</td></tr>
+						<tr><td>上月月末用户总资产</td><td>{{formatNumber(item.totalAssetLast)}}</td></tr>
+						<tr><td>截止现在本月公司账户支出(提现)</td><td>{{formatNumber(item.withdrawAmount)}}</td></tr>
+						<tr><td>账务状态</td><td>{{item.status}}</td></tr>
+						<tr><td>上月月末公司账户余额</td><td>{{formatNumber(item.balance-item.payAmount+item.withdrawAmount)}}</td></tr>
+						<tr><td>截止现在公司账户余额</td><td>{{formatNumber(item.balance)}}</td></tr>
+		        </tbody>
+</table>
+ 
