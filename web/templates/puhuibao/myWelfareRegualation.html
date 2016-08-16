@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
+	<title>Document</title>
+	<style type="text/css">
+		dl,dt,dd{margin: 0;padding: 0;}
+		.container{padding:.40rem .50rem;background: #ffffff;}
+		.list{ margin-bottom: .40rem; }
+		.list dt{ font-size: .26rem;color: #c8a556;}
+		.list dd{font-size: .24rem; color: #666666;margin-top: .24rem;text-indent: .52rem;}
+		.instro{color:#c8a556;text-align: center; font-size: .24rem;}
+	</style>
+</head>
+<body>
+<script>
+    function setfont(){
+        var clientWidth = document.body.clientWidth||document.documentElement.clientWidth;
+        if(clientWidth > 750) {
+            clientWidth = 750;
+        }
+        document.documentElement.style.fontSize = clientWidth / 7.5 + 'px';
+    }
+    setfont();
+    window.onresize=setfont;
+</script>
+<div class="container">
+	<dl class="list">
+		<dt>1.体验金</dt>
+		<dd>金朗理财提供理财体验金及收益，用户体验理财；投资期限届满后，收益归用户所有，理财体验金由金朗理财收回。</dd>
+	</dl>
+	<dl class="list">
+		<dt>2.加息券</dt>
+		<dd>用户在投资时选择满足条件的加息券，即可享受加息服务直至投资期限届满。加息券与红包不可同时使用。</dd>
+	</dl>
+	<dl class="list">
+		<dt>3.红包</dt>
+		<dd>红包可抵扣资金的1.0%，最多可抵扣红包面值。每个红包仅可使用一次，且不可叠加使用。</dd>
+	</dl>
+
+	<p class="instro">该活动的解释权在法律规定的范围内归金朗理财所有</p>
+</div>
+</body>
+</html>

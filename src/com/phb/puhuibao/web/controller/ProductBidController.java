@@ -736,6 +736,157 @@ public class ProductBidController extends BaseController<ProductBid, String> {
 	}	
 	
 	
+	
+	/**
+	 * 安全保障
+	 * @param id
+	 * @param muid
+	 * @param request
+	 * @param response
+	 */
+	@RequestMapping(params = "method=getSecurety", method = RequestMethod.GET)
+	@ResponseBody
+	public void getSecurety(HttpServletRequest request, HttpServletResponse response){
+		File cache = null;
+		try {
+			cache = new File(request.getSession().getServletContext().getResource("/cache").getPath());
+		} catch (MalformedURLException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		if (!cache.exists()) {
+			cache.mkdir();
+		}
+
+		String path = "cache/scuretassurance.html";
+		String file = null;
+		try {
+			file = request.getSession().getServletContext().getResource("/").getPath() + path;
+		} catch (MalformedURLException e) {
+			LOG.error(e);
+			e.printStackTrace();
+		}
+		File f = new File(file);
+		File template = null;
+		try {
+			template = new File(request.getSession().getServletContext().getResource("/").getPath() + com.phb.puhuibao.common.Constants.SCURET_ASSURANCE);
+		} catch (MalformedURLException e) {
+			LOG.error(e);
+			e.printStackTrace();
+		}
+		boolean flag = true;
+		if (!f.exists()  || f.lastModified() < template.lastModified()) {
+			String content = getContent(request, com.phb.puhuibao.common.Constants.SCURET_ASSURANCE);
+ 
+			OutputStream fis = null;
+			OutputStreamWriter osw = null;
+			try {
+				fis = new FileOutputStream(f);
+				osw = new OutputStreamWriter(fis,"utf-8");
+				osw.write(content);
+				osw.flush();
+			} catch (IOException e) {
+				flag = false;
+				e.printStackTrace();
+			} finally {
+				try {
+					if (osw != null) {
+						osw.close();
+					}
+				} catch (Exception e) {
+				}
+			}
+		}
+
+		if (flag) {
+			try {
+				response.sendRedirect(path);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} else {
+			try {
+				request.getRequestDispatcher(com.phb.puhuibao.common.Constants.ERROR_TEMPLATE).forward(request, response);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	/**
+	 * 我的福利规则说明
+	 * @param id
+	 * @param muid
+	 * @param request
+	 * @param response
+	 */
+	@RequestMapping(params = "method=getMyWelfareRegualation", method = RequestMethod.GET)
+	@ResponseBody
+	public void getMyWelfareRegualation(HttpServletRequest request, HttpServletResponse response){
+		File cache = null;
+		try {
+			cache = new File(request.getSession().getServletContext().getResource("/cache").getPath());
+		} catch (MalformedURLException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		if (!cache.exists()) {
+			cache.mkdir();
+		}
+
+		String path = "cache/myWelfareRegualation.html";
+		String file = null;
+		try {
+			file = request.getSession().getServletContext().getResource("/").getPath() + path;
+		} catch (MalformedURLException e) {
+			LOG.error(e);
+			e.printStackTrace();
+		}
+		File f = new File(file);
+		File template = null;
+		try {
+			template = new File(request.getSession().getServletContext().getResource("/").getPath() + com.phb.puhuibao.common.Constants.MY_WELFARE_REGUALATION);
+		} catch (MalformedURLException e) {
+			LOG.error(e);
+			e.printStackTrace();
+		}
+		boolean flag = true;
+		if (!f.exists()  || f.lastModified() < template.lastModified()) {
+			String content = getContent(request, com.phb.puhuibao.common.Constants.MY_WELFARE_REGUALATION);
+ 
+			OutputStream fis = null;
+			OutputStreamWriter osw = null;
+			try {
+				fis = new FileOutputStream(f);
+				osw = new OutputStreamWriter(fis,"utf-8");
+				osw.write(content);
+				osw.flush();
+			} catch (IOException e) {
+				flag = false;
+				e.printStackTrace();
+			} finally {
+				try {
+					if (osw != null) {
+						osw.close();
+					}
+				} catch (Exception e) {
+				}
+			}
+		}
+
+		if (flag) {
+			try {
+				response.sendRedirect(path);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} else {
+			try {
+				request.getRequestDispatcher(com.phb.puhuibao.common.Constants.ERROR_TEMPLATE).forward(request, response);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}
 	/**
 	 * 月利通协议
 	 * @param id

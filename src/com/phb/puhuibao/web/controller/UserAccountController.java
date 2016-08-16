@@ -180,6 +180,7 @@ public class UserAccountController extends BaseController<UserAccount, String> {
 		entity.setmUserId(user.getmUserId());
 		entity.setAmount(amount);
 		entity.setProcessType(1);
+		entity.setIsPaid(0);// 0:未确认 1:已确认
  
 		try {
 		    entity = userAccountService.processSave(entity);
