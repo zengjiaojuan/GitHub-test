@@ -72,7 +72,7 @@ public class ExperienceInvestmentController extends BaseController<ExperienceInv
 				investment.setLeftDays(0);
 			} else {
 				 
-				Date startday = investment.getIncomeDate();// 起息日
+				  Date startday = investment.getIncomeDate();// 起息日
 				  Date nowday =  new Date() ;
 				  long diff = nowday.getTime() - startday.getTime();//这样得到的差值是微秒级别
 				 
