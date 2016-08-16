@@ -6,7 +6,6 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import com.idp.pub.service.IBaseService;
@@ -27,7 +26,7 @@ public class RedPacketJob {
 	private JdbcTemplate jdbcTemplate;
 
 	 
-	@Scheduled(cron="0 10 23 * * *")
+	
     public void process() {
 		try {
 			String sql = "select  t.redpacket_id  from phb_muser_redpacket t where   date(t.last_date) <=   curdate() and t.status =1";
