@@ -4,14 +4,33 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta charset="UTF-8">
 <meta name="author">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
 </head>
 <style type="text/css">
-body{background-image:url("../img/secure.png"); background-repeat: no-repeat; background-size: cover;}
+.index {
+	width: 100%;
+	height: 16.3rem; background : url("../img/secure.png");
+	background: url("../img/secure.png");
+	background-size: cover;
+}
 </style>
-<body  >
 
-  
- 
+<body>
+	<script>
+		function setfont() {
+			var clientWidth = document.body.clientWidth
+					|| document.documentElement.clientWidth;
+			if (clientWidth > 750) {
+				clientWidth = 750;
+			}
+			document.documentElement.style.fontSize = clientWidth / 7.5 + 'px';
+		}
+		setfont();
+		window.onresize = setfont;
+	</script>
+	<div class="index"></div>
+
+
 </body>
 </html>
