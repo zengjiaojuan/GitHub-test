@@ -144,24 +144,25 @@ public class MobileUserServiceImpl extends DefaultBaseService<MobileUser, String
  
 	@Override
 	public Map<String, Object> processFortune(String muid) {
-		Map<String, Object> params = new HashMap<String, Object>();
-		params.put("mUserId", muid);
-		List<UserInvestment> investments = userInvestmentDao.find(params);
-		double todayIncome = 0;
-		double totalIncome = 0; // 预收益
-		double investmentAmount = 0;
-		long currentTime = new Date().getTime();
+		Map<String, Object> params = new HashMap<String, Object>(); 		//用哈希map生成一个容器
+		params.put("mUserId", muid);										//给容器里存放键值对
+		List<UserInvestment> investments = userInvestmentDao.find(params);	//给方法中放入
+		double todayIncome = 0;					 // 当天收益
+		double totalIncome = 0;					 // 预收益
+		double investmentAmount = 0;			 // 投资金额
+		long currentTime = new Date().getTime(); //现在时间
 		for (UserInvestment investment : investments) {
+			//status（ 收益中1、到期赎回2、提前赎回3、平仓4）
 			if (investment.getStatus() >= 2) {
 				//totalIncome += investment.getLastIncome();
 			} else {
 				String productSN = investment.getProductSN();
 				params = new HashMap<String, Object>();
 				params.put("productSN", productSN);
-				AssetProduct product = assetProductDao.unique(params);
-				 double rate = investment.getAnnualizedRate();  // 年利率从用户投资表取
-				double amount = investment.getInvestmentAmount();
-				double everyIncome =  investment.getDailyIncome();
+				AssetProduct product = assetProductDao.unique(params);  //
+				 double rate = investment.getAnnualizedRate();  		// 年利率从用户投资表取
+				double amount = investment.getInvestmentAmount();		// 投资金额 
+				double everyIncome =  investment.getDailyIncome();		//
 				//Functions.calEveryIncome(amount, rate);
 				if (currentTime >= investment.getIncomeDate().getTime()) {
 					todayIncome += everyIncome;

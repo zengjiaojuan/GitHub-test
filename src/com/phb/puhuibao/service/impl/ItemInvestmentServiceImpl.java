@@ -125,8 +125,8 @@ public class ItemInvestmentServiceImpl extends DefaultBaseService<ItemInvestment
 			userAccountLogDao.save(log);
 		}
 		
-		UserMessage message =  new UserMessage();
-		message.setmUserId(entity.getmUserId());
+		UserMessage message =  new UserMessage(); 				//用户消息表
+		message.setmUserId(entity.getmUserId());				//获得museid
 		message.setTitle("系统消息");
 		message.setContent("您成功投资了：" + entity.getItemSN() + ",投资总额：" + entity.getInvestmentAmount());
 		userMessageDao.save(message);
