@@ -151,6 +151,7 @@ public class MobileUserServiceImpl extends DefaultBaseService<MobileUser, String
 		double totalIncome = 0;					 // 预收益
 		double investmentAmount = 0;			 // 投资金额
 		long currentTime = new Date().getTime(); //现在时间
+		//用户真实投资记录
 		for (UserInvestment investment : investments) {
 			//status（ 收益中1、到期赎回2、提前赎回3、平仓4）
 			if (investment.getStatus() >= 2) {
@@ -191,10 +192,12 @@ public class MobileUserServiceImpl extends DefaultBaseService<MobileUser, String
 					//totalIncome += amount * rate * product.getPeriod() / 365;
 					factor = 365;
 		        }
-				totalIncome += Functions.calTotalIncome(amount, rate, product.getPeriod(), factor);
+		        //totalIncome 可以根据investment对象 直接获取，不需要重新计算 数据库中有这些数据
+				//totalIncome += Functions.calTotalIncome(amount, rate, product.getPeriod(), factor);
+		    	totalIncome += investment.getTotalIncome();
 			}
 		}
-		
+		//用户体验投资记录
 		params = new HashMap<String, Object>();
 		params.put("mUserId", muid);
 		List<ExperienceInvestment> experienceInvestments = experienceInvestmentDao.find(params);
