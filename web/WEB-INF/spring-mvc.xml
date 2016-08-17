@@ -49,7 +49,7 @@
 			<ref bean="invokeRedPacketJob"></ref>
 		</property>
 		<property name="cronExpression">
-			<value>0 25 18 * * ?</value>
+			<value>0 10 23 * * ?</value>
 		</property>
 	</bean>
 	
