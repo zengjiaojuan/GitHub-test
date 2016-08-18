@@ -201,8 +201,10 @@ public class ProductBidController extends BaseController<ProductBid, String> {
 		Map<String,Object> retobj = null;
 		Map<String, Object> data = new HashMap<String, Object>();
 		List <Map<String, Object>> list = null;
+		List <Map<String, Object>> list1 = null;
 		String sql="";
 		if(StringUtil.isEmpty(muid)){// 用户未登陆
+			    //sql查出的是新手标
 				sql = "SELECT b.bid_id, b.bid_sn, a.product_name, a.annualized_rate, a.period, a.unit,CASE WHEN b.status = 3 THEN  b.total_amount ELSE b.current_amount END as currentAmount,b.total_amount totalAmount FROM phb_product_bid b LEFT JOIN phb_asset_product a ON b.product_sn = a.product_sn WHERE b. STATUS = 1 AND a.product_sn = 'P888'";
 				list = this.jdbcTemplate.queryForList(sql);
 				if (list.isEmpty()) {// 没有可以投资的新手标
@@ -213,17 +215,42 @@ public class ProductBidController extends BaseController<ProductBid, String> {
 					data.put("result", retobj);
 					data.put("status", 1);
 				}			  
-		} else{
-			sql = " SELECT b.bid_id, b.bid_sn, a.product_name, a.annualized_rate, a.period, a.unit  ,CASE WHEN b.status = 3 THEN  b.total_amount ELSE b.current_amount END as currentAmount,b.total_amount totalAmount  FROM phb_product_bid b LEFT JOIN phb_asset_product a ON b.product_sn = a.product_sn where b. STATUS = 1 order by a.important desc";
+		} else{//用户登录
+			//通过muid 查一下这个用户是否为新用户(没有购买过理财产品的)
+			sql="SELECT u.bid_sn from  phb_muser_investment u WHERE u.m_user_id = " + muid;
+			list1 = this.jdbcTemplate.queryForList(sql);//通过muid查询投资表得到结果list
+			if(list1.isEmpty()){//新的用户(没有购买过理财产品的)
+				//sql查出的是新手标
+				sql = "SELECT b.bid_id, b.bid_sn, a.product_name, a.annualized_rate, a.period, a.unit,CASE WHEN b.status = 3 THEN  b.total_amount ELSE b.current_amount END as currentAmount,b.total_amount totalAmount FROM phb_product_bid b LEFT JOIN phb_asset_product a ON b.product_sn = a.product_sn WHERE b. STATUS = 1 AND a.product_sn = 'P888'";
+					  
+			}else{//老用户
+				//sql查出所有的标
+				sql = " SELECT b.bid_id, b.bid_sn, a.product_name, a.annualized_rate, a.period, a.unit  ,CASE WHEN b.status = 3 THEN  b.total_amount ELSE b.current_amount END as currentAmount,b.total_amount totalAmount  FROM phb_product_bid b LEFT JOIN phb_asset_product a ON b.product_sn = a.product_sn where b. STATUS = 1 order by a.important desc";
+				
+			}
 			list = this.jdbcTemplate.queryForList(sql);
-			if (list.isEmpty()) {// 没有可以投资的了
+			if(list.isEmpty()){//没有可以推荐的
 				data.put("result", retobj);
 				data.put("status", 1);
+				
 			}else{
-				retobj = list.get(0);
+				retobj=list.get(0);
 				data.put("result", retobj);
 				data.put("status", 1);
 			}
+			
+			
+			
+//			sql = " SELECT b.bid_id, b.bid_sn, a.product_name, a.annualized_rate, a.period, a.unit  ,CASE WHEN b.status = 3 THEN  b.total_amount ELSE b.current_amount END as currentAmount,b.total_amount totalAmount  FROM phb_product_bid b LEFT JOIN phb_asset_product a ON b.product_sn = a.product_sn where b. STATUS = 1 order by a.important desc";
+//			list = this.jdbcTemplate.queryForList(sql);
+//			if (list.isEmpty()) {// 没有可以投资的了
+//				data.put("result", retobj);
+//				data.put("status", 1);
+//			}else{
+//				retobj = list.get(0);
+//				data.put("result", retobj);
+//				data.put("status", 1);
+//			}
 			
 		}
 
