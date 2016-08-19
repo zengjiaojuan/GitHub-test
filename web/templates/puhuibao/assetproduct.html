@@ -21,7 +21,6 @@
             <th>还款方式</th>
             <th>保障方式</th>
             <th>到期赎回率费用</th>
-            <th>提前赎回率费用</th>
             <th>最小投资额</th>
             <th>投资额递增倍数</th>
             <th>单笔额度上限</th>
@@ -39,7 +38,6 @@
             <td>{{it.paymentMethod}}</td>
             <td>{{it.guaranteeMethod}}</td>
             <td>{{it.redemptionDueRate}}</td>
-            <td>{{it.redemptionEarlyRate}}</td>
             <td>{{it.investmentAmountMin}}</td>
             <td>{{it.investmentAmountMultiple}}</td>
             <td>{{it.investmentAmountUpper}}</td>
@@ -92,21 +90,13 @@
 			                    <input type="text" class="form-control" required ng-model="key.paymentMethod" ng-maxlength="50" ng-trim maxlength="50" />
                             </div>
                             <span class="mustItem">*</span>
-			                <label class="col-lg-2 control-label">保障方式</label>
-			                <div class="col-lg-3">
-			                    <input type="text" class="form-control" required ng-model="key.guaranteeMethod" ng-maxlength="50" ng-trim maxlength="50" />
-                            </div>
-                            <span class="mustItem">*</span>
+			               
 			                <label class="col-lg-2 control-label">到期赎回费用率</label>
 			                <div class="col-lg-3">
 			                    <input type="number" class="form-control" required ng-model="key.redemptionDueRate" ng-maxlength="50" ng-trim maxlength="50" />
                             </div>
                             <span class="mustItem">*</span>
-			                <label class="col-lg-2 control-label">提前赎回费用率</label>
-			                <div class="col-lg-3">
-			                    <input type="number" class="form-control" required ng-model="key.redemptionEarlyRate" ng-maxlength="50" ng-trim maxlength="50" />
-                            </div>
-                            <span class="mustItem">*</span>
+			               
 			                <label class="col-lg-2 control-label">最小投资额</label>
 			                <div class="col-lg-3">
 			                    <input type="number" class="form-control" required ng-model="key.investmentAmountMin" ng-maxlength="50" ng-trim maxlength="50" />
@@ -117,11 +107,7 @@
 			                    <input type="number" class="form-control" required ng-model="key.investmentAmountMultiple" ng-maxlength="50" ng-trim maxlength="50" />
                             </div>
                             <span class="mustItem">*</span>
-			                <label class="col-lg-2 control-label">单笔额度上限</label>
-			                <div class="col-lg-3">
-			                    <input type="number" class="form-control" required ng-model="key.investmentAmountUpper" ng-maxlength="50" ng-trim maxlength="50" />
-                            </div>
-                            <span class="mustItem">*</span>
+			                
 			                <label class="col-lg-2 control-label">年化利率</label>
 			                <div class="col-lg-3">
 			                    <input type="number" class="form-control" required ng-model="key.annualizedRate" ng-maxlength="50" ng-trim maxlength="50" />
@@ -133,18 +119,7 @@
                             </div>
                             <span class="mustItem">*</span>
                         </div>
-                        <div class="form-group">
-			                <label class="col-lg-2 control-label">加入期</label>
-			                <div class="col-lg-3">
-                                <div data-datetimepicker="key.startDate"></div>
-                            </div>
-                            <span class="mustItem">&nbsp;&nbsp;</span>
-			                <label class="col-lg-2 control-label">到期日</label>
-			                <div class="col-lg-3">
-                                <div data-datetimepicker="key.endDate"></div>
-                            </div>
-                            <span class="mustItem">&nbsp;&nbsp;</span>
-                        </div>
+ 
                         <div class="form-group">
 			                <label class="col-lg-2 control-label">周期</label>
 			                <div class="col-lg-3">
@@ -156,26 +131,14 @@
 			                    <input type="text" class="form-control" required ng-model="key.unit" ng-maxlength="50" ng-trim maxlength="50" />
                             </div>
                             <span class="mustItem">*</span>
-			                <label class="col-lg-2 control-label">加入费率</label>
-			                <div class="col-lg-3">
-			                    <input type="number" class="form-control" required ng-model="key.joinRate" ng-maxlength="50" ng-trim maxlength="50" />
-                            </div>
-                            <span class="mustItem">*</span>
+ 
 			                <label class="col-lg-2 control-label">管理费率</label>
 			                <div class="col-lg-3">
 			                    <input type="number" class="form-control" required ng-model="key.managementRate" ng-maxlength="50" ng-trim maxlength="50" />
                             </div>
                             <span class="mustItem">*</span>
-			                <label class="col-lg-2 control-label">到期赎回方式</label>
-			                <div class="col-lg-3">
-			                    <input type="text" class="form-control" ng-model="key.redemptionDueMethod" ng-maxlength="50" ng-trim maxlength="50" />
-                            </div>
-                            <span class="mustItem">&nbsp;&nbsp;</span>
-			                <label class="col-lg-2 control-label">提前赎回方式</label>
-			                <div class="col-lg-3">
-			                    <input type="text" class="form-control" ng-model="key.redemptionEarlyMethod" ng-maxlength="50" ng-trim maxlength="50" />
-                            </div>
-                            <span class="mustItem">&nbsp;&nbsp;</span>
+			                
+			                 
 			                <label class="col-lg-2 control-label">总投资额度</label>
 			                <div class="col-lg-3">
 			                    <input type="number" class="form-control" ng-model="key.totalAmount" ng-maxlength="50" ng-trim maxlength="50" />
@@ -187,7 +150,9 @@
 				                    <option value="0">新手专享</option>
 				                    <option value="1">定存宝</option>
 				                    <option value="2">朗月赢</option>
-				                    <option value="3">金宝宝</option>
+				                    <option value="3">金元宝</option>
+				                    <option value="4">年年红</option>
+				                    <option value="5">债权</option>
 				                </select>
                             </div>
                             <span class="mustItem">*</span>

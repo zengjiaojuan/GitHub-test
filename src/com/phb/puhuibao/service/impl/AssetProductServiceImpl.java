@@ -1,6 +1,5 @@
 package com.phb.puhuibao.service.impl;
 
-import java.util.Date;
 import java.util.Map;
 
 import javax.annotation.Resource;
@@ -25,26 +24,31 @@ import com.phb.puhuibao.entity.AssetProduct;
 @Transactional
 @Service("assetProductService")
 public class AssetProductServiceImpl extends DefaultBaseService<AssetProduct, String> {
+	@Override
 	@Resource(name = "assetProductDao")
 	public void setBaseDao(IBaseDao<AssetProduct, String> baseDao) {
 		super.setBaseDao(baseDao);
 	}
 
+	@Override
 	@Resource(name = "assetProductDao")
 	public void setPagerDao(IPagerDao<AssetProduct> pagerDao) {
 		super.setPagerDao(pagerDao);
 	}
 
+	@Override
 	public AssetProduct save(AssetProduct entity) {
-		entity.setCreateTime(new Date());
+		 
 		return  this.getBaseDao().save(entity);
 	}
 		 
-    public AssetProduct update(AssetProduct entity) {
+    @Override
+	public AssetProduct update(AssetProduct entity) {
 		return  this.getBaseDao().update(entity);
     }		 
 		 
-    public Integer delete(Map<String, Object> params) {
+    @Override
+	public Integer delete(Map<String, Object> params) {
         return this.getBaseDao().delete(params); 
     }
 }

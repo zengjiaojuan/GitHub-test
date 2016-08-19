@@ -44,6 +44,7 @@ public class AssetProductController extends BaseController<AssetProduct, String>
 	@Resource(name = "appContext")
 	private AppContext appContext;
 
+	@Override
 	@Resource(name = "assetProductService")
 	public void setBaseService(IBaseService<AssetProduct, String> baseService) {
 		super.setBaseService(baseService);
@@ -133,7 +134,7 @@ public class AssetProductController extends BaseController<AssetProduct, String>
 			e1.printStackTrace();
 		}
 		boolean flag = true;
-		if (!f.exists() || f.lastModified() < result.getUpdateTime().getTime() || f.lastModified() < template.lastModified()) {
+		if (!f.exists()  || f.lastModified() < template.lastModified()) {
 			DecimalFormat df = new DecimalFormat("#.00%");
 			String content = getContent(request, PRODUCT_TEMPLATE);
 			//content = content.replaceFirst("\\$version\\$", appContext.getVersion());
@@ -164,19 +165,8 @@ public class AssetProductController extends BaseController<AssetProduct, String>
 	
 			Format format = new SimpleDateFormat("yyyy年MM月dd日");
 			String joinPeriod = "";
-			Date startDate = result.getStartDate();
-			if (startDate == null) {
-				startDate = new Date();
-			}
-			Date endDate = result.getEndDate();
-			if (endDate == null) {
-				Calendar cal = Calendar.getInstance();
-				cal.setTime(startDate);
-				cal.add(Calendar.DATE, 1);
-				endDate = cal.getTime();
-			}
-			joinPeriod = format.format(startDate) + "至" + format.format(endDate);
-			content = content.replaceFirst("\\$joinPeriod\\$", joinPeriod);
+			 
+		 
 			
 			Calendar cal = Calendar.getInstance();
 			cal.add(Calendar.DATE, 1); // 到账第二天起息
@@ -314,7 +304,7 @@ public class AssetProductController extends BaseController<AssetProduct, String>
 			e1.printStackTrace();
 		}
 		boolean flag = true;
-		if (!f.exists() || f.lastModified() < result.getUpdateTime().getTime() || f.lastModified() < template.lastModified()) {
+		if (!f.exists() ||  f.lastModified() < template.lastModified()) {
 			Format format = new SimpleDateFormat("yyyy年MM月dd日");
 			DecimalFormat df = new DecimalFormat("#.00%");
 			String content = getContent(request, AGREEMENT_TEMPLATE);
@@ -461,7 +451,7 @@ public class AssetProductController extends BaseController<AssetProduct, String>
 			e1.printStackTrace();
 		}
 		boolean flag = true;
-		if (!f.exists() || f.lastModified() < result.getUpdateTime().getTime() || f.lastModified() < template.lastModified()) {
+		if (!f.exists() ||  f.lastModified() < template.lastModified()) {
 			Format format = new SimpleDateFormat("yyyy年MM月dd日");
 			String content = getContent(request, MONTH_AGREEMENT_TEMPLATE);
 			content = content.replaceFirst("\\$signDate\\$", format.format(new Date()));

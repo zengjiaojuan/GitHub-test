@@ -7,7 +7,8 @@
   <!-- RESOURCE RESULTMAP -->
 
   <resultMap id="resourceResultMap" type="com.phb.puhuibao.entity.AssetProduct">
-    <id property="productId" column="product_id" jdbcType="TINYINT" />
+    
+     <result property="productId" column="product_id" jdbcType="INTEGER"/>
     <result property="productName" column="product_name" jdbcType="VARCHAR"/>
     <result property="paymentMethod" column="payment_method" jdbcType="VARCHAR"/>
     <result property="guaranteeMethod" column="guarantee_method" jdbcType="VARCHAR"/>
@@ -19,15 +20,12 @@
     <result property="productSN" column="product_sn" jdbcType="VARCHAR"/>
     <result property="annualizedRate" column="annualized_rate" jdbcType="DECIMAL"/>
     <result property="rewardRate" column="reward_rate" jdbcType="DECIMAL"/>
-    <result property="startDate" column="start_date" jdbcType="DATE"/>
-    <result property="endDate" column="end_date" jdbcType="DATE"/>
     <result property="period" column="period" jdbcType="TINYINT"/>
     <result property="joinRate" column="join_rate" jdbcType="DECIMAL"/>
     <result property="managementRate" column="management_rate" jdbcType="DECIMAL"/>
     <result property="redemptionDueMethod" column="redemption_due_method" jdbcType="VARCHAR"/>
     <result property="redemptionEarlyMethod" column="redemption_early_method" jdbcType="VARCHAR"/>
     <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
-    <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
     <result property="currentAmount" column="current_amount" jdbcType="BIGINT"/>
     <result property="totalAmount" column="total_amount" jdbcType="BIGINT"/>
     <result property="productDesc" column="product_desc" jdbcType="LONGVARCHAR"/>
@@ -74,12 +72,8 @@
 			<if test="rewardRate != null">
 				  ,reward_rate=#{rewardRate,jdbcType=DECIMAL}
 			</if>
-			<if test="startDate != null">
-				  ,start_date=#{startDate,jdbcType=DATE}
-			</if>
-			<if test="endDate != null">
-				  ,end_date=#{endDate,jdbcType=DATE}
-			</if>
+		 
+			 
 			<if test="period != null">
 				  ,period=#{period,jdbcType=TINYINT}
 			</if>
@@ -155,15 +149,12 @@
     investment_amount_upper,
     annualized_rate,
     reward_rate,
-    start_date,
-    end_date,
     period,
     unit,
     join_rate,
     management_rate,
     redemption_due_method,
     redemption_early_method,
-    create_time,
     total_amount,
     product_desc,
     help,
@@ -183,15 +174,12 @@
 			#{investmentAmountUpper,jdbcType=INTEGER},
 			#{annualizedRate,jdbcType=DECIMAL},
 			#{rewardRate,jdbcType=DECIMAL},
-			#{startDate,jdbcType=DATE},
-			#{endDate,jdbcType=DATE},
 			#{period,jdbcType=TINYINT},
 			#{unit,jdbcType=VARCHAR},
 			#{joinRate,jdbcType=DECIMAL},
 			#{managementRate,jdbcType=DECIMAL},
 			#{redemptionDueMethod,jdbcType=VARCHAR},
 			#{redemptionEarlyMethod,jdbcType=VARCHAR},
-			#{createTime,jdbcType=TIMESTAMP},
 			#{totalAmount,jdbcType=BIGINT},
 			#{productDesc,jdbcType=LONGVARCHAR},
 			#{help,jdbcType=VARCHAR},
@@ -212,8 +200,6 @@
     product_sn,
     annualized_rate,
     reward_rate,
-    start_date,
-    end_date,
     period,
     unit,
     join_rate,

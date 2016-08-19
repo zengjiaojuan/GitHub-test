@@ -10,8 +10,8 @@ define(function (require, exports, module) {
         //------------------add/edit--------- 	
             $scope.edit = function(item){ //click on edit link
               	$scope.keye = angular.copy(item);
-            	$scope.keye.startDate = dateFormat(item.startDate, 'yyyy-MM-dd HH:mm:ss');
-            	$scope.keye.endDate = dateFormat(item.endDate, 'yyyy-MM-dd HH:mm:ss');
+            	$scope.keye.startDate = dateFormat(item.startDate, 'yyyy-MM-dd');
+            	$scope.keye.endDate = dateFormat(item.endDate, 'yyyy-MM-dd');
             };
             $scope.preview =function(item){
             	$scope.keyv = angular.copy(item);
@@ -26,7 +26,6 @@ define(function (require, exports, module) {
               	$scope.key.productSN = null;
             };
             $scope.create = function(item) {//add and edit
- 				item.updateTime = null;
      			if(item.productId){ // edit
 	               	AssetProduct.save(item,function(){
 	               		//window.location.reload();
@@ -35,9 +34,6 @@ define(function (require, exports, module) {
                      	$('#edit').modal('hide');
                     });
                 }else{ // add
-                  	item.startDate = dateFormat(item.startDate, 'yyyy-MM-dd HH:mm:ss');
-                  	item.endDate = dateFormat(item.endDate, 'yyyy-MM-dd HH:mm:ss');
-                	item.productId = 0;
 	               	AssetProduct.put(item,function(){
                       	$scope.refresh('current',true);//refresh listgrid
                       	//$scope.clearForm();

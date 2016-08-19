@@ -1,9 +1,7 @@
 package com.phb.puhuibao.entity;
 
-import java.util.Date;
-
 public class AssetProduct {
-	private int productId; // id
+	private Integer productId; // id
 	private String productName; // 产品名称
 	private String productSN; // 编号
 	private String paymentMethod; // 还款方式
@@ -15,16 +13,13 @@ public class AssetProduct {
 	private Integer investmentAmountUpper; // 单笔额度上限
 	private Double annualizedRate; // 年化利率
 	private Double rewardRate; //奖励利率
-	private Date startDate; // 加入期
-	private Date endDate; // 到期日
+ 
 	private Integer period; // 周期
 	private String unit; // 单位
 	private Double joinRate; // 加入费率
 	private Double managementRate; // 管理费率
 	private String redemptionDueMethod; // 到期赎回方式
 	private String redemptionEarlyMethod; // 提前赎回方式
-	private Date createTime;
-	private Date updateTime;
 	private Long currentAmount; // 已投资额度
 	private Long totalAmount; // 总投资额度
 	private String productDesc; // 产品介绍
@@ -57,10 +52,12 @@ public class AssetProduct {
 	public void setHelp(String help) {
 		this.help = help;
 	}
-	public int getProductId() {
+ 
+ 
+	public Integer getProductId() {
 		return productId;
 	}
-	public void setProductId(int productId) {
+	public void setProductId(Integer productId) {
 		this.productId = productId;
 	}
 	public String getProductName() {
@@ -129,18 +126,7 @@ public class AssetProduct {
 	public void setRewardRate(Double rewardRate) {
 		this.rewardRate = rewardRate;
 	}
-	public Date getStartDate() {
-		return startDate;
-	}
-	public void setStartDate(Date startDate) {
-		this.startDate = startDate;
-	}
-	public Date getEndDate() {
-		return endDate;
-	}
-	public void setEndDate(Date endDate) {
-		this.endDate = endDate;
-	}
+	 
 	public Integer getPeriod() {
 		return period;
 	}
@@ -177,18 +163,7 @@ public class AssetProduct {
 	public void setRedemptionEarlyMethod(String redemptionEarlyMethod) {
 		this.redemptionEarlyMethod = redemptionEarlyMethod;
 	}
-	public Date getCreateTime() {
-		return createTime;
-	}
-	public void setCreateTime(Date createTime) {
-		this.createTime = createTime;
-	}
-	public Date getUpdateTime() {
-		return updateTime;
-	}
-	public void setUpdateTime(Date updateTime) {
-		this.updateTime = updateTime;
-	}
+	 
 	public Long getCurrentAmount() {
 		return currentAmount;
 	}

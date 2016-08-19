@@ -300,7 +300,7 @@ public class ProductBidController extends BaseController<ProductBid, String> {
 			e.printStackTrace();
 		}
 		boolean flag = true;
-		if (!f.exists() || f.lastModified() < result.getUpdateTime().getTime() || f.lastModified() < template.lastModified()) {
+		if (!f.exists() || f.lastModified() < template.lastModified()) {
 			DecimalFormat df = new DecimalFormat("#.00%");
 			String content = getContent(request, com.phb.puhuibao.common.Constants.BID_TEMPLATE);
 			//content = content.replaceFirst("\\$version\\$", appContext.getVersion());
@@ -484,7 +484,7 @@ public class ProductBidController extends BaseController<ProductBid, String> {
 			e.printStackTrace();
 		}
 		boolean flag = true;
-		if (!f.exists() || f.lastModified() < result.getUpdateTime().getTime() || f.lastModified() < template.lastModified()) {
+		if (!f.exists() ||  f.lastModified() < template.lastModified()) {
 			Format format = new SimpleDateFormat(com.phb.puhuibao.common.Constants.DATE_FORMAT_CHS);
 			DecimalFormat df = new DecimalFormat("#.00%");
 			String content = getContent(request, com.phb.puhuibao.common.Constants.AGREEMENT_TEMPLATE);
@@ -635,7 +635,7 @@ public class ProductBidController extends BaseController<ProductBid, String> {
 			e.printStackTrace();
 		}
 		boolean flag = true;
-		if (!f.exists() || f.lastModified() < result.getUpdateTime().getTime() || f.lastModified() < template.lastModified()) {
+		if (!f.exists() || f.lastModified() < template.lastModified()) {
 			Format format = new SimpleDateFormat(com.phb.puhuibao.common.Constants.DATE_FORMAT_CHS);
 			DecimalFormat df = new DecimalFormat("#.00%");
 			String content = getContent(request, com.phb.puhuibao.common.Constants.SERVICE_AGREEMENT_TEMPLATE);
@@ -939,7 +939,7 @@ public class ProductBidController extends BaseController<ProductBid, String> {
 			e1.printStackTrace();
 		}
 		boolean flag = true;
-		if (!f.exists() || f.lastModified() < result.getUpdateTime().getTime() || f.lastModified() < template.lastModified()) {
+		if (!f.exists() ||  f.lastModified() < template.lastModified()) {
 			Format format = new SimpleDateFormat(com.phb.puhuibao.common.Constants.DATE_FORMAT_CHS);
 			String content = getContent(request, com.phb.puhuibao.common.Constants.MONTH_AGREEMENT_TEMPLATE);
 			content = content.replaceFirst("\\$signDate\\$", format.format(new Date()));
