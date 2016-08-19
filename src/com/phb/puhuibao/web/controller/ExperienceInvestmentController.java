@@ -1,5 +1,6 @@
 package com.phb.puhuibao.web.controller;
 
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -102,8 +103,11 @@ public class ExperienceInvestmentController extends BaseController<ExperienceInv
 				Date expiredDate = calendar.getTime();
 				investment.setExpireDate(expiredDate);
 				
-				
-				investment.setTotalIncome(everyIncome * investment.getPeriod());// 总收益
+				//总的收益变为BigDecimal 类型 并且结果 取小数点后俩位
+			    BigDecimal total = new BigDecimal(everyIncome * investment.getPeriod()).setScale(2, BigDecimal.ROUND_DOWN);
+				double totals = total.doubleValue(); //将total变为double类型
+				investment.setTotalIncome(totals);// 总收益
+			   // investment.setTotalIncome(everyIncome * investment.getPeriod());// 总收益
 				result.add(investment);
 			}
 		}
