@@ -85,7 +85,6 @@ public class ProductBidController extends BaseController<ProductBid, String> {
 		
 		params = new HashMap<String, Object>();
 		params.put("lstatus", 2);
-		//params.put("gendDate", new Date());
 		List<ProductBid> bids = this.getBaseService().findList(params);
 		List<String> productSNs = new ArrayList<String>();
 		for (ProductBid bid : bids) {
@@ -93,36 +92,37 @@ public class ProductBidController extends BaseController<ProductBid, String> {
 		}
 
 		Calendar cal = Calendar.getInstance();
-		Date startDate = cal.getTime();
-		String date = new SimpleDateFormat("yyMMdd").format(startDate);
+	 
+		/*
+		 * 如果一个产品在产品定义表里有,但是在产品的标的表里没有,就会自动制标  现在注释掉,所有的标必须手动
+		 */
 		for (AssetProduct product : products) { // 自动制标
 			product.setEstimateIncome(Functions.estimateIncome(product, jdbcTemplate));
-			if (!productSNs.contains(product.getProductSN())) {
-				String bidSN = product.getProductSN() + date;
-				params = new HashMap<String, Object>();
-				params.put("bidSN", bidSN);
-				ProductBid bid = this.getBaseService().unique(params);
-				int i = 1;
-				String sn = bidSN;
-				while (bid != null) {
-					sn = bidSN + "-" + i;
-					params = new HashMap<String, Object>();
-					params.put("bidSN", sn);
-					bid = this.getBaseService().unique(params);
-					i ++;
-				}
-				bidSN =  sn;
-				
-				bid = new ProductBid();
-				bid.setProductSN(product.getProductSN());
-				bid.setBidSN(bidSN);
-				bid.setStartDate(startDate);
-				cal.add(Calendar.DATE, appContext.getAutoBidPeriod());
-				bid.setEndDate(cal.getTime());
-//				bid.setTotalAmount((long) appContext.getAutoBidAmount());
-				bid.setTotalAmount(product.getTotalAmount());
-				this.getBaseService().save(bid);
-			}
+//			if (!productSNs.contains(product.getProductSN())) {
+//				String bidSN = product.getProductSN() + date;
+//				params = new HashMap<String, Object>();
+//				params.put("bidSN", bidSN);
+//				ProductBid bid = this.getBaseService().unique(params);
+//				int i = 1;
+//				String sn = bidSN;
+//				while (bid != null) {
+//					sn = bidSN + "-" + i;
+//					params = new HashMap<String, Object>();
+//					params.put("bidSN", sn);
+//					bid = this.getBaseService().unique(params);
+//					i ++;
+//				}
+//				bidSN =  sn;
+//				
+//				bid = new ProductBid();
+//				bid.setProductSN(product.getProductSN());
+//				bid.setBidSN(bidSN);
+//				bid.setStartDate(startDate);
+//				cal.add(Calendar.DATE, appContext.getAutoBidPeriod());
+//				bid.setEndDate(cal.getTime());// 没有作用
+//				bid.setTotalAmount(product.getTotalAmount());
+//				this.getBaseService().save(bid);
+//			}
 		}
 		
 		Pager<ProductBid> pager = new Pager<ProductBid>();
@@ -138,7 +138,7 @@ public class ProductBidController extends BaseController<ProductBid, String> {
 			params.put("type", type);
 		}
 		params.put("lstatus", 9);
-		params.put("orderBy", "status,bid_sn desc,start_date desc");
+		params.put("orderBy", "bid_important desc");
 		params.put("muid", muid);
 		//params.put("order", "desc");
 		Pager<ProductBid> p = this.getBaseService().findByPager(pager, params);
@@ -152,7 +152,13 @@ public class ProductBidController extends BaseController<ProductBid, String> {
 			Map<String, Object> map = new HashMap<String, Object>();
 			map.put("bidId", bid.getBidId());
 			map.put("bidSN", bid.getBidSN());
-			map.put("productName", product.getProductName());
+			
+			if(StringUtil.isEmpty(bid.getBidName())){
+				map.put("productName",product.getProductName());
+			}else{
+				map.put("productName",bid.getBidName() );
+			}
+			
 			map.put("guaranteeMethod", product.getGuaranteeMethod());
 			map.put("investmentAmountMin", product.getInvestmentAmountMin());
 			//map.put("investmentAmountMultiple", product.getInvestmentAmountMultiple());
@@ -169,8 +175,7 @@ public class ProductBidController extends BaseController<ProductBid, String> {
 				map.put("currentAmount", bid.getCurrentAmount());
 			}
 			map.put("totalAmount", bid.getTotalAmount());
-			map.put("startDate", bid.getStartDate());
-			if (bid.getStatus() == 0 && new Date().getTime() > bid.getStartDate().getTime()) {
+			if (bid.getStatus() == 0 ) {
 				bid.setStatus(1);
 				this.getBaseService().update(bid);
 //			} else if (bid.getStatus() == 1 && new Date().getTime() > bid.getEndDate().getTime()) {
@@ -370,8 +375,8 @@ public class ProductBidController extends BaseController<ProductBid, String> {
 //				endDate = cal.getTime();
 //			}
 //			joinPeriod = format.format(startDate) + "至" + format.format(endDate);
-			String joinPeriod = format.format(bid.getStartDate()) + "至" + format.format(bid.getEndDate());
-			content = content.replaceFirst("\\$joinPeriod\\$", joinPeriod);
+//			String joinPeriod = format.format(bid.getStartDate()) + "至" + format.format(bid.getEndDate());
+//			content = content.replaceFirst("\\$joinPeriod\\$", joinPeriod);
 			
 			Calendar cal = Calendar.getInstance();
 			cal.add(Calendar.DATE, 1); // 到账第二天起息

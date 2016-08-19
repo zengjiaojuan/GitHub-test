@@ -1,7 +1,6 @@
 package com.phb.puhuibao.entity;
 
 import java.io.Serializable;
-import java.util.Date;
 
 public class ProductBid implements Serializable {
 	/**
@@ -12,11 +11,33 @@ public class ProductBid implements Serializable {
 	private String bidSN; // 编号
 	private String productSN; // 编号
 	private String productName;
-	private Date startDate; // 加入期
-	private Date endDate; // 到期日
 	private Long currentAmount; // 已投资额度
 	private Long totalAmount; // 总投资额度
 	private Integer status; // 投资状态
+	private String bidName;
+	private String bidPictures;//bid_pictures
+	private Integer bidImportant ;//
+	
+	
+	
+	public String getBidPictures() {
+		return bidPictures;
+	}
+	public void setBidPictures(String bidPictures) {
+		this.bidPictures = bidPictures;
+	}
+	public Integer getBidImportant() {
+		return bidImportant;
+	}
+	public void setBidImportant(Integer bidImportant) {
+		this.bidImportant = bidImportant;
+	}
+	public String getBidName() {
+		return bidName;
+	}
+	public void setBidName(String bidName) {
+		this.bidName = bidName;
+	}
 	public String getProductName() {
 		return productName;
 	}
@@ -55,18 +76,8 @@ public class ProductBid implements Serializable {
 	public void setProductSN(String productSN) {
 		this.productSN = productSN;
 	}
-	public Date getStartDate() {
-		return startDate;
-	}
-	public void setStartDate(Date startDate) {
-		this.startDate = startDate;
-	}
-	public Date getEndDate() {
-		return endDate;
-	}
-	public void setEndDate(Date endDate) {
-		this.endDate = endDate;
-	}
+ 
+ 
 	public Long getCurrentAmount() {
 		return currentAmount;
 	}

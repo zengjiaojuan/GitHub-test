@@ -8,7 +8,7 @@ define(function (require, exports, module) {
          	 $scope.params.orderBy = 'a.start_date';
           	 $scope.params.order = 'desc';
           	$scope.refresh && $scope.refresh('first', true);
-
+          	var dateFormat = $filter('date');
           	AssetProduct.query({isArray:true,params:{}},function (list){ //for combo
           		$scope.products = list;
           	});
@@ -41,15 +41,12 @@ define(function (require, exports, module) {
             }
             //------------------add/edit--------- 	
             $scope.edit = function(item){ //click on edit link
-            	var dateFormat = $filter('date');
- 				if (dateFormat(new Date(), 'yyyy-MM-dd HH:mm:ss') > dateFormat(item.startDate, 'yyyy-MM-dd HH:mm:ss')) {
+ 				if (item.status!=0) {
  					alert("已开标，不可修改！");
  					return;
  				}
              	$('#addandedit').modal('show');
               	$scope.keye = angular.copy(item);
-            	$scope.keye.startDate = dateFormat(item.startDate, 'yyyy-MM-dd HH:mm:ss');
-            	$scope.keye.endDate = dateFormat(item.endDate, 'yyyy-MM-dd HH:mm:ss');
               	AssetProduct.query({isArray:true,params:{productSN:item.productSN}},function (list){ //for combo
               		if (list.length > 0) {
                 	    $scope.product = list[0];
@@ -61,11 +58,12 @@ define(function (require, exports, module) {
                 $scope.product = "";
             };
             $scope.createSN = function(product){
-            	var dateFormat = $filter('date');
                 $scope.keye.bidSN = product.productSN + dateFormat(new Date, 'yyMMdd');
                 $scope.keye.productSN = product.productSN;
             };
             $scope.create = function(item) {//add and edit
+            	
+            	item.startDate = dateFormat(item.startDate, 'yyyy-MM-dd');
      			if(item.bidId){ // edit
 	               	ProductBid.save(item,function(result){
      	         		if (result.success == "false"){
@@ -85,14 +83,14 @@ define(function (require, exports, module) {
         	         	}
                       	$scope.refresh('current',true);//refresh listgrid
                       	//$scope.clearForm();
-                        $('#addandedit').modal('hide');
+                        $('#add').modal('hide');
                     });
               	}
             };
         //-------------delete----------        
             $scope.todelete = function(item) {//click on DELETE link
-            	var dateFormat = $filter('date');
- 				if (dateFormat(new Date(), 'yyyy-MM-dd HH:mm:ss') > dateFormat(item.startDate, 'yyyy-MM-dd HH:mm:ss')) {
+            	
+ 				if (item.status!=0) {
  					alert("已开标，不可删除！");
  					return;
  				}

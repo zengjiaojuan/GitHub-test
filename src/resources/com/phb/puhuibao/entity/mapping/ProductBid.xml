@@ -9,11 +9,11 @@
     <result property="bidSN" column="bid_sn" jdbcType="VARCHAR"/>
     <result property="productSN" column="product_sn" jdbcType="VARCHAR"/>
     <result property="productName" column="product_name" jdbcType="VARCHAR"/>
-    
-    <result property="startDate" column="start_date" jdbcType="DATE"/>
-    <result property="endDate" column="end_date" jdbcType="DATE"/>
     <result property="currentAmount" column="current_amount" jdbcType="BIGINT"/>
     <result property="totalAmount" column="total_amount" jdbcType="BIGINT"/>
+     <result property="bidName" column="bid_name" jdbcType="VARCHAR"/>
+     <result property="bidPictures" column="bid_pictures" jdbcType="VARCHAR"/>
+     <result property="bidImportant" column="bid_important" jdbcType="INTEGER"/>
   </resultMap>
   
   <!-- RESOURCE INSERT -->
@@ -30,21 +30,20 @@
 			<if test="productSN != null">
 				  ,product_sn=#{productSN,jdbcType=VARCHAR}
 			</if>
-			<if test="startDate != null">
-				  ,start_date=#{startDate,jdbcType=DATE}
+			<if test="bidName != null">
+				  ,bid_name=#{bidName,jdbcType=VARCHAR}
 			</if>
-			<if test="endDate != null">
-				  ,end_date=#{endDate,jdbcType=DATE}
+			<if test="bidPictures != null">
+				  ,bid_pictures=#{bidPictures,jdbcType=VARCHAR}
 			</if>
-			<if test="currentAmount != null">
-				  ,current_amount=#{currentAmount,jdbcType=BIGINT}
+			<if test="bidImportant != null">
+				  ,bid_important=#{bidImportant,jdbcType=VARCHAR}
 			</if>
+			
 			<if test="totalAmount != null">
 				  ,total_amount=#{totalAmount,jdbcType=BIGINT}
 			</if>
-			<if test="status != null">
-				  ,status=#{status,jdbcType=DATE}
-			</if>
+		 
 		</trim>
 		where bid_id=#{bidId}
   </update>
@@ -74,18 +73,19 @@
   <!-- MySQL specific -->
   <sql id="allapplColumn">
     bid_sn,
+    bid_name,
     product_sn,
-    start_date,
-    end_date,
-    total_amount
+    total_amount,
+    bid_important
   </sql>
   <sql id="allapplColumnVar">
 	values(
 			#{bidSN,jdbcType=VARCHAR},
+			#{bidName,jdbcType=VARCHAR},
 			#{productSN,jdbcType=VARCHAR},
-			#{startDate,jdbcType=DATE},
-			#{endDate,jdbcType=DATE},
-			#{totalAmount,jdbcType=BIGINT}
+			#{totalAmount,jdbcType=BIGINT},
+			#{bidImportant,jdbcType=INTEGER}
+			
 	)
   </sql>
   <sql id="allColumn">
@@ -93,11 +93,12 @@
     a.bid_sn,
     b.product_name,
     a.product_sn,
-    a.start_date,
-    a.end_date,
     a.current_amount,
     a.total_amount,
     a.status,
+    a.bid_pictures,
+    a.bid_important,
+    a.bid_name,
     b.type
   </sql>
   
@@ -106,10 +107,11 @@
     a.bid_sn,
     b.product_name,
     a.product_sn,
-    a.start_date,
-    a.end_date,
     a.current_amount,
     a.total_amount,
+    a.bid_name,
+    a.bid_pictures,
+    a.bid_important,
     CASE
                 WHEN alert.alert_deviceid IS NOT  NULL THEN  6
                 ELSE a.status
@@ -132,9 +134,6 @@
 		</if>
 		<if test="lstatus != null">
 			AND a.status <![CDATA[<]]> #{lstatus}
-		</if>
-		<if test="gendDate != null">
-			AND end_date <![CDATA[>]]> #{gendDate}
 		</if>
 		<if test="type != null">
 			AND b.type = #{type}
