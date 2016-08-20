@@ -58,10 +58,22 @@ define(function (require, exports, module) {
                 $scope.product = "";
             };
             $scope.createSN = function(product){
-                $scope.keye.bidSN = product.productSN + dateFormat(new Date, 'yyMMdd');
+                $scope.keye.bidSN = product.productSN + dateFormat(new Date, 'yyMMdd')+Math.ceil(Math.random()*(9999-1000)+1000);
                 $scope.keye.productSN = product.productSN;
+                
+                if(product.type==5){//债权则需要显示债权的下拉列表
+                	$scope.showcontract=1;
+                }else{
+                	$scope.showcontract=0;
+                }
+                
+                
             };
+            
+  
             $scope.create = function(item) {//add and edit
+            	
+            	$scope.uploader.upload();
             	
             	item.startDate = dateFormat(item.startDate, 'yyyy-MM-dd');
      			if(item.bidId){ // edit
@@ -87,6 +99,35 @@ define(function (require, exports, module) {
                     });
               	}
             };
+
+            $scope.changeFile = function(file) {
+            	$scope.file = file;
+            }
+            $scope.uperror = function(file, type, ext) {
+                if (type == 'extensions') {
+                    alert("上传文件类型错误，请选择png,jpeg,jpg,bmp文件上传。");
+                } else if (type == 'fileSingleSizeLimit') {
+                    alert("上传文件超过最大限制，请选择其它文件。");
+                } else if (type == 'emptyFile') {
+                    alert("上传文件为空文件，请选择其它文件。");
+                }
+            }
+            // 上传成功回调
+            $scope.singleupsuccess = function() {
+                setTimeout(function() {
+                    
+                    $scope.upsuccess( $scope.file);
+                }, 10);
+            }
+            $scope.upsuccess = function(file) {
+                // {"fileType":"txt","filePath":"","fileName":"1403331632090.txt","orgFileName":"tttt.txt","success":"true"}
+                $scope.filePath = file.filePath;
+                $scope.orgFileName = file.orgFileName;
+                console.log(angular.toJson(file));
+               
+            }
+            
+            
         //-------------delete----------        
             $scope.todelete = function(item) {//click on DELETE link
             	

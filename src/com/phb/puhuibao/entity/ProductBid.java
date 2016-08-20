@@ -15,16 +15,16 @@ public class ProductBid implements Serializable {
 	private Long totalAmount; // 总投资额度
 	private Integer status; // 投资状态
 	private String bidName;
-	private String bidPictures;//bid_pictures
+	private String bidContract;//bid_pictures
 	private Integer bidImportant ;//
 	
 	
-	
-	public String getBidPictures() {
-		return bidPictures;
+	 
+	public String getBidContract() {
+		return bidContract;
 	}
-	public void setBidPictures(String bidPictures) {
-		this.bidPictures = bidPictures;
+	public void setBidContract(String bidContract) {
+		this.bidContract = bidContract;
 	}
 	public Integer getBidImportant() {
 		return bidImportant;

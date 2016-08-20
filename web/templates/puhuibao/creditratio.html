@@ -1,0 +1,198 @@
+<div class="col-sm-12 col-md-12">
+
+ 
+ 
+            <form class="form-custom clearfix">
+	           
+                <div class="col-sm-5 col-md-5">
+                
+                    <a href="javascript:"  ng-click="creatematching()">产生本期分配方案</a>
+                    <a href="javascript:"  ng-click="saveRatio()">保存本期分配方案</a>
+                    <a href="javascript:"  ng-click="savePDF()">生成投资人PDF</a>
+ 
+                </div>
+                                                            
+                                                            
+               <div class="col-sm-1 col-md-1">
+                
+                  <font color="ff0000"><red>  {{createErrorMessage}}</red></font>
+                </div>
+                
+            <div class="col-sm-2 col-md-2">
+                                                 本期客户投资总额：
+                  <font color="ff0000"><red>  {{sum}}</red></font>
+            </div>
+                
+             <div class="col-sm-2 col-md-2">
+                                                本期客户人数：
+                  <font color="ff0000"><red>  {{count}}</red></font>
+                </div>
+            </form>
+ 
+  
+
+    <table class="table table-striped table-bordered table-condensed index-center  table-costom">
+        <thead>
+        <tr>
+            <th >序号</th>
+            <th >姓名</th>
+            <th >比例</th>
+            <th>现有债权</th>
+            <th>本期分配金额</th>
+            <th>分配后剩余金额</th>
+ 
+ 
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="rowlink" ng-repeat="item in limitArr">
+            <td>{{current*limit+$index+1}}</td>
+            <td>{{item.borrowerName}}</td>
+            <td>{{item.borrowPersentage}}</td>
+            <td>{{item.borrowAmount  }}</td>
+            <td>{{item.borrowAmount - item.borrowLeft }}</td>
+            <td ng-if="item.borrowLeft >= 0"> {{item.borrowLeft}}</td>
+            <td ng-if="item.borrowLeft < 0" style="background-color:#ff0000">{{item.borrowLeft}}</td>
+   
+        </tr>
+        </tbody>
+    </table>
+            <div data-remote-paging="pager" 
+					data-refresh="refresh" 
+					data-current="current" 
+					data-total="total" 
+					data-data="limitArr"
+					data-limit="limit"
+					data-params="params"
+			></div>
+	 
+</div>
+ 
+  
+ 
+<div class="modal fade" id="addandedit" tabindex="-1" role="dialog" aria-hidden="true">
+<form class="form-horizontal" name="addSyncApplForm" novalidate="novalidate"    ng-submit="create(pageitem)" >
+    <div class="modal-dialog" style="width: 830px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4  class="modal-title">新增</h4>
+            </div>
+            <div class="modal-body">
+               <div class="row">
+                    <div class="col-sm-12 col-md-12">
+             <h6 class="modal-title">借款人信息</h6>
+             
+             
+             
+                      <div class="form-group">
+			                <label class="col-lg-2 control-label">借款人姓名</label>
+			                <div class="col-lg-3">
+			                    <input type="text" class="form-control" required ng-model="pageitem.borrowerName" ng-maxlength="50" ng-trim maxlength="50" />
+			                </div>
+			                 <span class="mustItem">*</span>
+			                 <label class="col-lg-2 control-label">合同号</label>
+			                <div class="col-lg-3">
+			                     <input type="text" class="form-control" required ng-model="pageitem.borrowerContract" ng-maxlength="10"   ng-trim maxlength="10" />
+			                </div>
+			                <span class="mustItem">*</span>
+		 
+                        </div>
+                        
+                       <div class="form-group">
+                       	 <label class="col-lg-2 control-label">身份证</label>
+			                <div class="col-lg-3">
+			                    <input type="text" class="form-control" required ng-model="pageitem.borrowerId" ng-maxlength="18" ng-minlength="18"  />
+			                </div>
+			                <span class="mustItem">*</span>
+			                <label class="col-lg-2 control-label">身份</label>
+			                <div class="col-lg-3">
+			                    <select   id="selectedjob" ng-model="pageitem.borrowerJob"   ng-init="pageitem.borrowerJob = '1'"
+			                           required select2 
+			                          ng-options="pageitem.jobid as pageitem.jobname for pageitem  in borrowerjob"
+							    ></select>
+			                </div>
+			                 <span class="mustItem">*</span>
+
+		 
+                        </div>
+             
+             
+ 
+                        <div class="form-group">
+                        	<label class="col-lg-2 control-label">担保状态</label>
+			                <div class="col-lg-3">
+			                    <select   id="selectwarrant" ng-init="pageitem.warrantStatus = '1'" ng-model="pageitem.warrantStatus"  
+			                           required select2 
+			                          ng-options="pageitem.warrantid as pageitem.warrantname for pageitem  in borrowerwarrant"
+							    ></select>
+			                </div>
+			                <span class="mustItem">*</span>
+			                <label class="col-lg-2 control-label">资金用途</label>
+			                <div class="col-lg-3">
+			                    <select   id="selectusage" ng-init="pageitem.moneyUseage = '1'" ng-model="pageitem.moneyUseage"  
+			                           required select2 
+			                          ng-options="pageitem.usageid as pageitem.usagename for pageitem  in borrowerusage"
+							    ></select>
+			                </div>
+			                 <span class="mustItem">*</span>
+
+		 
+                        </div>
+   
+                        <div class="form-group">
+                       		 
+			               <label class="col-lg-2 control-label">金额（万）</label>
+			                <div class="col-lg-3">
+			                    <input type="text" class="form-control" required ng-model="pageitem.contractAmount" ng-maxlength="30" ng-trim maxlength="30" />
+			                </div>
+			                 <span class="mustItem">*</span>
+                       
+		 
+                        </div>
+                        
+                       <div class="form-group">
+                       		
+			                <label class="col-lg-2 control-label">起息日</label>
+			                <div class="col-lg-3">
+			                    <div data-datetimepicker="pageitem.contractStartdate"></div>
+			                </div>
+			                 <span class="mustItem">*</span>
+			               <label class="col-lg-2 control-label">到息日</label>
+			                <div class="col-lg-3">
+			                    <div data-datetimepicker="pageitem.contractExpiredate"></div>
+			                </div>
+			                 <span class="mustItem">*</span>
+ 
+		 
+                        </div>
+                        
+            
+ 
+    
+                        
+          
+
+          
+          
+                 
+          
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-primary"     ng-disabled="addSyncApplForm.$invalid" ng-click="save(pageitem)">保存</button>
+                <button type="button" class="btn btn-danger"     ng-click="clearForm()">重置</button>
+                <button type="button" class="btn btn-default"    data-dismiss="modal">取消</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    </form>
+    <!-- /.modal-dialog -->
+</div>
+ 
+ 
+ 
+ 
+ 

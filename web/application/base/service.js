@@ -582,6 +582,7 @@ define(function() {
 		return $resource('creditMatching.shtml');
 	}]);
 	
+ 
 	app.factory('GroupRedpacket', ['$resource', function($resource) {
 		return $resource('groupRedpacket.shtml');
 	}]);

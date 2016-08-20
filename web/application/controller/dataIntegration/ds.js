@@ -242,7 +242,7 @@ define(function(require, exports, module) {
                         }
                     }
                     // 上传成功回调
-                    $scope.singleupsuccess = function() {
+                    $scope.singleupsuccess = function(data) {
                         setTimeout(function(){
                             var files = $scope.data.uploaderFile;
                             $scope.upsuccess(files[0]);

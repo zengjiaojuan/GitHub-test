@@ -12,7 +12,7 @@
     <result property="currentAmount" column="current_amount" jdbcType="BIGINT"/>
     <result property="totalAmount" column="total_amount" jdbcType="BIGINT"/>
      <result property="bidName" column="bid_name" jdbcType="VARCHAR"/>
-     <result property="bidPictures" column="bid_pictures" jdbcType="VARCHAR"/>
+     <result property="bidContract" column="bid_contract" jdbcType="VARCHAR"/>
      <result property="bidImportant" column="bid_important" jdbcType="INTEGER"/>
   </resultMap>
   
@@ -33,8 +33,8 @@
 			<if test="bidName != null">
 				  ,bid_name=#{bidName,jdbcType=VARCHAR}
 			</if>
-			<if test="bidPictures != null">
-				  ,bid_pictures=#{bidPictures,jdbcType=VARCHAR}
+			<if test="bidContract != null">
+				  ,bid_contract=#{bidContract,jdbcType=VARCHAR}
 			</if>
 			<if test="bidImportant != null">
 				  ,bid_important=#{bidImportant,jdbcType=VARCHAR}
@@ -76,7 +76,8 @@
     bid_name,
     product_sn,
     total_amount,
-    bid_important
+    bid_important,
+    bid_contract
   </sql>
   <sql id="allapplColumnVar">
 	values(
@@ -84,7 +85,9 @@
 			#{bidName,jdbcType=VARCHAR},
 			#{productSN,jdbcType=VARCHAR},
 			#{totalAmount,jdbcType=BIGINT},
-			#{bidImportant,jdbcType=INTEGER}
+			#{bidImportant,jdbcType=INTEGER},
+			#{bidContract,jdbcType=VARCHAR}
+			
 			
 	)
   </sql>
@@ -96,7 +99,7 @@
     a.current_amount,
     a.total_amount,
     a.status,
-    a.bid_pictures,
+    a.bid_contract,
     a.bid_important,
     a.bid_name,
     b.type
@@ -110,7 +113,7 @@
     a.current_amount,
     a.total_amount,
     a.bid_name,
-    a.bid_pictures,
+    a.bid_contract,
     a.bid_important,
     CASE
                 WHEN alert.alert_deviceid IS NOT  NULL THEN  6
