@@ -14,6 +14,7 @@
      <result property="bidName" column="bid_name" jdbcType="VARCHAR"/>
      <result property="bidContract" column="bid_contract" jdbcType="VARCHAR"/>
      <result property="bidImportant" column="bid_important" jdbcType="INTEGER"/>
+     <result property="status" column="status" jdbcType="INTEGER"/>
   </resultMap>
   
   <!-- RESOURCE INSERT -->
@@ -42,6 +43,12 @@
 			
 			<if test="totalAmount != null">
 				  ,total_amount=#{totalAmount,jdbcType=BIGINT}
+			</if>
+			<if test="currentAmount != null">
+				  ,current_amount=#{currentAmount,jdbcType=BIGINT}
+			</if>
+			<if test="status != null">
+				  ,status=#{status,jdbcType=INTEGER}
 			</if>
 		 
 		</trim>
