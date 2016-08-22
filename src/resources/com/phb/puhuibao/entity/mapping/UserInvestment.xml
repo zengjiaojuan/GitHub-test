@@ -63,19 +63,27 @@
   
   <!-- RESOURCE SELECT -->
   <select id="query" parameterType="java.util.Map" resultMap="resourceResultMap">
-    select <include refid="allColumn" /> from phb_muser_investment a left join phb_product_bid c on a.bid_sn= c.bid_sn left join phb_asset_product b on b.product_sn= c.product_sn left join phb_mobile_user u on u.m_user_id = a.m_user_id <include refid="dynamicWhere" />
+    select <include refid="allColumn" /> from phb_muser_investment a left join phb_product_bid c on a.bid_sn= c.bid_sn left join phb_asset_product b on 
+
+b.product_sn= c.product_sn left join phb_mobile_user u on u.m_user_id = a.m_user_id <include refid="dynamicWhere" />
   </select>
   <select id="findByPager" parameterType="java.util.Map" resultMap="resourceResultMap">
     <include refid="queryBody" />
   </select>
   <select id="findByPagerCount" parameterType="java.util.Map" resultType="int" >
-	select count(1) from phb_muser_investment a left join phb_product_bid c on a.bid_sn= c.bid_sn left join phb_asset_product b on b.product_sn= c.product_sn left join phb_mobile_user u on u.m_user_id = a.m_user_id <include refid="dynamicWhere" />
+	select count(1) from phb_muser_investment a left join phb_product_bid c on a.bid_sn= c.bid_sn left join phb_asset_product b on b.product_sn= 
+
+c.product_sn left join phb_mobile_user u on u.m_user_id = a.m_user_id <include refid="dynamicWhere" />
   </select>
   <select id="unique" parameterType="java.util.Map" resultMap="resourceResultMap" >
-	select <include refid="allColumn" /> from phb_muser_investment a left join phb_product_bid c on a.bid_sn= c.bid_sn left join phb_asset_product b on b.product_sn= c.product_sn left join phb_mobile_user u on u.m_user_id = a.m_user_id <include refid="dynamicWhere" /> limit 1
+	select <include refid="allColumn" /> from phb_muser_investment a left join phb_product_bid c on a.bid_sn= c.bid_sn left join phb_asset_product b 
+
+on b.product_sn= c.product_sn left join phb_mobile_user u on u.m_user_id = a.m_user_id <include refid="dynamicWhere" /> limit 1
   </select>
   <select id="getById" parameterType="java.util.Map" resultMap="resourceResultMap">
-	select <include refid="allColumn" /> from phb_muser_investment a left join phb_product_bid c on a.bid_sn= c.bid_sn left join phb_asset_product b on b.product_sn= c.product_sn left join phb_mobile_user u on u.m_user_id = a.m_user_id where investment_id=#{investmentId}
+	select <include refid="allColumn" /> from phb_muser_investment a left join phb_product_bid c on a.bid_sn= c.bid_sn left join phb_asset_product b 
+
+on b.product_sn= c.product_sn left join phb_mobile_user u on u.m_user_id = a.m_user_id where investment_id=#{investmentId}
   </select>
 
   <!-- MySQL specific -->
@@ -148,7 +156,7 @@
   </sql>
   <sql id="dynamicOrderBy">
 	<if test="orderBy!=null">
-		order by a.${orderBy}
+		order by a.${orderBy},create_time
 		<if test="order!=null">
 			${order}
 		</if>
@@ -157,14 +165,18 @@
 
   <sql id="queryBody">
 	<if test="sno!=null and eno!=null and orderBy!=null">
-		select <include refid="allColumn" /> from phb_muser_investment a left join phb_product_bid c on a.bid_sn= c.bid_sn left join phb_asset_product b on b.product_sn= c.product_sn left join phb_mobile_user u on u.m_user_id = a.m_user_id
+		select <include refid="allColumn" /> from phb_muser_investment a left join phb_product_bid c on a.bid_sn= c.bid_sn left join 
+
+phb_asset_product b on b.product_sn= c.product_sn left join phb_mobile_user u on u.m_user_id = a.m_user_id
 		<include refid="dynamicWhere" />
 		<include refid="dynamicOrderBy" />
 		limit ${sno-1},${eno}
 	</if>
 	<!-- 无orderby -->
 	<if test="sno!=null and eno!=null and orderBy==null">
-		select <include refid="allColumn" /> from phb_muser_investment a left join phb_product_bid c on a.bid_sn= c.bid_sn left join phb_asset_product b on b.product_sn= c.product_sn left join phb_mobile_user u on u.m_user_id = a.m_user_id
+		select <include refid="allColumn" /> from phb_muser_investment a left join phb_product_bid c on a.bid_sn= c.bid_sn left join 
+
+phb_asset_product b on b.product_sn= c.product_sn left join phb_mobile_user u on u.m_user_id = a.m_user_id
 		<include refid="dynamicWhere" />
 		limit ${sno-1},${eno}
 	</if>
