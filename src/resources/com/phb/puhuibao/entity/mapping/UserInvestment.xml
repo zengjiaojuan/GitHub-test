@@ -156,11 +156,12 @@ on b.product_sn= c.product_sn left join phb_mobile_user u on u.m_user_id = a.m_u
   </sql>
   <sql id="dynamicOrderBy">
 	<if test="orderBy!=null">
-		order by a.${orderBy},create_time
+		order by a.${orderBy}
 		<if test="order!=null">
 			${order}
 		</if>
 	</if>
+	,create_time desc
   </sql>
 
   <sql id="queryBody">
