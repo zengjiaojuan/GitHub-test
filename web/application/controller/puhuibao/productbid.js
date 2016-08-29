@@ -73,7 +73,7 @@ define(function (require, exports, module) {
   
             $scope.create = function(item) {//add and edit
             	
-            	$scope.uploader.upload();
+            	//$scope.uploader.upload();
             	
             	item.startDate = dateFormat(item.startDate, 'yyyy-MM-dd');
      			if(item.bidId){ // edit

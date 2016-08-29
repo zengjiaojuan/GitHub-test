@@ -21,6 +21,7 @@
             <th width="230">产品名称</th>
             <th>已募资金</th>
             <th>总金额</th>
+            <th>重要性</th>
             <th>状态</th>
             <th>操作</th>
         </tr>
@@ -33,6 +34,7 @@
              <td>{{item.bidName}}</td>
             <td>{{item.currentAmount}}</td>
             <td>{{item.totalAmount}}</td>
+            <td>{{item.bidImportant}}</td>
             <td ng-if="item.status==0">未开标</td><td ng-if="item.status==1">抢购中</td><td ng-if="item.status==2">收益中</td><td ng-if="item.status==3">到期结清</td>
             <td>
                 <a href="javascript:" data-toggle="modal" data-target="#" upload-refresh="true" ng-click="edit(item)">修改</a> 
