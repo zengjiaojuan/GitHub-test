@@ -179,6 +179,7 @@ public class UserInvestmentServiceImpl extends DefaultBaseService<UserInvestment
 		message.setmUserId(entity.getmUserId());
 		message.setTitle("系统消息");
 		message.setContent("您成功投资了："+entity.getProductName()+",产品编号：" + entity.getBidSN() + ",投资总额：" + entity.getInvestmentAmount() + "元");
+		System.out.println(entity.getProductName());
 		userMessageDao.save(message);
 
 		params = new HashMap<String, Object>();
@@ -381,6 +382,7 @@ public class UserInvestmentServiceImpl extends DefaultBaseService<UserInvestment
 		message.setmUserId(entity.getmUserId());
 		message.setTitle("系统消息");
 		message.setContent("您成功投资了："+entity.getProductName()+",产品编号：" + entity.getBidSN() + ",投资总额：" + entity.getInvestmentAmount() + "元");
+		System.out.println(entity.getProductName());
 		userMessageDao.save(message);
 
 		params = new HashMap<String, Object>();

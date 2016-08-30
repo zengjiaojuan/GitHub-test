@@ -360,6 +360,7 @@ public class UserInvestmentController extends BaseController<UserInvestment, Str
 			UserInvestment entity = new UserInvestment();
 			entity.setmUserId( Integer.parseInt( muid));
 			entity.setBidSN(bidSN);
+			entity.setProductName(bid.getProductName());
 			entity.setInvestmentAmount(investmentAmount);
 			entity.setStatus(appContext.getInvestmentStatus());
 			Calendar cal = Calendar.getInstance();
