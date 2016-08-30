@@ -264,6 +264,36 @@ public class ProductBidController extends BaseController<ProductBid, String> {
 	}
 	
 	
+	
+	
+	/**
+	 * 推荐
+	 * @param muid 用户id 
+	 * @return
+	 */
+	@RequestMapping(value="borrowDetails")
+	@ResponseBody
+	public Map<String, Object> borrowDetails( @RequestParam String bidsn) {
+		Map<String, Object> data = new HashMap<String, Object>();
+		List <Map<String, Object>> list = null;
+		 
+		String sql="";
+		if(!StringUtil.isEmpty(bidsn)){ 
+			     
+				sql = "SELECT a.period, a.annualized_rate, a.payment_method, a.product_desc, c.borrower_name, case left(c.borrower_id,2)  when '11' then '北京市' when '12' then '天津市' when '13' then '河北省' when '14' then '山西省' when '15' then '内蒙古自治区' when '21' then '辽宁省' when '22' then '吉林省' when '23' then '黑龙江省' when '31' then '上海市' when '32' then '江苏省' when '33' then '浙江省' when '34' then '安徽省' when '35' then '福建省' when '36' then '江西省' when '37' then '山东省' when '41' then '河南省' when '42' then '湖北省' when '43' then '湖南省' when '44' then '广东省' when '45' then '广西壮族自治区' when '46' then '海南省' when '50' then '重庆市' when '51' then '四川省' when '52' then '贵州省' when '53' then '云南省' when '54' then '西藏自治区' when '61' then '陕西省' when '62' then '甘肃省' when '63' then '青海省' when '64' then '宁夏回族自治区' when '65' then '新疆维吾尔自治区' when '71' then '台湾省' when '81' then '香港特别行政区' when '82' then '澳门特别行政区' else '未知'      end   as borrower_province , year(curdate())-if(length(c.borrower_id)=18,substring(c.borrower_id,7,4),if(length(c.borrower_id)=15,concat('19',substring(c.borrower_id,7,2)),null)) as borrower_age,  case if(length(c.borrower_id)=18, cast(substring(c.borrower_id,17,1) as UNSIGNED)%2, if(length(c.borrower_id)=15,cast(substring(c.borrower_id,15,1) as UNSIGNED)%2,3))  when 1 then '男'	 when 0 then '女' else '未知' end as borrower_gender, case c.borrower_job when 1 then '私营业主' when 2 then '工薪' when 3 then '企业高管' end as borrower_job, case c.money_useage when 1 then '扩大经营' when 2 then '资金周转' when 3 then '个人消费' end as money_useage, case c.warrant_status when 1 then '质押担保' end as warrant_status  FROM phb_product_bid b LEFT JOIN phb_asset_product a ON b.product_sn = a.product_sn LEFT JOIN crm_borrower c ON b.bid_contract = c.borrower_contract where b.bid_sn =  '"+ bidsn +"'";
+				list = this.jdbcTemplate.queryForList(sql);
+				data.put("result", list);
+				data.put("status", 1);
+				 		  
+		}  
+
+		return data;
+ 
+	}
+	
+	
+	
+	
 	/**
 	 * 当前投资量
 	 * @param bidId
