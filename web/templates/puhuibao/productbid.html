@@ -83,7 +83,9 @@
 			                <label class="col-lg-2 control-label">标的名称</label>
 			                <div class="col-lg-3">
 			                     
-			                    <input type="text" class="form-control" required ng-model="keye.bidName" id="id_bidname" />
+			                    <input type="text" class="form-control" required ng-model="keye.bidName"  disabled ng-if="keye.status!=0" id="id_bidname" />
+			                    <input type="text" class="form-control" required ng-model="keye.bidName"  id="id_bidname"  ng-if="keye.status==0" />
+			                    
 			                 
 			                </div>
 			                <span class="mustItem">*</span>
@@ -104,7 +106,8 @@
                             <span class="mustItem">*</span>
 			                <label class="col-lg-2 control-label">总额度</label>
 			                <div class="col-lg-3">
-			                    <input type="number" class="form-control" required ng-model="keye.totalAmount" ng-maxlength="50" ng-trim maxlength="50" />
+			                    <input type="number" class="form-control" required ng-model="keye.totalAmount"  disabled ng-if="keye.status!=0" ng-maxlength="50" ng-trim maxlength="50" />
+			                    <input type="number" class="form-control" required ng-model="keye.totalAmount"   ng-if="keye.status==0" ng-maxlength="50" ng-trim maxlength="50" />
                             </div>
                             <span class="mustItem">*</span>
                         </div>

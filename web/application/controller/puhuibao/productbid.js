@@ -41,10 +41,7 @@ define(function (require, exports, module) {
             }
             //------------------add/edit--------- 	
             $scope.edit = function(item){ //click on edit link
- 				if (item.status!=0) {
- 					alert("已开标，不可修改！");
- 					return;
- 				}
+ 				 
              	$('#addandedit').modal('show');
               	$scope.keye = angular.copy(item);
               	AssetProduct.query({isArray:true,params:{productSN:item.productSN}},function (list){ //for combo
