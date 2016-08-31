@@ -592,6 +592,9 @@ define(function() {
 	app.factory('ThirdPayLog', ['$resource', function($resource) {
 		return $resource('thirdPayLog.shtml');
 	}]);
+	app.factory('ProductBid2', ['$resource', function($resource) {
+		return $resource('productBid.shtml');
+	}]);
 	
 	
 	

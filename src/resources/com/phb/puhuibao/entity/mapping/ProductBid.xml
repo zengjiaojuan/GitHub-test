@@ -15,6 +15,7 @@
      <result property="bidContract" column="bid_contract" jdbcType="VARCHAR"/>
      <result property="bidImportant" column="bid_important" jdbcType="INTEGER"/>
      <result property="status" column="status" jdbcType="INTEGER"/>
+     <result property="recommendStatus" column="recommend_status" jdbcType="INTEGER"/>
   </resultMap>
   
   <!-- RESOURCE INSERT -->
@@ -38,7 +39,7 @@
 				  ,bid_contract=#{bidContract,jdbcType=VARCHAR}
 			</if>
 			<if test="bidImportant != null">
-				  ,bid_important=#{bidImportant,jdbcType=VARCHAR}
+				  ,bid_important=#{bidImportant,jdbcType=INTEGER}
 			</if>
 			
 			<if test="totalAmount != null">
@@ -49,6 +50,9 @@
 			</if>
 			<if test="status != null">
 				  ,status=#{status,jdbcType=INTEGER}
+			</if>
+			<if test="recommendStatus != null">
+				  ,recommend_status=#{recommendStatus,jdbcType=INTEGER}
 			</if>
 		 
 		</trim>
@@ -122,6 +126,7 @@
     a.bid_name,
     a.bid_contract,
     a.bid_important,
+    a.recommend_status,
     CASE
                 WHEN alert.alert_deviceid IS NOT  NULL THEN  6
                 ELSE a.status
@@ -142,6 +147,9 @@
 		<if test="status != null">
 			AND a.status = #{status}
 		</if>
+		<if test="recommendStatus != null">
+			AND a.recommend_status = #{recommendStatus}
+		</if>
 		<if test="lstatus != null">
 			AND a.status <![CDATA[<]]> #{lstatus}
 		</if>
@@ -151,6 +159,7 @@
 		<if test="getype != null">
 			AND b.type <![CDATA[>]]>= #{getype}
 		</if>
+		
 	</trim>
   </sql>
   <sql id="dynamicOrderBy">

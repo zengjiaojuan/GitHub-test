@@ -17,9 +17,15 @@ public class ProductBid implements Serializable {
 	private String bidName;
 	private String bidContract;//bid_pictures
 	private Integer bidImportant ;//
-	
+	private Integer recommendStatus;//推荐标识符 0不推荐，1推荐
 	
 	 
+	public Integer getRecommendStatus() {
+		return recommendStatus;
+	}
+	public void setRecommendStatus(Integer recommendStatus) {
+		this.recommendStatus = recommendStatus;
+	}
 	public String getBidContract() {
 		return bidContract;
 	}

@@ -1,0 +1,97 @@
+
+<div class="col-sm-12 col-md-12">
+	<div class="row">
+		<div class="col-sm-12 col-md-12">
+			<form class="form-custom clearfix">
+				<div class="col-sm-2 col-md-2">
+					<input class="form-control" type="text" placeholder="产品编号"
+						ng-model="params.querykeyword" />
+				</div>
+				<div class="col-sm-4 col-md-4">
+					<button class="btn btn-custom" type="submit"
+						ng-click="refresh('first',true)">查询</button>
+					<button class="btn btn-custom" type="button" data-toggle="modal"
+						data-target="#add" upload-refresh="true" ng-click="clearForm()">新增</button>
+				</div>
+			</form>
+		</div>
+	</div>
+	<table
+		class="table table-striped table-bordered table-condensed index-center table-costom">
+		<thead>
+			<tr>
+				<th width="40">序号</th>
+				<th width="150">发标编号</th>
+				<th width="130">产品编号</th>
+				<th width="230">产品名称</th>
+				<th>是否推荐</th>
+				<th>重要等级</th>
+				<th>状态</th>
+				<th>操作</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr class="rowlink" ng-repeat="item in limitArr">
+				<td>{{current*limit+$index+1}}</td>
+				<td>{{item.bidSN}}</td>
+				<td>{{item.productSN}}</td>
+				<td>{{item.bidName}}</td>
+				<td>{{item.recommendStatus}}</td>
+				<td>{{item.bidImportant}}</td>
+				<td ng-if="item.status==0">未开标</td>
+				<td ng-if="item.status==1">抢购中</td>
+				<td ng-if="item.status==2">收益中</td>
+				<td ng-if="item.status==3">到期结清</td>
+				<td><a href="javascript:" data-toggle="modal" data-target="#"
+					upload-refresh="true" ng-click="recommend(item)">
+						<p ng-if="item.recommendStatus==0">推荐</p>
+						<p ng-if="item.recommendStatus==1">取消 推荐</p>
+				</a> <a href="javascript:" data-toggle="modal" data-target="#edit"
+					upload-refresh="true" ng-click="edit(item)">修改</a></td>
+			</tr>
+		</tbody>
+	</table>
+	<div data-remote-paging="pager" data-refresh="refresh"
+		data-current="current" data-total="total" data-data="limitArr"
+		data-limit="limit" data-params="params"></div>
+</div>
+
+<div class="modal fade" id="edit" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" style="width: 800px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">修改</h4>
+            </div>            
+            <form name="shareFm" class="form-horizontal" ng-submit="baocun(keyclone)" novalidate="novalidate">    
+	            <div class="modal-body">
+	                <div class="row">
+	                  <div class="col-sm-12 col-md-12">
+                        <div class="form-group">
+			                <label class="col-lg-2 control-label">重要等级</label>
+			                <div class="col-lg-3">
+			                    <input type="number" class="form-control" required ng-model="keyclone.bidImportant" ng-maxlength="50" ng-trim maxlength="50" />
+			                </div>
+			                <span class="mustItem">*</span>
+			           
+			                
+			              
+                            
+                        </div>
+                      
+                     
+	                 
+	                  </div>
+	                </div>
+	            </div>
+	            <div class="modal-footer">
+	              <button type="reset" class="btn btn-default">重置</button>
+	              <button type="submit" class="btn btn-primary" ng-disabled="shareFm.$invalid">保存</button>
+	              <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+	            </div>
+            </form>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div><!-- /.modal -->
