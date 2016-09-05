@@ -1,4 +1,5 @@
 eclipse.preferences.version=1
+encoding//web/templates/oms/user.html=UTF-8
 encoding//web/templates/puhuibao/advertisement.html=UTF-8
 encoding//web/templates/puhuibao/appreciation.html=UTF-8
 encoding//web/templates/puhuibao/assetproduct.html=UTF-8
@@ -11,4 +12,6 @@ encoding//web/templates/puhuibao/feedback.html=UTF-8
 encoding//web/templates/puhuibao/holiday.html=UTF-8
 encoding//web/templates/puhuibao/mobileuser.html=UTF-8
 encoding//web/templates/puhuibao/productbid.html=UTF-8
+encoding//web/templates/puhuibao/useraccount.html=UTF-8
+encoding//web/templates/puhuibao/userasset.html=UTF-8
 encoding/<project>=UTF-8
