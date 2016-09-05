@@ -324,7 +324,6 @@ public class UserInvestmentServiceImpl extends DefaultBaseService<UserInvestment
 		}
 		productBidDao.update(bid);
 		
-		//保存投资
 		entity.setCreateTime(new Date());
 		if(addRate !=null){
 			entity.setAnnualizedRate(productAnnualizedRate +  addRate.getAnnualizedRate()); // 产品年利率+加息劵利率

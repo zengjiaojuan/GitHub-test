@@ -407,7 +407,14 @@ public class UserInvestmentController extends BaseController<UserInvestment, Str
 			
 
 
-
+            int periodDays=0;
+            String periodUnit=product.getUnit();
+            if("个月".equals(periodUnit)){
+            	periodDays=product.getPeriod()*30;
+            }else if("天".equals(periodUnit)){
+            	periodDays=product.getPeriod()*1;
+            }
+            
 			int addrateflag=1;
 			if(addRate != null){// 加息劵存在
 				if(addRate.getRateStatus() ==0){// 失效的加息劵
@@ -416,40 +423,40 @@ public class UserInvestmentController extends BaseController<UserInvestment, Str
 					return data;
 				} else{
 					if(addRate.getAmountFlag().equals("equalorgreaterthan")){//>=
-						 if(investmentAmount < addRate.getRateAmount()){// 投资额小于加息劵
+						 if(investmentAmount < addRate.getRateAmount()){
 							 data.put("message", "此加息劵最低额度要求"+addRate.getRateAmount()+"元.");
 							 addrateflag=0;
 						 }
 					}
 					if(addRate.getAmountFlag().equals("equalorsmallerthan")){//<=
-						if(investmentAmount > addRate.getRateAmount()){// 投资额小于加息劵
+						if(investmentAmount > addRate.getRateAmount()){
 							 data.put("message", "此加息劵最多只能投"+addRate.getRateAmount()+"元.");
 							 addrateflag=0;
 						 }
 						
 					}
 					if(addRate.getAmountFlag().equals("equal")){
-						if(investmentAmount != addRate.getRateAmount()){//  
+						if(investmentAmount != addRate.getRateAmount()){
 							 data.put("message", "此加息劵只能用在投资额度为"+addRate.getRateAmount()+"元的产品上.");
 							 addrateflag=0;
 						 }
 					}
 					if(addRate.getRateFlag().equals("equalorgreaterthan")){//>=
-						 if(days < addRate.getRatePeriod()){// 投资额小于加息劵
+						 if(periodDays < addRate.getRatePeriod()){
 							 data.put("message", "此加息劵只能用在大于"+addRate.getRatePeriod()+"天的产品上.");
 							 addrateflag=0;
 						 }
 					} 
 					if(addRate.getRateFlag().equals("equalorsmallerthan")){//<=
-						if(days > addRate.getRatePeriod()){// 投资额小于加息劵
-							 data.put("message", "此加息劵只能用在小于"+addRate.getRateAmount()+"天的产品上.");
+						if(periodDays > addRate.getRatePeriod()){
+							 data.put("message", "此加息劵只能用在小于"+addRate.getRatePeriod()+"天的产品上.");
 							 addrateflag=0;
 						 }
 						
 					}
 					if(addRate.getRateFlag().equals("equal")){
-						if(days != addRate.getRatePeriod()){// 投资额小于加息劵
-							 data.put("message", "此加息劵只能用在投资额度为"+addRate.getRateAmount()+"元的产品上.");
+						if(periodDays != addRate.getRatePeriod()){
+							 data.put("message", "此加息劵只能用在投资额度为"+addRate.getRatePeriod()+"天的产品上.");
 							 addrateflag=0;
 						 }
 					}

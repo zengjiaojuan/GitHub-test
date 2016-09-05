@@ -18,7 +18,7 @@ public class ProductBid implements Serializable {
 	private String bidContract;//bid_pictures
 	private Integer bidImportant ;//
 	private Integer recommendStatus;//推荐标识符 0不推荐，1推荐
-	
+	private Integer type; // 产品类似
 	 
 	public Integer getRecommendStatus() {
 		return recommendStatus;
@@ -50,8 +50,6 @@ public class ProductBid implements Serializable {
 	public void setProductName(String productName) {
 		this.productName = productName;
 	}
-	private Integer type; // 产品类似
-	
 	public Integer getType() {
 		return type;
 	}
