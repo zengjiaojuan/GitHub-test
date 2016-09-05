@@ -77,7 +77,7 @@ public class ExperienceInvestmentController extends BaseController<ExperienceInv
 				  Date nowday =  new Date() ;
 				  long diff = nowday.getTime() - startday.getTime();//这样得到的差值是微秒级别
 				 
-				int currentTime_income = (int) (diff / (1000 * 60 * 60 * 24)) + 1;  // 天数  看到的时候包含当天
+				int currentTime_income = (int) (diff / (1000 * 60 * 60 * 24)) ;  // 天数  看到的时候包含当天
 				double amount = investment.getInvestmentAmount();
 				double everyIncome = Functions.calEveryIncome(amount, investment.getAnnualizedRate());
 
