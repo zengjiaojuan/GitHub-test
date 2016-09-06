@@ -23,8 +23,9 @@
 		<property name="triggers">
 			<list>
 				<ref bean="redeemJob"></ref>
-				<ref bean="addRateJobInvoke"></ref>
-				<ref bean="redPacketJob"/>
+				<ref bean="addRateJob"></ref>
+				<ref bean="redPacketJob"></ref>
+				<ref bean="deleteUselessLuckyMoneyJob"></ref>
 			</list>
 		</property>
 	</bean>
@@ -36,7 +37,7 @@
 			<value>0 0 0 * * ?</value>
 		</property>
 	</bean>
-	<bean name="addRateJobInvoke" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean" >
+	<bean name="addRateJob" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean" >
 		<property name="jobDetail">
 			<ref bean="invokeAddRateJob"></ref>
 		</property>
@@ -44,23 +45,23 @@
 			<value>0 0 23 * * ?</value>
 		</property>
 	</bean>
-	<bean name="deleteUselessLuckyMoneyJob" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean" >
-		<property name="jobDetail">
-			<ref bean="invokeAddRateJob"></ref>
-		</property>
-		<property name="cronExpression">
-			<value>0 0 23 * * ?</value>
-		</property>
-	</bean>
+
 	<bean name="redPacketJob" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean" >
 		<property name="jobDetail">
-			<ref bean="invokeDeleteUselessLuckyMoneyJob"></ref>
+			<ref bean="invokeAddRateJob"></ref>
 		</property>
 		<property name="cronExpression">
-			<value>0 0 22 * * ?</value>
+			<value>0 10 23 * * ?</value>
 		</property>
 	</bean>
-	
+		<bean name="deleteUselessLuckyMoneyJob" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean" >
+		<property name="jobDetail">
+			<ref bean="invokedeleteUselessLuckyMoneyJob"></ref>
+		</property>
+		<property name="cronExpression">
+			<value>0 0 10 * * ?</value>
+		</property>
+	</bean>
 	<bean id="invokeRedeemJob" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
 		<property name="targetObject">
 			<ref bean="fredeemjob"></ref>
@@ -71,7 +72,7 @@
 	</bean>
 	<bean id="invokeAddRateJob" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
 		<property name="targetObject">
-			<ref bean="addRateJob"></ref>
+			<ref bean="faddRateJob"></ref>
 		</property>
 		<property name="targetMethod">
 			<value>process</value>
@@ -85,7 +86,7 @@
 			<value>process</value>
 		</property>
 	</bean>
-	<bean id="invokeDeleteUselessLuckyMoneyJob" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+	<bean id="invokedeleteUselessLuckyMoneyJob" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
 		<property name="targetObject">
 			<ref bean="fdeleteUselessLuckyMoneyJob"></ref>
 		</property>
@@ -94,7 +95,7 @@
 		</property>
 	</bean>
 	<bean id="fredeemjob" class="com.phb.puhuibao.job.RedeemJob"></bean>
-	<bean id="addRateJob" class="com.phb.puhuibao.job.AddRateJob"></bean>
+	<bean id="faddRateJob" class="com.phb.puhuibao.job.AddRateJob"></bean>
 	<bean id="fredPacketJob" class="com.phb.puhuibao.job.RedPacketJob"></bean>
 	<bean id="fdeleteUselessLuckyMoneyJob" class="com.phb.puhuibao.job.deleteUselessLuckyMoneyJob"></bean>
 	<!-- 自定义扩展属性数据类型转换扩展点 -->
