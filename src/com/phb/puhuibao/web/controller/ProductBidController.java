@@ -138,7 +138,7 @@ public class ProductBidController extends BaseController<ProductBid, String> {
 			params.put("type", type);
 		}
 		params.put("lstatus", 9);
-		params.put("orderBy", "bid_important desc");
+		params.put("orderBy", "a.status , bid_important desc");
 		params.put("muid", muid);
 		//params.put("order", "desc");
 		Pager<ProductBid> p = this.getBaseService().findByPager(pager, params);
