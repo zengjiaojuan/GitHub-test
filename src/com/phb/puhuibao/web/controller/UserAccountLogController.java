@@ -2,6 +2,7 @@ package com.phb.puhuibao.web.controller;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,7 +38,7 @@ public class UserAccountLogController extends BaseController<UserAccountLog, Str
 	@RequestMapping(value="pageQuery")
 	@ResponseBody
 	public Map<String, Object> pageQuery(@RequestParam int pageno, @RequestParam String muid, String type) {
-		// 提现  0,8
+		// 提现  1,8
 		Pager<UserAccountLog> pager = new Pager<UserAccountLog>();
 		pager.setReload(true);
 		pager.setCurrent(pageno);
@@ -46,9 +47,14 @@ public class UserAccountLogController extends BaseController<UserAccountLog, Str
 		map.put("mUserId", muid);
 		map.put("orderBy", "create_time");
 		map.put("order", "desc");
-		//map.put("accountType", type);
-		if(!StringUtil.isBlank(type)){
-			map.put("accountTypeString", type);
+		
+		if(!StringUtil.isBlank(type)&&type.length()==3){
+			List<Integer> list = new ArrayList<Integer>();
+			list.add(8);
+			list.add(1);
+			map.put("list", list);
+		}else{
+			map.put("accountType", type);
 		}
 		
 		//0: 提现 1:充值   2: 下线投资提成 3:理财体验收益 4:投资 5:红包抵资 6:投资收益 7:投资赎回 8:提现中 
