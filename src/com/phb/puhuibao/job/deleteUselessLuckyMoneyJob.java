@@ -15,7 +15,7 @@ public class deleteUselessLuckyMoneyJob {
 
     public void process() {
 		try {
-			String sql = "delete from phb_muser_experience where experience_amount =0";
+			String sql = "delete from phb_muser_experience where status =0";
 			 this.jdbcTemplate.execute(sql);
 			 
 		} catch (Exception e) {

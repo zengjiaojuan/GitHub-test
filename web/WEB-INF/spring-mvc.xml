@@ -59,7 +59,7 @@
 			<ref bean="invokedeleteUselessLuckyMoneyJob"></ref>
 		</property>
 		<property name="cronExpression">
-			<value>0 0 10 * * ?</value>
+			<value>0 0 22 * * ?</value>
 		</property>
 	</bean>
 	<bean id="invokeRedeemJob" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
