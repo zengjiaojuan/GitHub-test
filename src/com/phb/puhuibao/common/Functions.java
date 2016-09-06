@@ -70,7 +70,7 @@ public class Functions {
 		BigDecimal amountBD = new BigDecimal(String.valueOf(amount));
 		BigDecimal rateBD = new BigDecimal(String.valueOf(rate));
 		BigDecimal yearDaysBD = new BigDecimal(String.valueOf(yearDays));
-		BigDecimal everyIncomeBD = amountBD.multiply(rateBD).divide(yearDaysBD, 4, BigDecimal.ROUND_DOWN);
+		BigDecimal everyIncomeBD = amountBD.multiply(rateBD).divide(yearDaysBD, 2, BigDecimal.ROUND_DOWN);
 		return everyIncomeBD.doubleValue();
 	}
 
