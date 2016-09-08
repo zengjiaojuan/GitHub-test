@@ -211,7 +211,7 @@ public class ProductBidController extends BaseController<ProductBid, String> {
 		String sql="";
 		if(StringUtil.isEmpty(muid)){// 用户未登陆
 			    //sql查出的是新手标
-				sql = "SELECT b.bid_id, b.bid_sn, a.product_name, a.annualized_rate, a.period, a.unit,CASE WHEN b.status = 3 THEN  b.total_amount ELSE b.current_amount END as currentAmount,b.total_amount totalAmount FROM phb_product_bid b LEFT JOIN phb_asset_product a ON b.product_sn = a.product_sn WHERE b. STATUS = 1 AND a.product_sn = 'P888'";
+				sql = "SELECT b.bid_id, b.bid_sn,b.status, a.product_name, a.annualized_rate, a.period, a.unit,CASE WHEN b.status = 3 THEN  b.total_amount ELSE b.current_amount END as currentAmount,b.total_amount totalAmount FROM phb_product_bid b LEFT JOIN phb_asset_product a ON b.product_sn = a.product_sn WHERE b. STATUS = 1 AND a.product_sn = 'P888'";
 				list = this.jdbcTemplate.queryForList(sql);
 				if (list.isEmpty()) {// 没有可以投资的新手标
 					data.put("result", retobj);
@@ -227,11 +227,11 @@ public class ProductBidController extends BaseController<ProductBid, String> {
 			list1 = this.jdbcTemplate.queryForList(sql);//通过muid查询投资表得到结果list
 			if(list1.isEmpty()){//新的用户(没有购买过理财产品的)
 				//sql查出的是新手标
-				sql = "SELECT b.bid_id, b.bid_sn, a.product_name, a.annualized_rate, a.period, a.unit,CASE WHEN b.status = 3 THEN  b.total_amount ELSE b.current_amount END as currentAmount,b.total_amount totalAmount FROM phb_product_bid b LEFT JOIN phb_asset_product a ON b.product_sn = a.product_sn WHERE b. STATUS = 1 AND a.product_sn = 'P888'";
+				sql = "SELECT b.bid_id, b.bid_sn,b.status, a.product_name, a.annualized_rate, a.period, a.unit,CASE WHEN b.status = 3 THEN  b.total_amount ELSE b.current_amount END as currentAmount,b.total_amount totalAmount FROM phb_product_bid b LEFT JOIN phb_asset_product a ON b.product_sn = a.product_sn WHERE b. STATUS = 1 AND a.product_sn = 'P888'";
 					  
 			}else{//老用户
 				//sql查出所有的标
-				sql = " SELECT b.bid_id, b.bid_sn, a.product_name, a.annualized_rate, a.period, a.unit  ,CASE WHEN b.status = 3 THEN  b.total_amount ELSE b.current_amount END as currentAmount,b.total_amount totalAmount  FROM phb_product_bid b LEFT JOIN phb_asset_product a ON b.product_sn = a.product_sn where b. STATUS = 1 order by a.important desc";
+				sql = " SELECT b.bid_id, b.bid_sn,b.status, a.product_name, a.annualized_rate, a.period, a.unit  ,CASE WHEN b.status = 3 THEN  b.total_amount ELSE b.current_amount END as currentAmount,b.total_amount totalAmount  FROM phb_product_bid b LEFT JOIN phb_asset_product a ON b.product_sn = a.product_sn where b. STATUS = 1 order by a.important desc";
 				
 			}
 			list = this.jdbcTemplate.queryForList(sql);
