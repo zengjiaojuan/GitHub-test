@@ -5,6 +5,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.math.BigDecimal;
 import java.net.MalformedURLException;
 import java.text.DecimalFormat;
 import java.text.Format;
@@ -267,28 +268,133 @@ public class ProductBidController extends BaseController<ProductBid, String> {
 	
 	
 	/**
-	 * 推荐
-	 * @param muid 用户id 
+	 * 项目介绍
+	 * @param bidsn 产品编号
 	 * @return
 	 */
 	@RequestMapping(value="borrowDetails")
+	//@RequestMapping(params = "method=borrowDetails", method = RequestMethod.GET)
 	@ResponseBody
-	public Map<String, Object> borrowDetails( @RequestParam String bidsn) {
-		Map<String, Object> data = new HashMap<String, Object>();
+	public void borrowDetails( @RequestParam String bidsn, HttpServletRequest request, HttpServletResponse response) {
+		
+//		Map<String, Object> data = new HashMap<String, Object>();
 		List <Map<String, Object>> list = null;
-		 
 		String sql="";
-		if(!StringUtil.isEmpty(bidsn)){ 
-			     
-				sql = "SELECT a.period, a.annualized_rate, a.payment_method, a.product_desc, c.borrower_name, case left(c.borrower_id,2)  when '11' then '北京市' when '12' then '天津市' when '13' then '河北省' when '14' then '山西省' when '15' then '内蒙古自治区' when '21' then '辽宁省' when '22' then '吉林省' when '23' then '黑龙江省' when '31' then '上海市' when '32' then '江苏省' when '33' then '浙江省' when '34' then '安徽省' when '35' then '福建省' when '36' then '江西省' when '37' then '山东省' when '41' then '河南省' when '42' then '湖北省' when '43' then '湖南省' when '44' then '广东省' when '45' then '广西壮族自治区' when '46' then '海南省' when '50' then '重庆市' when '51' then '四川省' when '52' then '贵州省' when '53' then '云南省' when '54' then '西藏自治区' when '61' then '陕西省' when '62' then '甘肃省' when '63' then '青海省' when '64' then '宁夏回族自治区' when '65' then '新疆维吾尔自治区' when '71' then '台湾省' when '81' then '香港特别行政区' when '82' then '澳门特别行政区' else '未知'      end   as borrower_province , year(curdate())-if(length(c.borrower_id)=18,substring(c.borrower_id,7,4),if(length(c.borrower_id)=15,concat('19',substring(c.borrower_id,7,2)),null)) as borrower_age,  case if(length(c.borrower_id)=18, cast(substring(c.borrower_id,17,1) as UNSIGNED)%2, if(length(c.borrower_id)=15,cast(substring(c.borrower_id,15,1) as UNSIGNED)%2,3))  when 1 then '男'	 when 0 then '女' else '未知' end as borrower_gender, case c.borrower_job when 1 then '私营业主' when 2 then '工薪' when 3 then '企业高管' end as borrower_job, case c.money_useage when 1 then '扩大经营' when 2 then '资金周转' when 3 then '个人消费' end as money_useage, case c.warrant_status when 1 then '质押担保' end as warrant_status  FROM phb_product_bid b LEFT JOIN phb_asset_product a ON b.product_sn = a.product_sn LEFT JOIN crm_borrower c ON b.bid_contract = c.borrower_contract where b.bid_sn =  '"+ bidsn +"'";
+		if(!StringUtil.isEmpty(bidsn)){    //当bidsn标的编号不为空时 通过sql查询债权信息			     
+				sql = "SELECT a.period,a.unit,a.annualized_rate, a.payment_method, a.product_desc, c.borrower_name, case left(c.borrower_id,2)  when '11' then '北京市' when '12' then '天津市' when '13' then '河北省' when '14' then '山西省' when '15' then '内蒙古自治区' when '21' then '辽宁省' when '22' then '吉林省' when '23' then '黑龙江省' when '31' then '上海市' when '32' then '江苏省' when '33' then '浙江省' when '34' then '安徽省' when '35' then '福建省' when '36' then '江西省' when '37' then '山东省' when '41' then '河南省' when '42' then '湖北省' when '43' then '湖南省' when '44' then '广东省' when '45' then '广西壮族自治区' when '46' then '海南省' when '50' then '重庆市' when '51' then '四川省' when '52' then '贵州省' when '53' then '云南省' when '54' then '西藏自治区' when '61' then '陕西省' when '62' then '甘肃省' when '63' then '青海省' when '64' then '宁夏回族自治区' when '65' then '新疆维吾尔自治区' when '71' then '台湾省' when '81' then '香港特别行政区' when '82' then '澳门特别行政区' else '未知'      end   as borrower_province , year(curdate())-if(length(c.borrower_id)=18,substring(c.borrower_id,7,4),if(length(c.borrower_id)=15,concat('19',substring(c.borrower_id,7,2)),null)) as borrower_age,  case if(length(c.borrower_id)=18, cast(substring(c.borrower_id,17,1) as UNSIGNED)%2, if(length(c.borrower_id)=15,cast(substring(c.borrower_id,15,1) as UNSIGNED)%2,3))  when 1 then '男'	 when 0 then '女' else '未知' end as borrower_gender, case c.borrower_job when 1 then '私营业主' when 2 then '工薪' when 3 then '企业高管' end as borrower_job, case c.money_useage when 1 then '扩大经营' when 2 then '资金周转' when 3 then '个人消费' end as money_useage, case c.warrant_status when 1 then '质押担保' end as warrant_status  FROM phb_product_bid b LEFT JOIN phb_asset_product a ON b.product_sn = a.product_sn LEFT JOIN crm_borrower c ON b.bid_contract = c.borrower_contract where b.bid_sn =  '"+ bidsn +"'";
 				list = this.jdbcTemplate.queryForList(sql);
-				data.put("result", list);
-				data.put("status", 1);
-				 		  
-		}  
+				//[{period=12, annualized_rate=0.100, payment_method=到期还本付息，月复利计息, 
+				//product_desc=“年年红”是金朗理财平台推出的具有较高资金流动性的理财模式，固定十二个月出借。到期后本金利息自动收回，省时省心轻松理财。, 
+				//borrower_name=null, borrower_province=未知, borrower_age=null, borrower_gender=未知,
+				//borrower_job=null, money_useage=null, warrant_status=null}]
+//				data.put("result", list);
+//				data.put("status", 1);
+				Object period = list.get(0).get("period");						//投资期限
+				Object unit = list.get(0).get("unit");      					//还款期限单位
+				Object payment_method = list.get(0).get("payment_method");      //还款方法
+//				Object  annualized_rate = list.get(0).get("annualized_rate");    //年化收益率
+				BigDecimal annualized_rate = ((BigDecimal) list.get(0).get("annualized_rate")).multiply(new BigDecimal(100)).setScale(0);
+				//System.out.println(annualized_rate.toString());
+				//String string = annualized_rate.toString();
+//				System.out.println("11111111111111111111111111111111111111111111111111");
+//				BigDecimal amountDB = new BigDecimal((char[]) annualized_rate);
+//				int i = amountDB.intValue();
 
-		return data;
- 
+//				Object rate = Integer.parseInt((String) annualized_rate)*100);
+				Object product_desc = list.get(0).get("product_desc");          //产品描述(借款描述)
+				Object borrower_name = list.get(0).get("borrower_name");        //借债人姓名
+				Object borrower_province = list.get(0).get("borrower_province");//借债人户籍
+				Object borrower_age = list.get(0).get("borrower_age");          //借债人年龄
+				Object borrower_gender = list.get(0).get("borrower_gender");    //借债人性别
+				Object borrower_job = list.get(0).get("borrower_job");          //借款人身份（单位信息）
+				Object money_useage = list.get(0).get("money_useage");          //借款用途
+				Object warrant_status = list.get(0).get("warrant_status");      //担保状态
+//				for (Map<String, Object> map : list) {
+//					for (Object All : map.values()) {
+//						System.out.println(All);	
+//					}
+//				}
+				
+				// 应该在service做同步块
+				File cache = null;
+				try {
+					cache = new File(request.getSession().getServletContext().getResource("/cache").getPath());  //获得路径
+				} catch (MalformedURLException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				if (!cache.exists()) {
+					cache.mkdir();
+				}
+				//String path = "cache/ prodIntro.html";  
+				String path = "cache/ "+ bidsn + new SimpleDateFormat("yyyyMMdd").format(new Date()) + ".html";  
+				String file = null;
+				try {
+					file = request.getSession().getServletContext().getResource("/").getPath() + path;
+				} catch (MalformedURLException e) {
+					LOG.error(e);
+					e.printStackTrace();
+				}
+				File f = new File(file);
+				File template = null;
+				try {
+					template = new File(request.getSession().getServletContext().getResource("/").getPath() + com.phb.puhuibao.common.Constants.PROD_INTRO);
+				} catch (MalformedURLException e) {
+					LOG.error(e);
+					e.printStackTrace();
+				}
+				boolean flag = true;
+				if (!f.exists() || f.lastModified() < template.lastModified()) {
+					//DecimalFormat df = new DecimalFormat("#.00%");
+					String content = getContent(request, com.phb.puhuibao.common.Constants.PROD_INTRO);//请求获得页面
+					content = content.replaceFirst("\\$period\\$", ""+period);
+					content = content.replaceFirst("\\$unit\\$", ""+unit);	
+					content = content.replaceFirst("\\$annualized_rate\\$", ""+annualized_rate);	
+					content = content.replaceFirst("\\$payment_method\\$", ""+payment_method);	
+					content = content.replaceFirst("\\$product_desc\\$", ""+product_desc);	
+					content = content.replaceFirst("\\$borrower_name\\$", ""+borrower_name);	
+					content = content.replaceFirst("\\$borrower_province\\$", ""+borrower_province);	
+					content = content.replaceFirst("\\$borrower_age\\$", ""+borrower_age);	
+					content = content.replaceFirst("\\$borrower_gender\\$", ""+borrower_gender);	
+					content = content.replaceFirst("\\$borrower_job\\$", ""+borrower_job);	
+					content = content.replaceFirst("\\$money_useage\\$", ""+money_useage);	
+					content = content.replaceFirst("\\$warrant_status\\$", ""+warrant_status);	
+
+					OutputStream fis = null;
+					OutputStreamWriter osw = null;
+					try {
+						fis = new FileOutputStream(f);
+						osw = new OutputStreamWriter(fis,"utf-8");
+						osw.write(content);
+						osw.flush();
+					} catch (IOException e) {
+						flag = false;
+						e.printStackTrace();
+					} finally {
+						try {
+							if (osw != null) {
+								osw.close();
+							}
+						} catch (Exception e) {
+						}
+					}
+				}
+				if (flag) {
+					try {
+						response.sendRedirect("../" + path);
+						//response.sendRedirect(path);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				} else {
+					try {
+						request.getRequestDispatcher(com.phb.puhuibao.common.Constants.ERROR_TEMPLATE).forward(request, response);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+		}  
+//		return data;
 	}
 	
 	
