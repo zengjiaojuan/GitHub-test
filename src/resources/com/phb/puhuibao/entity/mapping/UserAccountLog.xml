@@ -87,7 +87,7 @@
 			<if test="changeType != null">
 				AND change_type = #{changeType}
 			</if>
-			<if test="accountType != null">
+			<if test="accountType != null and accountType != ''">
 				AND account_type = #{accountType}
 			</if>
 			<if test="list != null">
