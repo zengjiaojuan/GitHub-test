@@ -1,0 +1,16 @@
+body{overflow: auto;}
+.part-item{margin:.25rem .4rem;}
+.li-item{padding: .1rem 0rem;width :3.4rem;line-height: .55rem;font-size: .34rem;}
+.li-title{line-height: .7rem; font-size: .40rem;color: goldenrod;}
+.li-item2{margin-top: .15rem; font-size: .31rem;line-height: .35rem;}
+.li4-item{text-align: center;font-size: .34rem;}
+.item{text-align: right;color: darkgrey; font-size: .30rem;}
+#img-idcard{margin-top:.15rem ; width: 100%;height: 4rem;}
+#img-loanContract{margin-top: .4rem; width: 100%;height: 8rem;}
+
+
+#table{width: auto;box-sizing: border-box;margin: .15rem auto;border-collapse: collapse;padding: 20px;}
+#table tr{display: block;width: 6.6rem;height: .8rem;position: relative;}
+#table tr:after{content: '';display: table;height: 1.8px;width: 6rem; background: #FFFFFF;background: linear-gradient(to right,#f2f2f2 0%,#c0c0c0 50%,#f2f2f2 100%);}
+#table td{width: 3.3rem;}
+
