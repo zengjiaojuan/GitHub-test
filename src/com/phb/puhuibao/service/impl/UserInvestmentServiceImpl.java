@@ -288,7 +288,7 @@ public class UserInvestmentServiceImpl extends DefaultBaseService<UserInvestment
 		String sql = "select 1 from phb_mobile_user where m_user_id=" + entity.getmUserId() + " for update";
 		this.jdbcTemplate.execute(sql);
 		UserRedpacket redpacket = null;
-		if (!"".equals(redpacketId)) {
+		if (!"".equals(redpacketId)&&redpacketId!=null) {
 			redpacket = userRedpacketDao.get(redpacketId);
 		}
 		if (redpacket != null && redpacket.getStatus() == 1) {

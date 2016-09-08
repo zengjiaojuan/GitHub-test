@@ -125,6 +125,7 @@ public class MobileUserController extends BaseController<MobileUser, String> {
 			StringBuffer url = new StringBuffer(); //localhost:8080/lcb/register/reg.html?tel=13811855184&invitecode=rtxv&amount=30
 			String ipandport = commons.getAddrServerIp();
 			url.append("http://").append(ipandport).append("/lcb/register/reg.html?tel=").append(muser.getmUserTel()).append("&invitecode=").append(invitecode).append("&amount=20");
+			//url.append("http://").append(ipandport).append("/lcb/register/share.html");
 			
 			data.put("des", "金朗理财邀请您财富之旅");
 			data.put("url", url.toString());

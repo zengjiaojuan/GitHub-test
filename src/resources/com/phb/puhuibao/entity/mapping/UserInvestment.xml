@@ -88,12 +88,14 @@ on b.product_sn= c.product_sn left join phb_mobile_user u on u.m_user_id = a.m_u
 
   <!-- MySQL specific -->
   <sql id="allapplColumn">
-    M_USER_ID,
+    m_user_id,
 	bid_sn,
 	investment_amount,
 	create_time,
 	status,
 	income_date,
+	last_income,
+	last_date,
 	expire_date,
 	total_income,
 	annualized_rate,
@@ -107,6 +109,8 @@ on b.product_sn= c.product_sn left join phb_mobile_user u on u.m_user_id = a.m_u
 			#{createTime,jdbcType=TIMESTAMP},
 			#{status,jdbcType=TINYINT},
 			#{incomeDate,jdbcType=DATE},
+			#{lastIncome,jdbcType=DECIMAL},
+			#{lastDate,jdbcType=DATE},
 			#{expireDate,jdbcType=DATE},
 			#{totalIncome,jdbcType=DECIMAL},
 			#{annualizedRate,jdbcType=DECIMAL},
