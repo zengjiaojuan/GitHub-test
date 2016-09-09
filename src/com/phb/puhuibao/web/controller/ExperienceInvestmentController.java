@@ -22,7 +22,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.idp.pub.context.AppContext;
 import com.idp.pub.service.IBaseService;
 import com.idp.pub.web.controller.BaseController;
-import com.phb.puhuibao.common.Functions;
 import com.phb.puhuibao.entity.ExperienceInvestment;
 import com.phb.puhuibao.entity.ExperienceProduct;
 import com.phb.puhuibao.entity.UserExperience;
@@ -63,7 +62,7 @@ public class ExperienceInvestmentController extends BaseController<ExperienceInv
 		params.put("mUserId", muid);
 		params.put("orderBy", "create_time");
 		params.put("order", "desc");
-		List<ExperienceInvestment> queryResult = this.getBaseService().findList(params);
+		List<ExperienceInvestment> queryResult = this.getBaseService().findList(params); //用户体验投资集合findList=query
 		List<ExperienceInvestment> result = new ArrayList<ExperienceInvestment>();
 
 		params = new HashMap<String, Object>();
@@ -74,23 +73,27 @@ public class ExperienceInvestmentController extends BaseController<ExperienceInv
 			} else {
 				 
 				  Date startday = investment.getIncomeDate();// 起息日
-				  Date nowday =  new Date() ;
-				  long diff = nowday.getTime() - startday.getTime();//这样得到的差值是微秒级别
+				  Date nowday =  new Date() ;                // 当前时间
+				  long diff = nowday.getTime() - startday.getTime();//这样得到的差值是微秒级别(当前时间-起息时间)
 				 
-				int currentTime_income = (int) (diff / (1000 * 60 * 60 * 24)) ;  // 天数  看到的时候包含当天
-				double amount = investment.getInvestmentAmount();
-				double everyIncome = Functions.calEveryIncome(amount, investment.getAnnualizedRate());
-
+				int currentTime_income = (int) (diff / (1000 * 60 * 60 * 24)) + 1;  // 天数  看到的时候包含当天 //剩余天数
+				double amount = investment.getInvestmentAmount();                // 投资金额
+				//double everyIncome = Functions.calEveryIncome(amount, investment.getAnnualizedRate());//计算每天的收益，不考虑闰年(投资金额 ,年化利率)
+				//double annualizedRate = investment.getAnnualizedRate();
+				double everyIncome= amount * (investment.getAnnualizedRate()) / 365;
+				//BigDecimal bd1 = new BigDecimal(amount * (investment.getAnnualizedRate()));
 				if(currentTime_income<=0){// 如果今天在起息日之前
-					investment.setLeftDays(investment.getPeriod());
-					investment.setLastIncome(0.0);
+					investment.setLeftDays(investment.getPeriod());// 到期天数(初始周期5天)
+					investment.setLastIncome(0.00);//预期收益 初始为0.00
 				}else{
-					if (currentTime_income > investment.getPeriod()) {
+					if (currentTime_income > investment.getPeriod()) { //剩余天数>到期天数
 						investment.setLeftDays(0);
 						investment.setLastIncome(everyIncome * investment.getPeriod());
+						//investment.setLastIncome(everyIncome * investment.getPeriod());
 					} else {
 						investment.setLeftDays(appContext.getExperiencePeriod() -  currentTime_income);
 						investment.setLastIncome(everyIncome * currentTime_income);
+						//investment.setLastIncome(everyIncome * investment.getPeriod());
 
 					}
 					
