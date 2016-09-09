@@ -26,6 +26,7 @@
 				<ref bean="addRateJob"></ref>
 				<ref bean="redPacketJob"></ref>
 				<ref bean="deleteUselessLuckyMoneyJob"></ref>
+				<ref bean="lastIncomeJob"></ref>
 			</list>
 		</property>
 	</bean>
@@ -62,6 +63,14 @@
 			<value>0 0 22 * * ?</value>
 		</property>
 	</bean>
+	<bean name="lastIncomeJob" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean" >
+		<property name="jobDetail">
+			<ref bean="invokeLastIncomeJob"></ref>
+		</property>
+		<property name="cronExpression">
+			<value>0 5 0 * * ?</value>
+		</property>
+	</bean>
 	<bean id="invokeRedeemJob" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
 		<property name="targetObject">
 			<ref bean="fredeemjob"></ref>
@@ -94,10 +103,19 @@
 			<value>process</value>
 		</property>
 	</bean>
+	<bean id="invokeLastIncomeJob" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject">
+			<ref bean="flastIncomeJob"></ref>
+		</property>
+		<property name="targetMethod">
+			<value>process</value>
+		</property>
+	</bean>
 	<bean id="fredeemjob" class="com.phb.puhuibao.job.RedeemJob"></bean>
 	<bean id="faddRateJob" class="com.phb.puhuibao.job.AddRateJob"></bean>
 	<bean id="fredPacketJob" class="com.phb.puhuibao.job.RedPacketJob"></bean>
 	<bean id="fdeleteUselessLuckyMoneyJob" class="com.phb.puhuibao.job.deleteUselessLuckyMoneyJob"></bean>
+	<bean id="flastIncomeJob" class="com.phb.puhuibao.job.LastIncomeJob"></bean>
 	<!-- 自定义扩展属性数据类型转换扩展点 -->
 	<bean id="conversionService"
 		class="org.springframework.format.support.FormattingConversionServiceFactoryBean">
