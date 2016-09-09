@@ -661,7 +661,17 @@ public class UserInvestmentController extends BaseController<UserInvestment, Str
 		entity.setBidSN(bidSN);
 		entity.setInvestmentAmount(investmentAmount);
 		entity.setStatus(appContext.getInvestmentStatus());
-		int period=setAllDate(product, entity, null);	
+		int period=setAllDate(product, entity, null);
+		//--------计算预期总收益----------
+		double totalIncome=0.0;//预期总收益
+		totalIncome=investmentAmount* product.getAnnualizedRate()/365* period;
+		entity.setTotalIncome(totalIncome);// 保存预期总收益	
+		//--------计算每日&最终总   收益----------
+		double everyIncome =0.0;// 每日收益	
+		everyIncome = Functions.calEveryIncome(investmentAmount, product.getAnnualizedRate());  // 获取每日收益
+		double lastIncome =0.0;//最后实际收益
+		entity.setDailyIncome(everyIncome);// 保存每日收益
+		entity.setLastIncome(lastIncome); //保存最终收益---从0开始	
 		try {
 			userInvestmentService.processSave(entity, redpacketId,product.getAnnualizedRate());
 			data.put(Constants.SUCCESS, Constants.TRUE);
@@ -703,7 +713,7 @@ public class UserInvestmentController extends BaseController<UserInvestment, Str
 		else{
 			entity.setIncomeDate(cal.getTime());
 		}			
-		result.put("incomeDate", entity.getIncomeDate());
+	
 		//---------设置截止日期&最后一天-------------
 		int period=0;		   
          if (product.getUnit().indexOf("月") > 0) {
@@ -720,7 +730,7 @@ public class UserInvestmentController extends BaseController<UserInvestment, Str
             period=product.getPeriod()*1;
         }
        
-		result.put("RedeemDate", cal.getTime());
+	
 		entity.setExpireDate(cal.getTime());// 到期日
 		entity.setLastDate(cal.getTime());//最后一天
 		return period;

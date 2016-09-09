@@ -110,7 +110,7 @@ public class UserInvestmentServiceImpl extends DefaultBaseService<UserInvestment
 		
 		return entity;
 	}
-
+   //保存投资  带红包  不带加息券
 	@Override
 	public void processSave(UserInvestment entity, String redpacketId,Double productAnnualizedRate) {
 		double deductionAmount = 0;
