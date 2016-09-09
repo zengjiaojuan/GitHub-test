@@ -73,7 +73,7 @@ public class UserInvestmentController extends BaseController<UserInvestment, Str
 	private IBaseService<UserRedpacket, String> userRedpacketService;
 
 	@Resource(name = "jdbcTemplate")
-	private JdbcTemplate jdbcTemplate;
+	private  JdbcTemplate jdbcTemplate;
 	
 	/**
 	 * 我的投资 翻页
@@ -350,76 +350,24 @@ public class UserInvestmentController extends BaseController<UserInvestment, Str
 			entity.setProductName(bid.getProductName());
 			entity.setInvestmentAmount(investmentAmount);		
 			entity.setStatus(appContext.getInvestmentStatus());
-			Calendar cal = Calendar.getInstance();	//得到投资当天时间
-			//------计算并set起息日期-------
-			int waitDay=0;
-			int w = cal.get(Calendar.DAY_OF_WEEK)+1;
-			if (w == 1) {
-				waitDay=1;
-				cal.add(Calendar.DATE, 1);
-			} else if (w == 7) {
-				waitDay=2;
-				cal.add(Calendar.DATE, 2);
-			}	
-			while (true) {
-				String date = new SimpleDateFormat("yyyy-MM-dd").format(cal.getTime());
-				String sql = "select 1 from phb_holiday where holiday_date='" + date + "'";
-				List <Map<String, Object>> list = this.jdbcTemplate.queryForList(sql);
-				if (list.isEmpty()) {
-					break;
-				}
-				waitDay+=1;
-				cal.add(Calendar.DATE, 1);
-			}
-			if(waitDay==0){
-				cal.add(Calendar.DATE, 1);
-				entity.setIncomeDate(cal.getTime());	
-			}
-			else{
-				entity.setIncomeDate(cal.getTime());
-			}			
-			result.put("incomeDate", entity.getIncomeDate());
-			//---------设置截止日期&最后一天-------------
-			int period=0;
-			    if(waitDay==0){
-			    	cal.add(Calendar.DATE, -1);
-			    }else{
-			    	   cal.add(Calendar.DATE, -waitDay);
-			    }		 
-	         if (product.getUnit().indexOf("月") > 0) {
-	        	if(product.getPeriod()==12){
-	        		cal.add(Calendar.DATE, 365);
-	        		 period=365;	
-	        	}else{
-	        		 cal.add(Calendar.MONTH, product.getPeriod());
-	 	            period=product.getPeriod()*30;  
-	        	}
-	           
-	        } else {
-	            cal.add(Calendar.DATE, product.getPeriod());
-	            period=product.getPeriod()*1;
-	        }
-	       
-			result.put("RedeemDate", cal.getTime());
-			entity.setExpireDate(cal.getTime());// 到期日
-			entity.setLastDate(cal.getTime());//最后一天			
+			int period=setAllDate(product, entity, result);			
 			//--------计算预期总收益----------
 			double totalIncome=0.0;//预期总收益
 			totalIncome=investmentAmount* product.getAnnualizedRate()/365* period;
 			entity.setTotalIncome(totalIncome);// 保存预期总收益	
 			//--------计算每日&最终总   收益----------
 			double everyIncome =0.0;// 每日收益							
-			double lastIncome=0.0;//最后实际收益
-			int days = (int) ((cal.getTimeInMillis() - entity.getIncomeDate().getTime()) / (24 * 3600 * 1000));		
+			double lastIncome =0.0;//最后实际收益
+			//int days = (int) ((cal.getTimeInMillis() - entity.getIncomeDate().getTime()) / (24 * 3600 * 1000));		
 			if(addRate != null){
 				everyIncome = Functions.calEveryIncome(investmentAmount, addRate.getAnnualizedRate() + product.getAnnualizedRate());  // 获取每日收益
-				lastIncome=Functions.calTotalIncome(investmentAmount,addRate.getAnnualizedRate()+product.getAnnualizedRate(), days, 365);
+				//lastIncome=Functions.calTotalIncome(investmentAmount,addRate.getAnnualizedRate()+product.getAnnualizedRate(), days, 365);
 			}else{
 				everyIncome = Functions.calEveryIncome(investmentAmount,product.getAnnualizedRate());  // 获取每日收益
-				lastIncome=Functions.calTotalIncome(investmentAmount,  product.getAnnualizedRate(),days,365);
+				//lastIncome=Functions.calTotalIncome(investmentAmount,  product.getAnnualizedRate(),days,365);
 			}						
 			entity.setDailyIncome(everyIncome);// 保存每日收益
-			entity.setLastIncome(lastIncome); //保存最终收益						   
+			entity.setLastIncome(lastIncome); //保存最终收益---从0开始						   
 			int addrateflag=1;
 			if(addRate != null){// 加息劵存在
 				if(addRate.getRateStatus() ==0){// 失效的加息劵
@@ -652,6 +600,7 @@ public class UserInvestmentController extends BaseController<UserInvestment, Str
 	@ResponseBody
 	public Map<String, Object> adminSave(@RequestParam int muid, @RequestParam String bidSN, @RequestParam long investmentAmount, @RequestParam String redpacketId) {
 		Map<String, Object> params = new HashMap<String, Object>();
+		Map<String, Object> data = new HashMap<String, Object>();
 		params.put("bidSN", bidSN);
 		ProductBid bid = productBidService.unique(params);
 		if (bid.getType() == 0) {
@@ -662,7 +611,7 @@ public class UserInvestmentController extends BaseController<UserInvestment, Str
 			params.put("mUserId", muid);
 			Pager<UserInvestment> p = this.getBaseService().findByPager(pager, params);
 			if (p.getTotal() > 0) {
-				Map<String, Object> data = new HashMap<String, Object>();
+			
 				data.put(Constants.SUCCESS, Constants.FALSE);
 				data.put(Constants.MESSAGE, "您不可再投资“新手专享”。");
 				return data;			
@@ -686,8 +635,7 @@ public class UserInvestmentController extends BaseController<UserInvestment, Str
 		}
 		
 		MobileUser user = mobileUserService.getById("" + muid);
-		if ((user.getmUserMoney() - user.getFrozenMoney() + deductionAmount) < investmentAmount) {
-			Map<String, Object> data = new HashMap<String, Object>();
+		if ((user.getmUserMoney() - user.getFrozenMoney() + deductionAmount) < investmentAmount) {		
 			data.put(Constants.SUCCESS, Constants.FALSE);
 			data.put(Constants.MESSAGE, "用户余额不足！");
 			return data;			
@@ -695,15 +643,13 @@ public class UserInvestmentController extends BaseController<UserInvestment, Str
 		
 		long currentAmount = bid.getCurrentAmount();
 		long totalAmount = bid.getTotalAmount();
-		if (totalAmount - currentAmount < investmentAmount) {
-			Map<String, Object> data = new HashMap<String, Object>();
+		if (totalAmount - currentAmount < investmentAmount) {			
 			data.put(Constants.SUCCESS, Constants.FALSE);
 			data.put(Constants.MESSAGE, "剩余额度：" + (totalAmount - currentAmount));
 			return data;
 		} else if (totalAmount - currentAmount > investmentAmount) {
 			int minInvestmentAmount = product.getInvestmentAmountMin();
-			if (investmentAmount % (minInvestmentAmount) > 0) {
-				Map<String, Object> data = new HashMap<String, Object>();
+			if (investmentAmount % (minInvestmentAmount) > 0) {		
 				data.put(Constants.SUCCESS, Constants.FALSE);
 				data.put(Constants.MESSAGE, "不符合投资额递增倍数！");
 				return data;
@@ -715,25 +661,7 @@ public class UserInvestmentController extends BaseController<UserInvestment, Str
 		entity.setBidSN(bidSN);
 		entity.setInvestmentAmount(investmentAmount);
 		entity.setStatus(appContext.getInvestmentStatus());
-		Calendar cal = Calendar.getInstance();
-		cal.add(Calendar.DATE, 1); // 到账第二天起息
-		int w = cal.get(Calendar.DAY_OF_WEEK);
-		if (w == 1) {
-			cal.add(Calendar.DATE, 1);
-		} else if (w == 7) {
-			cal.add(Calendar.DATE, 2);
-		}		
-		while (true) {
-			String date = new SimpleDateFormat("yyyy-MM-dd").format(cal.getTime());
-			String sql = "select 1 from phb_holiday where holiday_date='" + date + "'";
-			List <Map<String, Object>> list = this.jdbcTemplate.queryForList(sql);
-			if (list.isEmpty()) {
-				break;
-			}
-			cal.add(Calendar.DATE, 1);
-		}
-		entity.setIncomeDate(cal.getTime()); // short date
-		Map<String, Object> data = new HashMap<String, Object>();
+		int period=setAllDate(product, entity, null);	
 		try {
 			userInvestmentService.processSave(entity, redpacketId,product.getAnnualizedRate());
 			data.put(Constants.SUCCESS, Constants.TRUE);
@@ -745,5 +673,56 @@ public class UserInvestmentController extends BaseController<UserInvestment, Str
 			return data;
 		}
 		
+	}
+	public  int setAllDate(AssetProduct product,UserInvestment entity,Map result){
+		Calendar cal = Calendar.getInstance();	//得到投资当天时间
+		//------计算并set起息日期-------
+		int waitDay=0;
+		int w = cal.get(Calendar.DAY_OF_WEEK)+1;
+		if (w == 1) {
+			waitDay=1;
+			cal.add(Calendar.DATE, 1);
+		} else if (w == 7) {
+			waitDay=2;
+			cal.add(Calendar.DATE, 2);
+		}	
+		while (true) {
+			String date = new SimpleDateFormat("yyyy-MM-dd").format(cal.getTime());
+			String sql = "select 1 from phb_holiday where holiday_date='" + date + "'";
+			List <Map<String, Object>> list = jdbcTemplate.queryForList(sql);
+			if (list.isEmpty()) {
+				break;
+			}
+			waitDay+=1;
+			cal.add(Calendar.DATE, 1);
+		}
+		if(waitDay==0){
+			cal.add(Calendar.DATE, 1);
+			entity.setIncomeDate(cal.getTime());	
+		}
+		else{
+			entity.setIncomeDate(cal.getTime());
+		}			
+		result.put("incomeDate", entity.getIncomeDate());
+		//---------设置截止日期&最后一天-------------
+		int period=0;		   
+         if (product.getUnit().indexOf("月") > 0) {
+        	if(product.getPeriod()==12){
+        		cal.add(Calendar.DATE, 365);
+        		 period=365;	
+        	}else{
+        		 cal.add(Calendar.MONTH, product.getPeriod());
+ 	            period=product.getPeriod()*30;  
+        	}
+           
+        } else {
+            cal.add(Calendar.DATE, product.getPeriod());
+            period=product.getPeriod()*1;
+        }
+       
+		result.put("RedeemDate", cal.getTime());
+		entity.setExpireDate(cal.getTime());// 到期日
+		entity.setLastDate(cal.getTime());//最后一天
+		return period;
 	}
 }
