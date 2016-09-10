@@ -84,16 +84,21 @@ public class ExperienceInvestmentController extends BaseController<ExperienceInv
 				//BigDecimal bd1 = new BigDecimal(amount * (investment.getAnnualizedRate()));
 				if(currentTime_income<=0){// 如果今天在起息日之前
 					investment.setLeftDays(investment.getPeriod());// 到期天数(初始周期5天)
-					investment.setLastIncome(0.00);//预期收益 初始为0.00
+					BigDecimal   b   =   new   BigDecimal(0.00); 
+					investment.setLastIncome(b.setScale(2,   BigDecimal.ROUND_DOWN).doubleValue());//预期收益 初始为0.00
 				}else{
 					if (currentTime_income > investment.getPeriod()) { //剩余天数>到期天数
 						investment.setLeftDays(0);
-						investment.setLastIncome(everyIncome * investment.getPeriod());
-						//investment.setLastIncome(everyIncome * investment.getPeriod());
+						BigDecimal bg = new BigDecimal(everyIncome * investment.getPeriod());
+						double LastIncome = bg.setScale(2, BigDecimal.ROUND_DOWN).doubleValue();
+						investment.setLastIncome(LastIncome);	
+						//investment.setLastIncome(everyIncome * investment.getPeriod());	
 					} else {
 						investment.setLeftDays(appContext.getExperiencePeriod() -  currentTime_income);
-						investment.setLastIncome(everyIncome * currentTime_income);
-						//investment.setLastIncome(everyIncome * investment.getPeriod());
+						BigDecimal bg = new BigDecimal(everyIncome * investment.getPeriod());
+						double LastIncome = bg.setScale(2, BigDecimal.ROUND_DOWN).doubleValue();
+						investment.setLastIncome(LastIncome);
+						//investment.setLastIncome(everyIncome * currentTime_income);
 
 					}
 					
