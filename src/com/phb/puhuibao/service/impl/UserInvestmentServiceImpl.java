@@ -1,7 +1,10 @@
 package com.phb.puhuibao.service.impl;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
@@ -282,12 +285,12 @@ public class UserInvestmentServiceImpl extends DefaultBaseService<UserInvestment
 	// 投资  带红包 带加息劵
 	@Override
 	public  void processSave(UserInvestment entity, String redpacketId, AddRate addRate,Double productAnnualizedRate,UserAddrate useraddRate) {
-
-		double deductionAmount = 0;
-		
+		Map<String, Object> params = new HashMap<String, Object>();
+		UserMessage message=null; 
+		double deductionAmount = 0;		
+		UserRedpacket redpacket = null;		
 		String sql = "select 1 from phb_mobile_user where m_user_id=" + entity.getmUserId() + " for update";
-		this.jdbcTemplate.execute(sql);
-		UserRedpacket redpacket = null;
+		this.jdbcTemplate.execute(sql);		
 		if (!"".equals(redpacketId)&&redpacketId!=null) {
 			redpacket = userRedpacketDao.get(redpacketId);
 		}
@@ -304,7 +307,6 @@ public class UserInvestmentServiceImpl extends DefaultBaseService<UserInvestment
 			updateredpacket.setStatus(0);
 			userRedpacketDao.update(updateredpacket);
 		}
-
 		// 用户的红包退回到余额
 		MobileUser u = mobileUserDao.get("" + entity.getmUserId());
 		MobileUser user = new MobileUser();
@@ -312,8 +314,7 @@ public class UserInvestmentServiceImpl extends DefaultBaseService<UserInvestment
 		user.setmUserMoney(u.getmUserMoney() - entity.getInvestmentAmount() + deductionAmount);
 		mobileUserDao.update(user);
 		
-		// 看是否投满
-		Map<String, Object> params = new HashMap<String, Object>();
+		// 看是否投满		
 		params.put("bidSN", entity.getBidSN());
 		ProductBid b = productBidDao.unique(params);
 		ProductBid bid = new ProductBid();
@@ -322,17 +323,37 @@ public class UserInvestmentServiceImpl extends DefaultBaseService<UserInvestment
 		if (bid.getCurrentAmount().equals(b.getTotalAmount())) {   // 如果投资额度满了   状态修改
 			bid.setStatus(2);
 		}
-		productBidDao.update(bid);
-		
+		productBidDao.update(bid);		
 		entity.setCreateTime(new Date());
 		if(addRate !=null){
 			entity.setAnnualizedRate(productAnnualizedRate +  addRate.getAnnualizedRate()); // 产品年利率+加息劵利率
 		}else{
 			entity.setAnnualizedRate(productAnnualizedRate);
 		}
-		
 		this.getBaseDao().save(entity); // 保存投资
+		params = new HashMap<String, Object>();
+		params.put("mUserId", entity.getmUserId());
+		List<UserInvestment> list=this.getBaseDao().find(params);
 		
+		if(list.size()==1){
+			MobileUser mu=mobileUserDao.get(entity.getmUserId()+"");
+			if (mu.getParentId() != null && mu.getParentId() > 0) {			
+				UserRedpacket redp=new UserRedpacket();
+				redp.setmUserId(mu.getParentId());
+				redp.setDeductionRate(appContext.getDeductionRate());
+				redp.setRedpacketAmount(appContext.getInviteRedpacketAmount());
+				redp.setStatus(1);
+				Calendar cal = Calendar.getInstance();
+				cal.add(Calendar.DATE, appContext.getRedpacketPeriod());
+				redp.setLastDate(cal.getTime());
+				userRedpacketDao.save(redp);										
+				 message =  new UserMessage();
+				 message.setmUserId(mu.getParentId());
+				 message.setTitle("获得推荐红包");
+				 message.setContent("因为推荐"+ mu.getmUserTel()+"您于" + new SimpleDateFormat("yyyy年MM月dd日").format(new Date()) + "获得推荐红包"+appContext.getInviteRedpacketAmount()+"元");
+				 userMessageDao.save(message);												
+			}
+		}
 		//修改加息劵状态
 		if(useraddRate!=null){
 			UserAddrate updateuseraddrate  = new UserAddrate();
@@ -376,12 +397,10 @@ public class UserInvestmentServiceImpl extends DefaultBaseService<UserInvestment
 			log.setAccountType(5);
 			userAccountLogDao.save(log);
 		}
-		
-		UserMessage message =  new UserMessage();
+		message =  new UserMessage();		
 		message.setmUserId(entity.getmUserId());
-		message.setTitle("系统消息"); 
-		message.setContent("您成功投资了"+entity.getProductName()+",产品编号为" + entity.getBidSN() + ",投资总额为" + entity.getInvestmentAmount() + "元。");
-		System.out.println(entity.getProductName());
+		message.setTitle("系统消息");
+		message.setContent("您成功投资了：" + entity.getBidSN() + ",投资总额：" + entity.getInvestmentAmount() + "元");
 		userMessageDao.save(message);
 
 		params = new HashMap<String, Object>();

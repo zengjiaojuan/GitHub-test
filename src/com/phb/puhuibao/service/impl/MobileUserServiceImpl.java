@@ -117,7 +117,7 @@ public class MobileUserServiceImpl extends DefaultBaseService<MobileUser, String
 		 userMessageDao.save(message);
 		
 		 //推荐人
-		if (entity.getParentId() != null && entity.getParentId() > 0) {
+		 /*if (entity.getParentId() != null && entity.getParentId() > 0) {
 			redpacket.setmUserId(entity.getParentId());
 			redpacket.setRedpacketAmount(appContext.getInviteRedpacketAmount());			
 			userRedpacketDao.save(redpacket);
@@ -131,7 +131,7 @@ public class MobileUserServiceImpl extends DefaultBaseService<MobileUser, String
 			
 			
 		}
-
+*/
 		 message =  new UserMessage();
 		message.setmUserId(entity.getmUserId());
 		message.setTitle("系统消息");

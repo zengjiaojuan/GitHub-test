@@ -370,10 +370,6 @@ public class MobileUserController extends BaseController<MobileUser, String> {
 		    }     
 		    entity.setNickname(sb.toString());//生成随机昵称
 			 mobileUserService.userCreate(entity);
-			 
-			 
-			 
-			 entity.setmUserPwd("");
 			data.put("result", entity);
 			data.put("token", entity.getLiveness()); // 存的是有用户的 key
 			data.put("message", "注册成功！");
