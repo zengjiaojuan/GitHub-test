@@ -12,7 +12,7 @@ import com.idp.pub.service.IBaseService;
 import com.phb.puhuibao.entity.UserRedpacket;
 
 
-// 今天晚上11点把过期红包置为无效
+// 今天晚上11点十分把过期红包置为无效
 @Component  
 public class RedPacketJob {
  
