@@ -92,7 +92,22 @@ public class Functions {
 		BigDecimal incomeByUnitBD = amountBD.multiply(rateBD).divide(factorBD, 2, BigDecimal.ROUND_DOWN);
 		return incomeByUnitBD.doubleValue();
 	}
-
+	public static int  calLeftDays(Date startday,Date expiredDate) {
+		startday.setHours(0);
+		startday.setMinutes(0);
+		startday.setSeconds(0);
+		expiredDate.setHours(0);
+		expiredDate.setMinutes(0);
+		expiredDate.setSeconds(0);
+		int leftdays=(int) ((expiredDate.getTime()-startday.getTime())/(1000 * 60 * 60 * 24));
+		
+		return leftdays;
+	}
+	public static int  getYearDays(Date startday) {
+		 int yearDays=(startday.getYear()%4==0&&startday.getYear()%100!=0?366:365);	
+		
+		return yearDays;
+	}
 	/**
 	 * 截取字符串
 	 * @param s

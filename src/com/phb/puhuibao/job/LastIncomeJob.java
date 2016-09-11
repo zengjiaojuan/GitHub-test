@@ -16,7 +16,7 @@ import com.phb.puhuibao.entity.UserInvestment;
 import com.phb.puhuibao.service.UserInvestmentService;
 
 public class LastIncomeJob {
-//每天晚上00:05:00把昨天的收益添加到累计收益。
+//每天晚上00:10:00把昨天的收益添加到累计收益。
 	private static final Log log = LogFactory.getLog(LastIncomeJob.class);
 	@Resource(name = "userInvestmentService")
 	private IBaseService<UserInvestment, String> baseUserInvestmentService;
@@ -46,6 +46,7 @@ public class LastIncomeJob {
 				 
 			}			
 		}
+	 
 	 public double getLastIncome(UserInvestment userInvest){
 		 Date nowDate=new Date();		 
 		 Date incomeDate=userInvest.getIncomeDate();
@@ -57,7 +58,7 @@ public class LastIncomeJob {
 		 lastDate.setMinutes(nowDate.getMinutes());
 		 lastDate.setSeconds(nowDate.getSeconds());
 		 int days=(int) ((nowDate.getTime()-incomeDate.getTime())/(24*3600*1000));		 
-		 int yearDays=(int) ((lastDate.getTime()-incomeDate.getTime())/(24*3600*1000));			
+		 int yearDays=(incomeDate.getYear()%4==0&&incomeDate.getYear()%100!=0?366:365);			
 		 double lastIncome=userInvest.getInvestmentAmount()*userInvest.getAnnualizedRate()/yearDays*days;
 		 return lastIncome;
 		}

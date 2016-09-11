@@ -1,6 +1,5 @@
 package com.phb.puhuibao.web.controller;
 
-import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -22,6 +21,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.idp.pub.context.AppContext;
 import com.idp.pub.service.IBaseService;
 import com.idp.pub.web.controller.BaseController;
+import com.phb.puhuibao.common.Functions;
 import com.phb.puhuibao.entity.ExperienceInvestment;
 import com.phb.puhuibao.entity.ExperienceProduct;
 import com.phb.puhuibao.entity.UserExperience;
@@ -64,61 +64,26 @@ public class ExperienceInvestmentController extends BaseController<ExperienceInv
 		params.put("order", "desc");
 		List<ExperienceInvestment> queryResult = this.getBaseService().findList(params); //用户体验投资集合findList=query
 		List<ExperienceInvestment> result = new ArrayList<ExperienceInvestment>();
-
 		params = new HashMap<String, Object>();
 		for (ExperienceInvestment investment : queryResult) {
 			investment.setUnit("天");
 			if (investment.getStatus() >= 2) {
 				investment.setLeftDays(0);
 			} else {
-				 
-				  Date startday = investment.getIncomeDate();// 起息日
-				  Date nowday =  new Date() ;                // 当前时间
-				  long diff = nowday.getTime() - startday.getTime();//这样得到的差值是微秒级别(当前时间-起息时间)
-				 
-				int currentTime_income = (int) (diff / (1000 * 60 * 60 * 24)) + 1;  // 天数  看到的时候包含当天 //剩余天数
-				double amount = investment.getInvestmentAmount();                // 投资金额
-				//double everyIncome = Functions.calEveryIncome(amount, investment.getAnnualizedRate());//计算每天的收益，不考虑闰年(投资金额 ,年化利率)
-				//double annualizedRate = investment.getAnnualizedRate();
-				double everyIncome= amount * (investment.getAnnualizedRate()) / 365;
-				//BigDecimal bd1 = new BigDecimal(amount * (investment.getAnnualizedRate()));
-				if(currentTime_income<=0){// 如果今天在起息日之前
-					investment.setLeftDays(investment.getPeriod());// 到期天数(初始周期5天)
-					BigDecimal   b   =   new   BigDecimal(0.00); 
-					investment.setLastIncome(b.setScale(2,   BigDecimal.ROUND_DOWN).doubleValue());//预期收益 初始为0.00
-				}else{
-					if (currentTime_income > investment.getPeriod()) { //剩余天数>到期天数
-						investment.setLeftDays(0);
-						BigDecimal bg = new BigDecimal(everyIncome * investment.getPeriod());
-						double LastIncome = bg.setScale(2, BigDecimal.ROUND_DOWN).doubleValue();
-						investment.setLastIncome(LastIncome);	
-						//investment.setLastIncome(everyIncome * investment.getPeriod());	
-					} else {
-						investment.setLeftDays(appContext.getExperiencePeriod() -  currentTime_income);
-						BigDecimal bg = new BigDecimal(everyIncome * investment.getPeriod());
-						double LastIncome = bg.setScale(2, BigDecimal.ROUND_DOWN).doubleValue();
-						investment.setLastIncome(LastIncome);
-						//investment.setLastIncome(everyIncome * currentTime_income);
-
-					}
-					
-				}
- 
-				//获得截止日期
+				//---获得截止日期---
+				Date nowday =  new Date() ; 
+				Date startday = investment.getIncomeDate();
 				Calendar calendar = Calendar.getInstance();
 				calendar.setTime(startday);
-				calendar.add(Calendar.DAY_OF_MONTH, appContext.getExperiencePeriod()-1);
+				calendar.add(Calendar.DAY_OF_MONTH, appContext.getExperiencePeriod());
 				Date expiredDate = calendar.getTime();
 				investment.setExpireDate(expiredDate);
-				
-				//总的收益变为BigDecimal 类型 并且结果 取小数点后俩位
-			    BigDecimal total = new BigDecimal(everyIncome * investment.getPeriod()).setScale(2, BigDecimal.ROUND_DOWN);
-				double totals = total.doubleValue(); //将total变为double类型
-				investment.setTotalIncome(totals);// 总收益
-			   // investment.setTotalIncome(everyIncome * investment.getPeriod());// 总收益
-				result.add(investment);
-			}
-		}
+				int leftDays=Functions.calLeftDays(startday, expiredDate);
+				investment.setLeftDays(leftDays);			
+			    }
+			 investment.setTotalIncome(investment.getLastIncome());// 总收益	
+			 result.add(investment);	
+			}                			
 		Map<String, Object> data = new HashMap<String, Object>();
 		data.put("result", result);
 		data.put("message", "");
@@ -147,25 +112,34 @@ public class ExperienceInvestmentController extends BaseController<ExperienceInv
 		entity.setProductSN(productSN);
 		entity.setInvestmentAmount(investmentAmount);
 		entity.setStatus(1);
-		Calendar cal = Calendar.getInstance();
-		cal.add(Calendar.DATE, 1); // 到账第二天起息
-		int w = cal.get(Calendar.DAY_OF_WEEK);
+		Calendar cal = Calendar.getInstance();	//得到投资当天时间
+		//------计算并set起息日期-------
+		int waitDay=0;
+		int w = cal.get(Calendar.DAY_OF_WEEK)+1;
 		if (w == 1) {
+			waitDay=1;
 			cal.add(Calendar.DATE, 1);
 		} else if (w == 7) {
+			waitDay=2;
 			cal.add(Calendar.DATE, 2);
-		}
+		}	
 		while (true) {
 			String date = new SimpleDateFormat("yyyy-MM-dd").format(cal.getTime());
 			String sql = "select 1 from phb_holiday where holiday_date='" + date + "'";
-			List<Map<String, Object>> list = this.jdbcTemplate.queryForList(sql);
+			List <Map<String, Object>> list = jdbcTemplate.queryForList(sql);
 			if (list.isEmpty()) {
 				break;
 			}
+			waitDay+=1;
 			cal.add(Calendar.DATE, 1);
 		}
-
-		entity.setIncomeDate(cal.getTime()); // short date
+		if(waitDay==0){
+			cal.add(Calendar.DATE, 1);
+			entity.setIncomeDate(cal.getTime());	
+		}
+		else{
+			entity.setIncomeDate(cal.getTime());
+		}			
 		try {
 			    experienceInvestmentService.processSave(entity);
 				data.put("message", "投资成功！");
@@ -178,4 +152,5 @@ public class ExperienceInvestmentController extends BaseController<ExperienceInv
 		}
 
 	}
+	
 }

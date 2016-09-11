@@ -37,9 +37,12 @@ public class ExperienceInvestmentServiceImpl extends DefaultBaseService<Experien
 	
 	@Resource(name = "userExperienceService")
 	private IBaseService<UserExperience, String> userExperienceService;
-	
- 
-
+	@Resource(name = "jdbcTemplate")
+	private JdbcTemplate jdbcTemplate;
+	@Resource(name = "mobileUserDao")
+	private IBaseDao<MobileUser, String> mobileUserDao;
+	@Resource(name = "userAccountLogDao")
+	private IBaseDao<UserAccountLog, String> userAccountLogDao; 
 	@Override
 	public void processSave(ExperienceInvestment entity) {
 	 
@@ -56,15 +59,7 @@ public class ExperienceInvestmentServiceImpl extends DefaultBaseService<Experien
 		entity.setCreateTime(new Date());
 		this.getBaseDao().save(entity);
 		 
-	}
-	
-	@Resource(name = "jdbcTemplate")
-	private JdbcTemplate jdbcTemplate;
-	@Resource(name = "mobileUserDao")
-	private IBaseDao<MobileUser, String> mobileUserDao;
-	@Resource(name = "userAccountLogDao")
-	private IBaseDao<UserAccountLog, String> userAccountLogDao;
-
+	}		
 	@Override
 	public ExperienceInvestment update(ExperienceInvestment entity) {
 		String sql = "select 1 from phb_mobile_user where m_user_id=" + entity.getmUserId() + " for update";

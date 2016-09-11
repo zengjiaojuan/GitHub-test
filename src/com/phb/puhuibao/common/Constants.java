@@ -11,7 +11,7 @@ public class Constants {
 	public static final String SERVICE_AGREEMENT_TEMPLATE = "/templates/puhuibao/agreement.html";
 	public static final String SCURET_ASSURANCE = "/templates/puhuibao/scuretassurance.html";
 	public static final String MY_WELFARE_REGUALATION = "/templates/puhuibao/myWelfareRegualation.html";
-	public static final String PROD_INTRO = "/templates/puhuibao/bid.html";
+	public static final String PROD_INTRO = "/templates/puhuibao/prodIntro.html";
 	public static final String ERROR_TEMPLATE = "/templates/puhuibao/error.html";
 	
  

@@ -56,7 +56,7 @@ public class RedeemJob {
 	
 	@Resource(name = "userMessageDao")
 	private IBaseDao<UserMessage, String> userMessageDao;
-
+    private static double monthBeforeLastIncome=0.00;
 	//@Scheduled(cron="0 0 0 * * *") // 0点
 //    public void redeem() {
 //		String sql = "select 1 from phb_muser_investment where status=1 for update";
@@ -205,6 +205,7 @@ public class RedeemJob {
 //		}
 //	}
     public void redeem() {
+    	
 		Calendar cal = Calendar.getInstance();
 //		int year = cal.get(Calendar.YEAR);
 //		int month = cal.get(Calendar.MONTH);
@@ -236,28 +237,10 @@ public class RedeemJob {
 			        }
 				}
 		        if (currentTime >= monthCal.getTimeInMillis()) {//又满了一个月 :  每天把上次计息日期加一个月,如果加完后小于当前时间
-//		        if (year == monthCal.get(Calendar.YEAR) && month == monthCal.get(Calendar.MONTH) && date == monthCal.get(Calendar.DATE)) {
-			        double rate = investment.getAnnualizedRate();
-					double amount = investment.getInvestmentAmount();
-					// double lastIncome = 0;
-					int factor;
-					if (product.getUnit().equals("天")) {
-						//lastIncome = amount * rate / 365;
-						factor = 365;
-			        } else {
-			        	//lastIncome = amount * rate / 12;
-			        	factor = 12;
-			        }
-					//double lastIncome = Functions.calIncomeByUnit(amount, rate, factor);
-					 
-					//新的计算累计收益的办法
-					Long incomeTime = incomeDate.getTime();
-					long days=0;
-					if (currentTime > incomeTime) {   // 当前日大于起息日
-						 days = (currentTime - incomeTime) / (24 * 3600 * 1000) + 1;
-					}
-					double lastIncome = investment.getDailyIncome() * days; 
-		        	investment.setLastIncome(lastIncome);
+//		       
+					double lastIncome2 = investment.getLastIncome(); 
+					monthBeforeLastIncome=investment.getLastIncome();
+		        	investment.setLastIncome(lastIncome2);
 			        investment.setLastDate(monthCal.getTime());
 					userInvestmentService.monthProcess(investment);
 					MobileUser user = baseMobileUserService.getById(investment.getmUserId() + "");
@@ -265,7 +248,7 @@ public class RedeemJob {
 					 message =  new UserMessage();
 					 message.setmUserId(user.getmUserId());
 					 message.setTitle("收到月息");
-					 message.setContent(new SimpleDateFormat("yyyy年MM月dd日").format(new Date()) + "获得月息"+investment.getLastIncome()+"元");
+					 message.setContent(new SimpleDateFormat("yyyy年MM月dd日").format(new Date()) + "获得月息"+(investment.getLastIncome()-monthBeforeLastIncome)+"元");
 					 userMessageDao.save(message);
 					
 					
