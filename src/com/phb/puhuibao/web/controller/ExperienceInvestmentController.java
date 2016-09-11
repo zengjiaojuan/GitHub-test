@@ -76,7 +76,7 @@ public class ExperienceInvestmentController extends BaseController<ExperienceInv
 				  Date nowday =  new Date() ;                // 当前时间
 				  long diff = nowday.getTime() - startday.getTime();//这样得到的差值是微秒级别(当前时间-起息时间)
 				 
-				int currentTime_income = (int) (diff / (1000 * 60 * 60 * 24)) + 1;  // 天数  看到的时候包含当天 //剩余天数
+				int currentTime_income = (int) (diff / (1000 * 60 * 60 * 24));  // 天数  看到的时候包含当天 //剩余天数
 				double amount = investment.getInvestmentAmount();                // 投资金额
 				//double everyIncome = Functions.calEveryIncome(amount, investment.getAnnualizedRate());//计算每天的收益，不考虑闰年(投资金额 ,年化利率)
 				//double annualizedRate = investment.getAnnualizedRate();
@@ -84,21 +84,22 @@ public class ExperienceInvestmentController extends BaseController<ExperienceInv
 				//BigDecimal bd1 = new BigDecimal(amount * (investment.getAnnualizedRate()));
 				if(currentTime_income<=0){// 如果今天在起息日之前
 					investment.setLeftDays(investment.getPeriod());// 到期天数(初始周期5天)
-					BigDecimal   b   =   new   BigDecimal(0.00); 
-					investment.setLastIncome(b.setScale(2,   BigDecimal.ROUND_DOWN).doubleValue());//预期收益 初始为0.00
+//					BigDecimal   b   =   new   BigDecimal(0.00); 
+//					investment.setLastIncome(b.setScale(2,   BigDecimal.ROUND_DOWN).doubleValue());//预期收益 初始为0.00
+					investment.setLastIncome(0.0);//预期收益 初始为0.0
 				}else{
 					if (currentTime_income > investment.getPeriod()) { //剩余天数>到期天数
 						investment.setLeftDays(0);
 						BigDecimal bg = new BigDecimal(everyIncome * investment.getPeriod());
 						double LastIncome = bg.setScale(2, BigDecimal.ROUND_DOWN).doubleValue();
 						investment.setLastIncome(LastIncome);	
-						//investment.setLastIncome(everyIncome * investment.getPeriod());	
+//						investment.setLastIncome(everyIncome * investment.getPeriod());	
 					} else {
 						investment.setLeftDays(appContext.getExperiencePeriod() -  currentTime_income);
 						BigDecimal bg = new BigDecimal(everyIncome * investment.getPeriod());
 						double LastIncome = bg.setScale(2, BigDecimal.ROUND_DOWN).doubleValue();
 						investment.setLastIncome(LastIncome);
-						//investment.setLastIncome(everyIncome * currentTime_income);
+//						investment.setLastIncome(everyIncome * currentTime_income);
 
 					}
 					
