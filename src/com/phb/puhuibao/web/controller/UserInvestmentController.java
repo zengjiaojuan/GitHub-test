@@ -101,16 +101,25 @@ public class UserInvestmentController extends BaseController<UserInvestment, Str
 				if (investment.getStatus() >= 2) {
 					investment.setLeftDays(0);
 				} else {
-					//---获得截止日期---
-					Date nowday =  new Date() ; 
-					Date startday = investment.getIncomeDate();
-					Calendar calendar = Calendar.getInstance();
-					calendar.setTime(startday);
-					calendar.add(Calendar.DAY_OF_MONTH, appContext.getExperiencePeriod());
-					Date expiredDate = calendar.getTime();
-					investment.setExpireDate(expiredDate);
-					int leftDays=Functions.calLeftDays(startday, expiredDate);
-					investment.setLeftDays(leftDays);		
+					Date incomeDate = investment.getIncomeDate();// 起息日
+					Long incomeTime = incomeDate.getTime();
+					if (currentTime > incomeTime) {   // 当前日大于起息日
+						double amount = investment.getInvestmentAmount();
+						//double everyIncome = Functions.calEveryIncome(amount, investment.getAnnualizedRate());
+						long days = (currentTime - incomeTime) / (24 * 3600 * 1000) + 1;
+						investment.setLastIncome(investment.getDailyIncome() * days); // 累计收益
+					}
+					cal = Calendar.getInstance();
+					cal.setTime(incomeDate);
+					if (investment.getUnit().equals("年")) {
+						cal.add(Calendar.YEAR, investment.getPeriod());
+					} else if (investment.getUnit().indexOf("月") > 0) {
+						cal.add(Calendar.MONTH, investment.getPeriod());
+					} else {
+						cal.add(Calendar.DATE, investment.getPeriod());
+					}
+					int leftDays = (int) ((cal.getTimeInMillis() - currentTime) / (24 * 3600 * 1000));
+					investment.setLeftDays(leftDays);    //剩余利息日
 				}
 				investment.setTotalIncomeString(investment.getTotalIncome()+"");
 			}
@@ -723,6 +732,7 @@ public class UserInvestmentController extends BaseController<UserInvestment, Str
        
 	
 		entity.setExpireDate(cal.getTime());// 到期日
+		entity.setLastDate(cal.getTime());//最后一天
 		return period;
 	}
 }
