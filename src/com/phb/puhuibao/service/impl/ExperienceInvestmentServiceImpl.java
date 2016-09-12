@@ -71,8 +71,8 @@ public class ExperienceInvestmentServiceImpl extends DefaultBaseService<Experien
 		this.jdbcTemplate.execute(sql);
 		MobileUser u = mobileUserDao.get("" + entity.getmUserId());
 		MobileUser user = new MobileUser();
-		user.setmUserId(entity.getmUserId());
-		user.setmUserMoney(u.getmUserMoney() + entity.getLastIncome());
+		user.setmUserId(entity.getmUserId());//用户id
+		user.setmUserMoney(u.getmUserMoney() + entity.getLastIncome());//可用金额=现有金额+累计收益
 		//user.setFrozenMoney(u.getFrozenMoney());
 		mobileUserDao.update(user);
 		
