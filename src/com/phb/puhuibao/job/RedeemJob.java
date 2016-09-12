@@ -414,7 +414,7 @@ public class RedeemJob {
 			params = new HashMap<String, Object>();
 			params.put("productSN", productSN);
 			ExperienceProduct product = experienceProductService.unique(params);
-			Date incomeDate = investment.getIncomeDate();
+			Date incomeDate = investment.getIncomeDate();//起息日
 			cal = Calendar.getInstance();
 			cal.setTime(incomeDate);
 	        cal.add(Calendar.DATE, product.getPeriod());
@@ -423,9 +423,9 @@ public class RedeemJob {
 	        }
 
 	        //到结算日了
-	        double rate = investment.getAnnualizedRate();
-			double amount = investment.getInvestmentAmount();
-	        double lastIncome = Functions.calTotalIncome(amount, rate, product.getPeriod(), 365);
+	        double rate = investment.getAnnualizedRate();//年化利率
+			double amount = investment.getInvestmentAmount();//投资金额
+	        double lastIncome = Functions.calTotalIncome(amount, rate, product.getPeriod(), 365);//累计收益
 	        
 	        ExperienceInvestment i = new ExperienceInvestment();
 			i.setInvestmentId(investment.getInvestmentId());
