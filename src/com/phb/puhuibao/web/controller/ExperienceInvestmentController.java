@@ -76,7 +76,7 @@ public class ExperienceInvestmentController extends BaseController<ExperienceInv
 				  Date nowday =  new Date() ;                // 当前时间
 				  long diff = nowday.getTime() - startday.getTime();//这样得到的差值是微秒级别(当前时间-起息时间)
 				 
-				int currentTime_income = (int) (diff / (1000 * 60 * 60 * 24));  // 天数  看到的时候包含当天 //剩余天数
+				int currentTime_income = (int) (diff / (1000 * 60 * 60 * 24)) ;  // 天数  看到的时候包含当天 //剩余天数
 				double amount = investment.getInvestmentAmount();                // 投资金额
 				//double everyIncome = Functions.calEveryIncome(amount, investment.getAnnualizedRate());//计算每天的收益，不考虑闰年(投资金额 ,年化利率)
 				//double annualizedRate = investment.getAnnualizedRate();
@@ -101,16 +101,35 @@ public class ExperienceInvestmentController extends BaseController<ExperienceInv
 						investment.setLastIncome(LastIncome);
 //						investment.setLastIncome(everyIncome * currentTime_income);
 
+				 /* Date startday = investment.getIncomeDate();// 起息日
+				  Date nowday =  new Date() ;
+				  long diff = nowday.getTime() - startday.getTime();//这样得到的差值是微秒级别
+				 
+				  int currentTime_income = (int) (diff / (1000 * 60 * 60 * 24)) + 1;  // 天数  看到的时候包含当天
+				  double amount = investment.getInvestmentAmount();
+				  double everyIncome = Functions.calEveryIncome(amount, investment.getAnnualizedRate());
+
+				if(currentTime_income<=0){// 如果今天在起息日之前
+					investment.setLeftDays(investment.getPeriod());
+					investment.setLastIncome(0.0);
+				}else{
+					if (currentTime_income > investment.getPeriod()) {
+						investment.setLeftDays(0);
+						investment.setLastIncome(everyIncome * investment.getPeriod());
+					} else {
+						investment.setLeftDays(appContext.getExperiencePeriod() -  currentTime_income);
+						investment.setLastIncome(everyIncome * currentTime_income);*/
+						
 					}
 					
 				}
  
 				//获得截止日期
 				Calendar calendar = Calendar.getInstance();
-				calendar.setTime(startday);
+				calendar.setTime(startday);  // 起息开始时间
 				calendar.add(Calendar.DAY_OF_MONTH, appContext.getExperiencePeriod()-1);
 				Date expiredDate = calendar.getTime();
-				investment.setExpireDate(expiredDate);
+				investment.setExpireDate(expiredDate); //结束时间
 				
 				//总的收益变为BigDecimal 类型 并且结果 取小数点后俩位
 			    BigDecimal total = new BigDecimal(everyIncome * investment.getPeriod()).setScale(2, BigDecimal.ROUND_DOWN);
