@@ -176,12 +176,17 @@ public class RedeemJob {
 			params = new HashMap<String, Object>();
 			params.put("productSN", productSN);
 			ExperienceProduct product = experienceProductService.unique(params);
+<<<<<<< HEAD
 			Date incomeDate = exinvestment.getIncomeDate();
 			Calendar cal = Calendar.getInstance();
 			 cal.getTime().setHours(incomeDate.getHours());
  			 cal.getTime().setMinutes(incomeDate.getMinutes());
  			 cal.getTime().setSeconds(incomeDate.getSeconds());
 			long currentTime = cal.getTimeInMillis();
+=======
+			Date incomeDate = investment.getIncomeDate();//起息日
+			cal = Calendar.getInstance();
+>>>>>>> e91e3e4319d9e61a0e704edfdab0b2ae9d937ba6
 			cal.setTime(incomeDate);
 	        cal.add(Calendar.DATE, product.getPeriod());
 	        if (currentTime >= cal.getTimeInMillis()) { // 还没有到期
@@ -207,6 +212,13 @@ public class RedeemJob {
 				
 	        }
 
+<<<<<<< HEAD
+=======
+	        //到结算日了
+	        double rate = investment.getAnnualizedRate();//年化利率
+			double amount = investment.getInvestmentAmount();//投资金额
+	        double lastIncome = Functions.calTotalIncome(amount, rate, product.getPeriod(), 365);//累计收益
+>>>>>>> e91e3e4319d9e61a0e704edfdab0b2ae9d937ba6
 	        
 			
 		}
