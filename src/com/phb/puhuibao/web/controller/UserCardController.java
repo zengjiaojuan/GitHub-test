@@ -258,6 +258,7 @@ public class UserCardController extends BaseController<UserCard, String> {
 	/**
 	 * 判断银行卡bin判断是否有效  判断用户是否已经绑卡
 	 * @param card_no
+	 * @param idnamber 身份证号
 	 * @return
 	 */
 	@RequestMapping(value="validBankCard")
