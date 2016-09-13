@@ -5,12 +5,13 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 
+import com.alibaba.druid.support.logging.Log;
+import com.alibaba.druid.support.logging.LogFactory;
 import com.idp.pub.dao.IBaseDao;
 import com.idp.pub.service.IBaseService;
 import com.phb.puhuibao.common.alipayapi.DateUtil;
@@ -29,7 +30,7 @@ public class LastIncomeJob {
 	private JdbcTemplate jdbcTemplate;
 	@Resource(name = "userInvestmentDao")
 	private IBaseDao<UserInvestment, String> userInvestmentDao;
-	
+	@Scheduled(cron="0 10 0 * * ?") 
 	 public void process() {
 			try {
 				String sql = "select * from phb_muser_investment t where  (t.last_date)>curdate() and (t.income_date<curdate())";
