@@ -5,15 +5,18 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.stereotype.Component;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 
 import com.idp.pub.service.IBaseService;
 import com.phb.puhuibao.entity.UserAddrate;
 
 
 // 今天晚上11点把过期加息劵置为无效
-@Component  
+@Configuration
+@EnableScheduling
 public class AddRateJob {
  
 	private static final Log log = LogFactory.getLog(AddRateJob.class);
@@ -26,7 +29,7 @@ public class AddRateJob {
 	private JdbcTemplate jdbcTemplate;
 
 	 
-	
+	@Scheduled(cron="0 0 23 * * ?") 
     public void process() {
 		try {
 			String sql = "select record_id from phb_muser_addrate t where   date(t.last_date) <=   curdate() and t.rate_status =1";

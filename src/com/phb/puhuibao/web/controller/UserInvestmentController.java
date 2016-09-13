@@ -350,24 +350,7 @@ public class UserInvestmentController extends BaseController<UserInvestment, Str
 			entity.setProductName(bid.getProductName());
 			entity.setInvestmentAmount(investmentAmount);		
 			entity.setStatus(appContext.getInvestmentStatus());
-			int period=setAllDate(product, entity, result);			
-			//--------计算预期总收益----------
-			double totalIncome=0.0;//预期总收益
-			totalIncome=investmentAmount* product.getAnnualizedRate()/365* period;
-			entity.setTotalIncome(totalIncome);// 保存预期总收益	
-			//--------计算每日&最终总   收益----------
-			double everyIncome =0.0;// 每日收益							
-			double lastIncome =0.0;//最后实际收益
-			//int days = (int) ((cal.getTimeInMillis() - entity.getIncomeDate().getTime()) / (24 * 3600 * 1000));		
-			if(addRate != null){
-				everyIncome = Functions.calEveryIncome(investmentAmount, addRate.getAnnualizedRate() + product.getAnnualizedRate());  // 获取每日收益
-				//lastIncome=Functions.calTotalIncome(investmentAmount,addRate.getAnnualizedRate()+product.getAnnualizedRate(), days, 365);
-			}else{
-				everyIncome = Functions.calEveryIncome(investmentAmount,product.getAnnualizedRate());  // 获取每日收益
-				//lastIncome=Functions.calTotalIncome(investmentAmount,  product.getAnnualizedRate(),days,365);
-			}						
-			entity.setDailyIncome(everyIncome);// 保存每日收益
-			entity.setLastIncome(lastIncome); //保存最终收益---从0开始						   
+			int period=setAllDate(product, entity, result);											   
 			int addrateflag=1;
 			if(addRate != null){// 加息劵存在
 				if(addRate.getRateStatus() ==0){// 失效的加息劵
@@ -417,6 +400,19 @@ public class UserInvestmentController extends BaseController<UserInvestment, Str
 					
 				}
 				
+				//--------计算每日&预期收益----------
+				double everyIncome =0.0;// 每日收益	
+				double totalIncome=0.0;//预期总收益
+				double lastIncome =0.0;//累计收益
+				if(addRate != null&&addrateflag==1){
+					everyIncome = Functions.calEveryIncome(investmentAmount, addRate.getAnnualizedRate() + product.getAnnualizedRate());  // 获取每日收益
+					totalIncome=investmentAmount* (product.getAnnualizedRate()+addRate.getAnnualizedRate())/365* period;
+				}else{
+					everyIncome = Functions.calEveryIncome(investmentAmount,product.getAnnualizedRate());
+					totalIncome=investmentAmount* (product.getAnnualizedRate())/365* period;
+				}						
+				entity.setDailyIncome(everyIncome);// 保存每日收益
+				entity.setLastIncome(lastIncome); //保存最终收益---从0开始	
 			}
 			if(addrateflag==0){
 				data.put("status", 0);
@@ -669,9 +665,7 @@ public class UserInvestmentController extends BaseController<UserInvestment, Str
 		//--------计算每日&最终总   收益----------
 		double everyIncome =0.0;// 每日收益	
 		everyIncome = Functions.calEveryIncome(investmentAmount, product.getAnnualizedRate());  // 获取每日收益
-		double lastIncome =0.0;//最后实际收益
-		entity.setDailyIncome(everyIncome);// 保存每日收益
-		entity.setLastIncome(lastIncome); //保存最终收益---从0开始	
+		entity.setDailyIncome(everyIncome);// 保存每日收益			
 		try {
 			userInvestmentService.processSave(entity, redpacketId,product.getAnnualizedRate());
 			data.put(Constants.SUCCESS, Constants.TRUE);
@@ -731,8 +725,7 @@ public class UserInvestmentController extends BaseController<UserInvestment, Str
         }
        
 	
-		entity.setExpireDate(cal.getTime());// 到期日
-		entity.setLastDate(cal.getTime());//最后一天
+		entity.setExpireDate(cal.getTime());// 到期日	
 		return period;
 	}
 }

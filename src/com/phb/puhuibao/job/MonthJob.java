@@ -8,8 +8,8 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 import com.idp.pub.service.IBaseService;
 import com.phb.puhuibao.entity.ItemInvestment;
@@ -20,7 +20,8 @@ import com.phb.puhuibao.entity.UserAccountLog;
 import com.phb.puhuibao.entity.UserInvestment;
 import com.phb.puhuibao.entity.UserLoan;
 
-@Component
+@Configuration
+@EnableScheduling
 public class MonthJob {
 	@Resource(name = "monthBalanceService")
 	private IBaseService<MonthBalance, String> baseMonthBalanceService;

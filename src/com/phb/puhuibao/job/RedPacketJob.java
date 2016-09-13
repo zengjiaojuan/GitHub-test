@@ -5,15 +5,18 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.stereotype.Component;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 
 import com.idp.pub.service.IBaseService;
 import com.phb.puhuibao.entity.UserRedpacket;
 
 
 // 今天晚上11点十分把过期红包置为无效
-@Component  
+@Configuration
+@EnableScheduling
 public class RedPacketJob {
  
 	private static final Log log = LogFactory.getLog(RedPacketJob.class);
@@ -25,8 +28,8 @@ public class RedPacketJob {
 	@javax.annotation.Resource(name = "jdbcTemplate")
 	private JdbcTemplate jdbcTemplate;
 
-	 
-	
+	// 每晚23:10:00把过期红包设置为无效
+	@Scheduled(cron="0 10 23 * * ?") 
     public void process() {
 		try {
 			String sql = "select  t.redpacket_id  from phb_muser_redpacket t where   date(t.last_date) <=   curdate() and t.status =1";

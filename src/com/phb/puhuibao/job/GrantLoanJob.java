@@ -2,7 +2,8 @@ package com.phb.puhuibao.job;
 
 import javax.annotation.Resource;
 
-import org.springframework.stereotype.Component;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 import com.idp.pub.service.IBaseService;
 import com.phb.puhuibao.entity.ItemInvestment;
@@ -11,7 +12,8 @@ import com.phb.puhuibao.entity.UserInvestment;
 import com.phb.puhuibao.entity.UserLoan;
 import com.phb.puhuibao.service.UserLoanService;
 
-@Component
+@Configuration
+@EnableScheduling
 public class GrantLoanJob {
 	@Resource(name = "userLoanService")
 	private IBaseService<UserLoan, String> baseUserLoanService;

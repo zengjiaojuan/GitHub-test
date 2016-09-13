@@ -8,20 +8,19 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
-import org.json.JSONException;
-import org.json.JSONObject;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
-
-import push.android.AndroidBroadcast;
-import push.android.AndroidCustomizedcast;
-import push.ios.IOSCustomizedcast;
 
 import com.idp.pub.service.IBaseService;
 import com.phb.puhuibao.entity.InvestmentAlert;
 
-@Component
+import push.android.AndroidCustomizedcast;
+import push.ios.IOSCustomizedcast;
+
+@Configuration
+@EnableScheduling
 public class HalfMinuteInvestmentAlert {
 	@Resource(name = "investmentAlertService")
 	private IBaseService<InvestmentAlert, String> investmentAlertService;
@@ -30,7 +29,7 @@ public class HalfMinuteInvestmentAlert {
 	private JdbcTemplate jdbcTemplate;
  
 
-//	@Scheduled(cron="0/30 * * * * ?") // 每30秒
+	@Scheduled(cron="0/30 * * * * ?") // 每30秒
     public void process() throws Exception {
 		
 
@@ -61,7 +60,7 @@ public class HalfMinuteInvestmentAlert {
 					// TODO Set your alias here, and use comma to split them if there are multiple alias.
 					// And if you have many alias, you can also upload a file containing these alias, then 
 					// use file_id to send customized notification.
-					customizedcast.setPredefinedKeyValue("alias",  (String)m.get("alert_deviceid"));
+					customizedcast.setPredefinedKeyValue("alias",  m.get("alert_deviceid"));
 					// TODO Set your alias_type here
 					customizedcast.setPredefinedKeyValue("alias_type", "kUMessageAliasTypeLogin");//umeng 的设置
 					customizedcast.setPredefinedKeyValue("ticker", "Android customizedcast ticker");
@@ -89,7 +88,7 @@ public class HalfMinuteInvestmentAlert {
 					// TODO Set your alias here, and use comma to split them if there are multiple alias.
 					// And if you have many alias, you can also upload a file containing these alias, then 
 					// use file_id to send customized notification.
-					customizedcast.setPredefinedKeyValue("alias", (String)m.get("alert_deviceid"));
+					customizedcast.setPredefinedKeyValue("alias", m.get("alert_deviceid"));
 					// TODO Set your alias_type here
 					customizedcast.setPredefinedKeyValue("alias_type", "kUMessageAliasTypeLogin");
 					customizedcast.setPredefinedKeyValue("alert", "【"+title+"】  "+content);

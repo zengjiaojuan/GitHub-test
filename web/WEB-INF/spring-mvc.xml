@@ -19,10 +19,10 @@
 	</context:component-scan>
 	<!--配置controller映射数据转换策略，还可使用高级自定义方式(RequestMappingHandlerMapping\RequestMappingHandlerAdapter)但需先删除此项 -->
 	<mvc:annotation-driven conversion-service="conversionService" />
-	<bean name="startJob" class="org.springframework.scheduling.quartz.SchedulerFactoryBean" autowire="no" lazy-init="false">
+<!-- 	<bean name="startJob" class="org.springframework.scheduling.quartz.SchedulerFactoryBean" autowire="no" lazy-init="false">
 		<property name="triggers">
 			<list>
-				<ref bean="redeemJob"></ref>
+				 <ref bean="redeemJob"></ref>
 				<ref bean="addRateJob"></ref>
 				<ref bean="redPacketJob"></ref>
 				<ref bean="deleteUselessLuckyMoneyJob"></ref>
@@ -35,7 +35,7 @@
 			<ref bean="invokeRedeemJob"></ref>
 		</property>
 		<property name="cronExpression">
-			<value>0 10 0 * * ?</value>
+			<value>0 0 15 * * ?</value>
 		</property>
 	</bean>
 	<bean name="addRateJob" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean" >
@@ -115,7 +115,7 @@
 	<bean id="faddRateJob" class="com.phb.puhuibao.job.AddRateJob"></bean>
 	<bean id="fredPacketJob" class="com.phb.puhuibao.job.RedPacketJob"></bean>
 	<bean id="fdeleteUselessLuckyMoneyJob" class="com.phb.puhuibao.job.deleteUselessLuckyMoneyJob"></bean>
-	<bean id="flastIncomeJob" class="com.phb.puhuibao.job.LastIncomeJob"></bean>
+	<bean id="flastIncomeJob" class="com.phb.puhuibao.job.LastIncomeJob"></bean> -->
 	<!-- 自定义扩展属性数据类型转换扩展点 -->
 	<bean id="conversionService"
 		class="org.springframework.format.support.FormattingConversionServiceFactoryBean">

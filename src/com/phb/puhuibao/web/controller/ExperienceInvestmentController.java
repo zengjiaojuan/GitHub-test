@@ -22,7 +22,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.idp.pub.context.AppContext;
 import com.idp.pub.service.IBaseService;
 import com.idp.pub.web.controller.BaseController;
-import com.phb.puhuibao.common.Functions;
 import com.phb.puhuibao.entity.ExperienceInvestment;
 import com.phb.puhuibao.entity.ExperienceProduct;
 import com.phb.puhuibao.entity.UserExperience;
@@ -65,28 +64,13 @@ public class ExperienceInvestmentController extends BaseController<ExperienceInv
 		params.put("order", "desc");
 		List<ExperienceInvestment> queryResult = this.getBaseService().findList(params); //用户体验投资集合findList=query
 		List<ExperienceInvestment> result = new ArrayList<ExperienceInvestment>();
+
 		params = new HashMap<String, Object>();
 		for (ExperienceInvestment investment : queryResult) {
 			investment.setUnit("天");
 			if (investment.getStatus() >= 2) {
 				investment.setLeftDays(0);
 			} else {
-
-				//---获得截止日期---
-				Date nowday =  new Date() ; 
-				Date startday = investment.getIncomeDate();
-				Calendar calendar = Calendar.getInstance();
-				calendar.setTime(startday);
-				calendar.add(Calendar.DAY_OF_MONTH, appContext.getExperiencePeriod());
-				Date expiredDate = calendar.getTime();
-				investment.setExpireDate(expiredDate);
-				int leftDays=Functions.calLeftDays(startday, expiredDate);
-				investment.setLeftDays(leftDays);			
-			    }
-			 investment.setTotalIncome(investment.getLastIncome());// 总收益	
-			 result.add(investment);	
-			}                			
-
 				 
 				  Date startday = investment.getIncomeDate();// 起息日
 				  Date nowday =  new Date() ;                // 当前时间
@@ -155,7 +139,6 @@ public class ExperienceInvestmentController extends BaseController<ExperienceInv
 				result.add(investment);
 			}
 		}
-
 		Map<String, Object> data = new HashMap<String, Object>();
 		data.put("result", result);
 		data.put("message", "");
@@ -184,34 +167,25 @@ public class ExperienceInvestmentController extends BaseController<ExperienceInv
 		entity.setProductSN(productSN);
 		entity.setInvestmentAmount(investmentAmount);
 		entity.setStatus(1);
-		Calendar cal = Calendar.getInstance();	//得到投资当天时间
-		//------计算并set起息日期-------
-		int waitDay=0;
-		int w = cal.get(Calendar.DAY_OF_WEEK)+1;
+		Calendar cal = Calendar.getInstance();
+		cal.add(Calendar.DATE, 1); // 到账第二天起息
+		int w = cal.get(Calendar.DAY_OF_WEEK);
 		if (w == 1) {
-			waitDay=1;
 			cal.add(Calendar.DATE, 1);
 		} else if (w == 7) {
-			waitDay=2;
 			cal.add(Calendar.DATE, 2);
-		}	
+		}
 		while (true) {
 			String date = new SimpleDateFormat("yyyy-MM-dd").format(cal.getTime());
 			String sql = "select 1 from phb_holiday where holiday_date='" + date + "'";
-			List <Map<String, Object>> list = jdbcTemplate.queryForList(sql);
+			List<Map<String, Object>> list = this.jdbcTemplate.queryForList(sql);
 			if (list.isEmpty()) {
 				break;
 			}
-			waitDay+=1;
 			cal.add(Calendar.DATE, 1);
 		}
-		if(waitDay==0){
-			cal.add(Calendar.DATE, 1);
-			entity.setIncomeDate(cal.getTime());	
-		}
-		else{
-			entity.setIncomeDate(cal.getTime());
-		}			
+
+		entity.setIncomeDate(cal.getTime()); // short date
 		try {
 			    experienceInvestmentService.processSave(entity);
 				data.put("message", "投资成功！");
@@ -224,5 +198,4 @@ public class ExperienceInvestmentController extends BaseController<ExperienceInv
 		}
 
 	}
-	
 }

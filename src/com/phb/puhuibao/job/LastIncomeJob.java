@@ -7,14 +7,17 @@ import javax.annotation.Resource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 import com.idp.pub.dao.IBaseDao;
 import com.idp.pub.service.IBaseService;
 import com.phb.puhuibao.common.alipayapi.DateUtil;
 import com.phb.puhuibao.entity.UserInvestment;
 import com.phb.puhuibao.service.UserInvestmentService;
-
+@Configuration
+@EnableScheduling
 public class LastIncomeJob {
 //每天晚上00:10:00把昨天的收益添加到累计收益。
 	private static final Log log = LogFactory.getLog(LastIncomeJob.class);
