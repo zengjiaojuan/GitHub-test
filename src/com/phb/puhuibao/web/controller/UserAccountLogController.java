@@ -76,7 +76,11 @@ public class UserAccountLogController extends BaseController<UserAccountLog, Str
 				//处理提现冻结 精度丢失问题 
 				BigDecimal amountDB = new BigDecimal(log.getAmount()).setScale(2, RoundingMode.HALF_UP);
 				log.setFlagAmount(""+amountDB);
-			}
+			}else if(log.getAccountType() ==  17777){
+				//处理提现冻结 精度丢失问题 
+				BigDecimal amountDB = new BigDecimal(log.getAmount()).setScale(2, RoundingMode.HALF_UP);
+				log.setFlagAmount(""+amountDB);
+				}
 		}
 		
 		
