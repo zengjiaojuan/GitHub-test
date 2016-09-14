@@ -41,13 +41,15 @@ public class UserRedpacketController extends BaseController<UserRedpacket, Strin
 		Pager<UserRedpacket> pager = new Pager<UserRedpacket>();
 		pager.setReload(true);
 		pager.setCurrent(pageno);
+		pager.setLimit(30);
 		Map<String,Object> params = new HashMap<String,Object>();
 		params.put("mUserId", muid);
-		params.put("orderBy", "status");
+		params.put("orderBy", "last_date");
 		params.put("order", "desc");
-		Pager<UserRedpacket> p = this.getBaseService().findByPager(pager, params);
-		p.setLimit(30);
 		Map<String, Object> data = new HashMap<String, Object>();
+		Pager<UserRedpacket> p = this.getBaseService().findByPager(pager, params);
+	
+		
 		data.put("result", p.getData());
 		data.put("count", p.getTotal());
 		data.put("message", "");
