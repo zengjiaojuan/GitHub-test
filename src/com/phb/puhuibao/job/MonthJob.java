@@ -10,6 +10,7 @@ import javax.annotation.Resource;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 
 import com.idp.pub.service.IBaseService;
 import com.phb.puhuibao.entity.ItemInvestment;
@@ -44,8 +45,8 @@ public class MonthJob {
 	@Resource(name = "userLoanService")
 	private IBaseService<UserLoan, String> baseUserLoanService;
 	
-	//@Scheduled(cron="0 0 2 1 * *") // 每月1日2点，在自动赎回后
-//	@Scheduled(cron="0 26 20 * * *")
+	@Scheduled(cron="0 0 2 1 * *") // 每月1日2点，在自动赎回后
+
     public void process() {
 		Calendar cal = Calendar.getInstance();
 //		String lTime = new SimpleDateFormat("yyyy-MM-dd").format(cal.getTime());
