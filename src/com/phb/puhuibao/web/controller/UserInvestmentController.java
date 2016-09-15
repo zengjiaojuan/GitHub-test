@@ -400,20 +400,29 @@ public class UserInvestmentController extends BaseController<UserInvestment, Str
 					
 				}
 				
-				//--------计算每日&预期收益----------
-				double everyIncome =0.0;// 每日收益	
-				double totalIncome=0.0;//预期总收益
-				double lastIncome =0.0;//累计收益
-				if(addRate != null&&addrateflag==1){
-					everyIncome = Functions.calEveryIncome(investmentAmount, addRate.getAnnualizedRate() + product.getAnnualizedRate());  // 获取每日收益
-					totalIncome=investmentAmount* (product.getAnnualizedRate()+addRate.getAnnualizedRate())/365* period;
-				}else{
-					everyIncome = Functions.calEveryIncome(investmentAmount,product.getAnnualizedRate());
-					totalIncome=investmentAmount* (product.getAnnualizedRate())/365* period;
-				}						
-				entity.setDailyIncome(everyIncome);// 保存每日收益
-				entity.setLastIncome(lastIncome); //保存最终收益---从0开始	
 			}
+
+			//--------计算每日&预期收益----------
+			double everyIncome =0.0;// 每日收益	
+			double totalIncome=0.0;//预期总收益
+			double lastIncome =0.0;//累计收益
+			int factor=0;
+			  if (product.getUnit().indexOf("月") > 0) {
+		        	factor=12;
+		           
+		        } else {
+		        	factor=365;
+		        }
+			if(addRate != null&&addrateflag==1){
+				everyIncome = Functions.calEveryIncome(investmentAmount, addRate.getAnnualizedRate() + product.getAnnualizedRate());  // 获取每日收益
+				totalIncome=Functions.calTotalIncome(investmentAmount, product.getAnnualizedRate()+addRate.getAnnualizedRate(), product.getPeriod(), factor);
+			}else{
+				everyIncome = Functions.calEveryIncome(investmentAmount,product.getAnnualizedRate());
+				totalIncome=Functions.calTotalIncome(investmentAmount, product.getAnnualizedRate(), product.getPeriod(), factor);
+			}	
+			entity.setTotalIncome(totalIncome);// 保存预期总收益	
+			entity.setDailyIncome(everyIncome);// 保存每日收益
+			entity.setLastIncome(lastIncome); //保存最终收益---从0开始	
 			if(addrateflag==0){
 				data.put("status", 0);
 				return data;
@@ -658,9 +667,16 @@ public class UserInvestmentController extends BaseController<UserInvestment, Str
 		entity.setInvestmentAmount(investmentAmount);
 		entity.setStatus(appContext.getInvestmentStatus());
 		int period=setAllDate(product, entity, null);
+		int factor=0;
+		  if (product.getUnit().indexOf("月") > 0) {
+	        	factor=12;
+	           
+	        } else {
+	        	factor=365;
+	        }
 		//--------计算预期总收益----------
 		double totalIncome=0.0;//预期总收益
-		totalIncome=investmentAmount* product.getAnnualizedRate()/365* period;
+		totalIncome=Functions.calTotalIncome(investmentAmount, product.getAnnualizedRate(), product.getPeriod(), factor);
 		entity.setTotalIncome(totalIncome);// 保存预期总收益	
 		//--------计算每日&最终总   收益----------
 		double everyIncome =0.0;// 每日收益	
