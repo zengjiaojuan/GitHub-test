@@ -128,7 +128,7 @@ public class MobileUserController extends BaseController<MobileUser, String> {
 			//url.append("http://").append(ipandport).append("/lcb/register/share.html");
 			url.append("http://").append(ipandport).append("/lcb/share.html");
 			
-			data.put("des", "金朗理财邀请您财富之旅");
+			data.put("des", "金朗理财邀请您开启财富之旅");
 			data.put("url", url.toString());
 			data.put("message", "成功");
 			data.put("status", 1);
