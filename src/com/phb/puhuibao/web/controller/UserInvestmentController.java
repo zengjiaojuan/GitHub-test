@@ -106,7 +106,7 @@ public class UserInvestmentController extends BaseController<UserInvestment, Str
 					if (currentTime > incomeTime) {   // 当前日大于起息日
 						double amount = investment.getInvestmentAmount();
 						//double everyIncome = Functions.calEveryIncome(amount, investment.getAnnualizedRate());
-						long days = (currentTime - incomeTime) / (24 * 3600 * 1000) ;
+						long days = (currentTime - incomeTime) / (24 * 3600 * 1000)+1 ;
 						investment.setLastIncome(investment.getDailyIncome() * days); // 累计收益
 					}
 					cal = Calendar.getInstance();
