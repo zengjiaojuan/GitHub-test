@@ -1,6 +1,5 @@
 package com.phb.puhuibao.web.controller;
 
-import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -119,7 +118,7 @@ public class UserInvestmentController extends BaseController<UserInvestment, Str
 					} else {
 						cal.add(Calendar.DATE, investment.getPeriod());
 					}
-					int leftDays = (int) ((cal.getTimeInMillis() - currentTime) / (24 * 3600 * 1000));
+					int leftDays = (int) ((cal.getTimeInMillis() - currentTime) / (24 * 3600 * 1000)+1);
 					investment.setLeftDays(leftDays);    //剩余利息日
 				}
 				investment.setTotalIncomeString(investment.getTotalIncome()+"");
@@ -422,20 +421,8 @@ public class UserInvestmentController extends BaseController<UserInvestment, Str
 				totalIncome=Functions.calTotalIncome(investmentAmount, product.getAnnualizedRate(), product.getPeriod(), factor);
 			}	
 			entity.setTotalIncome(totalIncome);// 保存预期总收益	
-			entity.setDailyIncome(everyIncome);// 保存每日收益
-			long nowDate=Calendar.getInstance().getTimeInMillis();
-			long incomeDate=entity.getIncomeDate().getTime();
-			long lastDate=entity.getLastDate().getTime();
-			if(nowDate>incomeDate){
-				int days=(int) ((nowDate-incomeDate)/(3600*24*1000));
-				int allDays=(int) ((lastDate-incomeDate)/(3600*24*1000));
-				lastIncome =new BigDecimal(entity.getInvestmentAmount()* entity.getAnnualizedRate()*days).divide(new BigDecimal(allDays), 2,BigDecimal.ROUND_DOWN).doubleValue();
-			}else{
-				lastIncome =0.00;
-			}
-		
-	         entity.setLastIncome(lastIncome);
-			entity.setLastIncome(lastIncome);	
+			entity.setDailyIncome(everyIncome);// 保存每日收益z
+			entity.setLastIncome(lastIncome); //保存最终收益---从0开始	
 			if(addrateflag==0){
 				data.put("status", 0);
 				return data;
@@ -738,7 +725,13 @@ public class UserInvestmentController extends BaseController<UserInvestment, Str
 		}			
 	
 		//---------设置截止日期&最后一天-------------
-		int period=0;		   
+		int period=0;
+		if(waitDay==0){
+			 cal.add(Calendar.DATE, -1);
+		}else{
+			 cal.add(Calendar.DATE, -waitDay);
+		}
+       
          if (product.getUnit().indexOf("月") > 0) {
         	if(product.getPeriod()==12){
         		cal.add(Calendar.DATE, 365);
@@ -753,7 +746,7 @@ public class UserInvestmentController extends BaseController<UserInvestment, Str
             period=product.getPeriod()*1;
         }
        
-	
+        
 		entity.setExpireDate(cal.getTime());// 到期日	
 		return period;
 	}
