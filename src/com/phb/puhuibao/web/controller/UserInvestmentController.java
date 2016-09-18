@@ -1,5 +1,6 @@
 package com.phb.puhuibao.web.controller;
 
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -118,7 +119,7 @@ public class UserInvestmentController extends BaseController<UserInvestment, Str
 					} else {
 						cal.add(Calendar.DATE, investment.getPeriod());
 					}
-					int leftDays = (int) ((cal.getTimeInMillis() - currentTime) / (24 * 3600 * 1000)+1);
+					int leftDays = (int) ((cal.getTimeInMillis() - currentTime) / (24 * 3600 * 1000));
 					investment.setLeftDays(leftDays);    //剩余利息日
 				}
 				investment.setTotalIncomeString(investment.getTotalIncome()+"");
@@ -422,7 +423,19 @@ public class UserInvestmentController extends BaseController<UserInvestment, Str
 			}	
 			entity.setTotalIncome(totalIncome);// 保存预期总收益	
 			entity.setDailyIncome(everyIncome);// 保存每日收益
-			entity.setLastIncome(lastIncome); //保存最终收益---从0开始	
+			long nowDate=Calendar.getInstance().getTimeInMillis();
+			long incomeDate=entity.getIncomeDate().getTime();
+			long lastDate=entity.getLastDate().getTime();
+			if(nowDate>incomeDate){
+				int days=(int) ((nowDate-incomeDate)/(3600*24*1000));
+				int allDays=(int) ((lastDate-incomeDate)/(3600*24*1000));
+				lastIncome =new BigDecimal(entity.getInvestmentAmount()* entity.getAnnualizedRate()*days).divide(new BigDecimal(allDays), 2,BigDecimal.ROUND_DOWN).doubleValue();
+			}else{
+				lastIncome =0.00;
+			}
+		
+	         entity.setLastIncome(lastIncome);
+			entity.setLastIncome(lastIncome);	
 			if(addrateflag==0){
 				data.put("status", 0);
 				return data;
