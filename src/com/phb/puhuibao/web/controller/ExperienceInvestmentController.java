@@ -1,7 +1,6 @@
 package com.phb.puhuibao.web.controller;
 
 import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -163,29 +162,29 @@ public class ExperienceInvestmentController extends BaseController<ExperienceInv
 		}
  
 		ExperienceInvestment entity = new ExperienceInvestment();
-		entity.setmUserId(muid);
-		entity.setProductSN(productSN);
-		entity.setInvestmentAmount(investmentAmount);
+		entity.setmUserId(muid); //用户id
+		entity.setProductSN(productSN); //产品编号
+		entity.setInvestmentAmount(investmentAmount); //理财投资金额
 		entity.setStatus(1);
 		Calendar cal = Calendar.getInstance();
 		cal.add(Calendar.DATE, 1); // 到账第二天起息
-		int w = cal.get(Calendar.DAY_OF_WEEK);
-		if (w == 1) {
-			cal.add(Calendar.DATE, 1);
-		} else if (w == 7) {
-			cal.add(Calendar.DATE, 2);
-		}
-		while (true) {
-			String date = new SimpleDateFormat("yyyy-MM-dd").format(cal.getTime());
-			String sql = "select 1 from phb_holiday where holiday_date='" + date + "'";
-			List<Map<String, Object>> list = this.jdbcTemplate.queryForList(sql);
-			if (list.isEmpty()) {
-				break;
-			}
-			cal.add(Calendar.DATE, 1);
-		}
+//		int w = cal.get(Calendar.DAY_OF_WEEK);
+//		if (w == 1) {
+//			cal.add(Calendar.DATE, 1);
+//		} else if (w == 7) {
+//			cal.add(Calendar.DATE, 2);
+//		}
+//		while (true) {
+//			String date = new SimpleDateFormat("yyyy-MM-dd").format(cal.getTime());
+//			String sql = "select 1 from phb_holiday where holiday_date='" + date + "'";
+//			List<Map<String, Object>> list = this.jdbcTemplate.queryForList(sql);
+//			if (list.isEmpty()) {
+//				break;
+//			}
+//			cal.add(Calendar.DATE, 1);
+//		}
 
-		entity.setIncomeDate(cal.getTime()); // short date
+		entity.setIncomeDate(cal.getTime()); // short date 计息时间
 		try {
 			    experienceInvestmentService.processSave(entity);
 				data.put("message", "投资成功！");
