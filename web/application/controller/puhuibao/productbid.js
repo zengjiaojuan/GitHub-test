@@ -1,7 +1,7 @@
 define(function (require, exports, module) {
     //理财产品发标
     return function setApp(app) {
-        app.controller('PuhuibaoProductbidCtrl', ['$scope','ProductBid','$filter','AssetProduct','UserRedpacket','UserInvestment',function ($scope,ProductBid,$filter,AssetProduct,UserRedpacket,UserInvestment) { 
+        app.controller('PuhuibaoProductbidCtrl', ['$scope','ProductBid','$filter','AssetProduct','UserRedpacket','UserInvestment','UploadFile','GeneratedKey',function ($scope,ProductBid,$filter,AssetProduct,UserRedpacket,UserInvestment,UploadFile,GeneratedKey) { 
         //------------------gridlist---------
             $scope.pager = ProductBid;
           	$scope.params = {};
@@ -67,10 +67,20 @@ define(function (require, exports, module) {
                 
             };
             
+            
+            
   
             $scope.create = function(item) {//add and edit
             	
-            	//$scope.uploader.upload();
+            	if($scope.idImage && $scope.idImage.length>0){
+          	      item.idPic = $scope.idImage[0].image;
+          	    }else{
+          	    	
+          	    }
+            	
+            	if($scope.contractImage && $scope.contractImage.length>0){
+            	      item.contractPic = $scope.contractImage[0].image;
+            	  }
             	
             	item.startDate = dateFormat(item.startDate, 'yyyy-MM-dd');
      			if(item.bidId){ // edit
@@ -96,6 +106,67 @@ define(function (require, exports, module) {
                     });
               	}
             };
+            
+            
+            
+            
+            
+//            $scope.create = function(item) {//add and edit
+//            	$scope.uploader.upload();
+//            	
+//            	$scope.tempitem = angular.copy(item);
+//              
+//            	$scope.keys = GeneratedKey.post({
+//                    optype : "genKeyN",
+//                    n : 2
+//                },function(result){                    
+//     				     var newids = result.newIds.split(",");
+//     				     if($scope.tempitem.bidId){//edit
+//     				    	 
+//     				    	var uploadProfilefile = {};
+//     				    	var uploadcertificatefile ={};
+// 
+//	    				               	if($scope.uploadProfilePic.length>0){
+//					  		                var params = {id : "'"+$scope.tempitem.idPic+"'"};
+//						               		UploadFile.remove({params : angular.toJson(params)});							               			
+//					               			//doctor.doctorPic = newids[0];
+//		    				               	uploadProfilefile.id =  newids[0];
+//		    				               	uploadProfilefile.fileName = $scope.uploadProfilePic[0].fileName;
+//		    				               	uploadProfilefile.fileType = $scope.uploadProfilePic[0].fileType;
+//		    				               	uploadProfilefile.filePath = $scope.uploadProfilePic[0].filePath;
+//		    				               	uploadProfilefile.orgFileName = $scope.uploadProfilePic[0].orgFileName;
+//		    				               	UploadFile.put(uploadProfilefile,function(){  });
+//	    				               	}
+//	    				               	if($scope.uploadCertificatePic.length>0){
+//				  		                    var params = {id : "'"+$scope.tempitem.contractPic+"'"};
+//					               			UploadFile.remove({params : angular.toJson(params)});							               			
+//					               			//doctor.doctorCertificate = newids[1];
+//		    				               	uploadcertificatefile.id = newids[1];
+//		    				               	uploadcertificatefile.fileName = $scope.uploadCertificatePic[0].fileName;
+//		    				               	uploadcertificatefile.fileType = $scope.uploadCertificatePic[0].fileType;
+//		    				               	uploadcertificatefile.filePath = $scope.uploadCertificatePic[0].filePath;
+//		    				               	uploadcertificatefile.orgFileName = $scope.uploadCertificatePic[0].orgFileName;
+//		    				               	UploadFile.put(uploadcertificatefile,function(){  });
+//	    				               	}
+//	    				               	ProductBid.save($scope.tempitem,function(result){
+//	    				               		if (result.success == "false"){
+//	    			        	         		alert(result.message);
+//	    			        	         		return;
+//	    			        	         	}
+//	    			                  		$scope.refresh('current',true);//refresh listgrid
+//	    			                     	$('#addandedit').modal('hide');
+//				                         });
+//   		       	                 
+//                  	} 
+//                      }
+//         	      );   
+//              };
+            
+            
+            
+            
+            
+            
 
             $scope.changeFile = function(file) {
             	$scope.file = file;
@@ -123,6 +194,13 @@ define(function (require, exports, module) {
                 console.log(angular.toJson(file));
                
             }
+            
+            $scope.imgShow = function(fileId){ 
+         	   if(!fileId){
+         		   return;
+         	   }
+          	   return '/lcb/uploadFile.shtml?method=download&fileId='+fileId; 
+          	}
             
             
         //-------------delete----------        

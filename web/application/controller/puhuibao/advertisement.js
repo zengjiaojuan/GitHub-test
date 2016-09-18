@@ -15,8 +15,11 @@ define(function (require, exports, module) {
         	  $scope.keye.endDate = dateFormat(item.endDate, 'yyyy-MM-dd HH:mm:ss');
           };
           $scope.create = function(item) { //edit
-        	  if($scope.uploadImage.length>0){
-        	      item.image = $scope.uploadImage[0].image;
+        	  if($scope.idImage.length>0){
+        	      item.idPic = $scope.idImage[0].image;
+        	  }
+        	  if($scope.contractImage.length>0){
+        	      item.contractPic = $scope.contractImage[0].image;
         	  }
      		  if (item.adId){
  	        	  Advertisement.save(item, function(){

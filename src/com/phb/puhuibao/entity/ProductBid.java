@@ -19,7 +19,21 @@ public class ProductBid implements Serializable {
 	private Integer bidImportant ;//
 	private Integer recommendStatus;//推荐标识符 0不推荐，1推荐
 	private Integer type; // 产品类似
+	private String  idPic;//id_pic;
+	private String contractPic;//contract_pic
 	 
+	public String getIdPic() {
+		return idPic;
+	}
+	public void setIdPic(String idPic) {
+		this.idPic = idPic;
+	}
+	public String getContractPic() {
+		return contractPic;
+	}
+	public void setContractPic(String contractPic) {
+		this.contractPic = contractPic;
+	}
 	public Integer getRecommendStatus() {
 		return recommendStatus;
 	}

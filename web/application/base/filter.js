@@ -427,6 +427,16 @@ define(function (require) {
         "03030000" :"光大银行" 
     });
     
+    filterFactory('PHB_PRODUCTTYPE', {
+    	'0': '新手标',
+        '1': '单季宝',
+        '2': '朗月赢',
+        '3': '金元宝',
+        '4': '年年红',
+        '5': '债权'
+        
+    });
+    
     app.filter('makenumberformat' , function(){
         return function(str){
         	var val = parseInt(str);

@@ -22,6 +22,7 @@
             <th>已募资金</th>
             <th>总金额</th>
             <th>重要性</th>
+            <th>产品类型</th>
             <th>状态</th>
             <th>操作</th>
         </tr>
@@ -35,6 +36,7 @@
             <td>{{item.currentAmount}}</td>
             <td>{{item.totalAmount}}</td>
             <td>{{item.bidImportant}}</td>
+            <td>{{item.type | PHB_PRODUCTTYPE }}</td>
             <td ng-if="item.status==0">未开标</td><td ng-if="item.status==1">抢购中</td><td ng-if="item.status==2">收益中</td><td ng-if="item.status==3">到期结清</td>
             <td>
                 <a href="javascript:" data-toggle="modal" data-target="#" upload-refresh="true" ng-click="edit(item)">修改</a> 
@@ -69,13 +71,13 @@
 
 <!-- 修改  -->
 <div class="modal fade" id="addandedit" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog" style="width: 800px;">
+    <div class="modal-dialog" style="width: 850px;">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                 <h4 class="modal-title">新增/修改</h4>
             </div>            
-            <form name="shareFm" class="form-horizontal" ng-submit="create(keye)" novalidate="novalidate">    
+            <form name="shareFm" class="form-horizontal" auto-file-upload  ng-submit="create(keye)" novalidate="novalidate">    
 	            <div class="modal-body">
 	                <div class="row">
 	                  <div class="col-sm-12 col-md-12">
@@ -111,6 +113,36 @@
                             </div>
                             <span class="mustItem">*</span>
                         </div>
+                        
+						   <div class="form-group" ng-if="keye.type==5" >                                  
+					                 <label class="col-lg-2 control-label">身份证照片</label>
+					                <div class="col-lg-4">
+										<img id="id_upload" class="img-thumbnail" ng-src="{{keye.idPic}}" style="width: 150px; height:149px;"/>
+					                    <div uploader  thumb ng-model="idImage"
+					                         server="zhaiquanImageUpload.shtml"
+					                         extensions="jpg,gif,png,jpeg"
+					                         files="files" onchange="document.getElementById('id_upload').style.display='none';">
+					                    </div>	         
+					                </div>
+		                          
+		                                                
+				           </div>
+				           <div class="form-group" ng-if="keye.type==5" >  
+				           
+				           
+				            <label class="col-lg-2 control-label">合同图</label>
+					                <div class="col-lg-4">
+										<img id="contract_upload" class="img-thumbnail" ng-src="{{keye.contractPic}}" style="width: 150px; height:149px;"/>
+					                    <div uploader  thumb ng-model="contractImage"
+					                         server="zhaiquanImageUpload.shtml"
+					                         extensions="jpg,gif,png,jpeg"
+					                         files="files" onchange="document.getElementById('contract_upload').style.display='none';">
+					                    </div>	         
+					                </div>
+				           </div>
+				           
+				        
+                        
                       
 	                  </div>
 	                </div>

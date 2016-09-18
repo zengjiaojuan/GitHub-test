@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.SortedMap;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -165,6 +166,55 @@ public class Functions {
 			multipartFile.transferTo(file);
 			results.put(Constants.SUCCESS, Constants.TRUE);
 			results.put("image", path + "/" + orgName);
+            response.setContentType("application/json;charset=UTF-8");
+            response.setHeader("Cache-Control", "no-store, max-age=0, no-cache, must-revalidate");
+            response.addHeader("Cache-Control", "post-check=0, pre-check=0");
+            response.setHeader("Pragma", "no-cache");
+		} catch (IllegalStateException e) {
+			results.put(Constants.SUCCESS, Constants.FALSE);
+			results.put(Constants.MESSAGE, e.getMessage());
+		} catch (IOException e) {
+			results.put(Constants.SUCCESS, Constants.FALSE);
+			results.put(Constants.MESSAGE, e.getMessage());
+		}
+        try {
+			response.getWriter().write(JsonUtils.toJson(results));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public static void uploadZhaiquan(HttpServletRequest request, HttpServletResponse response, String path) {
+		MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
+		Map<String, MultipartFile> fileMap = multipartRequest.getFileMap();
+		MultipartFile multipartFile = null;
+		Map<String, Object> results = Constants.MAP();
+		for (Map.Entry<String, MultipartFile> set : fileMap.entrySet()) {
+			multipartFile = set.getValue();// 文件名
+		}
+		
+		String orgname = multipartFile.getOriginalFilename();// 获取原始文件名
+		String fileType = orgname.substring(orgname.lastIndexOf(".") + 1, orgname.length());
+		String fileName = UUID.randomUUID().toString().replace("-", "") + "." + fileType;
+		String filePath = null;
+		try {
+			filePath = request.getSession().getServletContext().getResource("/").getPath() + path;
+		} catch (MalformedURLException e) {
+			LOG.error(e);
+			e.printStackTrace();
+		}
+		File file = new File(filePath + "/" + fileName);
+		try {
+			File mkdir = new File(filePath);
+			if (!mkdir.exists()) {
+				mkdir.mkdirs();
+			}
+			if (!file.exists()) {
+				file.createNewFile();
+			}
+			multipartFile.transferTo(file);
+			results.put(Constants.SUCCESS, Constants.TRUE);
+			results.put("image", fileName);
             response.setContentType("application/json;charset=UTF-8");
             response.setHeader("Cache-Control", "no-store, max-age=0, no-cache, must-revalidate");
             response.addHeader("Cache-Control", "post-check=0, pre-check=0");

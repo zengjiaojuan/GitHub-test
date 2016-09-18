@@ -208,7 +208,6 @@
     redemption_early_method,
     total_amount,
     product_desc,
-    update_time,
     current_amount,
     help,
     type,
