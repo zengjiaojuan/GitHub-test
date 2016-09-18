@@ -95,7 +95,7 @@ public class ExperienceInvestmentController extends BaseController<ExperienceInv
 //						investment.setLastIncome(everyIncome * investment.getPeriod());	
 					} else {
 						investment.setLeftDays(appContext.getExperiencePeriod() -  currentTime_income);
-						BigDecimal bg = new BigDecimal(everyIncome * investment.getPeriod());
+						BigDecimal bg = new BigDecimal(everyIncome * currentTime_income);
 						double LastIncome = bg.setScale(2, BigDecimal.ROUND_DOWN).doubleValue();
 						investment.setLastIncome(LastIncome);
 //						investment.setLastIncome(everyIncome * currentTime_income);
