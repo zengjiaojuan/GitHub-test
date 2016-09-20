@@ -725,13 +725,8 @@ public class UserInvestmentController extends BaseController<UserInvestment, Str
 		}			
 	
 		//---------设置截止日期&最后一天-------------
-		int period=0;
-		if(waitDay==0){
-			 cal.add(Calendar.DATE, -1);
-		}else{
-			 cal.add(Calendar.DATE, -waitDay);
-		}
-       
+		int period=0;	
+	    cal.add(Calendar.DATE, -1);
          if (product.getUnit().indexOf("月") > 0) {
         	if(product.getPeriod()==12){
         		cal.add(Calendar.DATE, 365);
