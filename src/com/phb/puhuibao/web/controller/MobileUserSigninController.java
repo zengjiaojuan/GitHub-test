@@ -18,8 +18,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.idp.pub.context.AppContext;
 import com.idp.pub.service.IBaseService;
 import com.idp.pub.web.controller.BaseController;
+import com.phb.puhuibao.dao.UserAccountLogDao;
 import com.phb.puhuibao.entity.MobileUser;
 import com.phb.puhuibao.entity.MobileUserSignin;
+import com.phb.puhuibao.entity.UserAccountLog;
 import com.phb.puhuibao.entity.UserExperience;
 import com.phb.puhuibao.service.MobileUserSigninService;
 
@@ -48,8 +50,8 @@ public class MobileUserSigninController extends BaseController<MobileUserSignin,
 
 	@Resource(name = "appContext")
 	private AppContext appContext;
-	
-
+	@Resource(name = "userAccountLogDao")
+	private UserAccountLogDao userAccountLogDao;
 	// 保存刮奖其实是把那个无效刮奖置为有效
 	@RequestMapping(value="saveChanceAward")
 	@ResponseBody
@@ -88,6 +90,16 @@ public class MobileUserSigninController extends BaseController<MobileUserSignin,
 			try {
 				mobileUserSigninService.processUpdate(experience);
 				data.put("message", "已保存到您的体验金");
+                UserAccountLog log = new UserAccountLog();
+				
+				log.setmUserId(experience.getmUserId());
+				log.setChangeType("用户刮奖");
+				log.setChangeDesc("恭喜您刮奖得到"+experience.getExperienceAmount()+"元");
+				log.setAmount(Double.parseDouble(experience.getExperienceAmount()+""));
+				log.setBalanceAmount(0.00);				
+				log.setAccountType(17777);
+				
+				userAccountLogDao.save(log);
 				data.put("status", 1);
 				return data;
 			} catch (Exception e) {

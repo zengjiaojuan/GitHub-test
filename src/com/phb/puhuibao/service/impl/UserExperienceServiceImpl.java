@@ -50,7 +50,7 @@ public class UserExperienceServiceImpl extends DefaultBaseService<UserExperience
 				UserExperience experience1 = this.getBaseDao().save(experience);           // 保存体验金
 				id = experience1.getExperienceId();
 				
-				UserAccountLog log = new UserAccountLog();
+				/*UserAccountLog log = new UserAccountLog();
 				
 				log.setmUserId(experience1.getmUserId());
 				log.setChangeType("用户刮奖");
@@ -58,7 +58,7 @@ public class UserExperienceServiceImpl extends DefaultBaseService<UserExperience
 				log.setAmount(Double.parseDouble(experience1.getExperienceAmount()+""));
 				log.setBalanceAmount(0.00);				
 				log.setAccountType(17777);
-				userAccountLogDao.save(log);
+				userAccountLogDao.save(log);*/
 				
 				
 			} catch (ParseException e) {
