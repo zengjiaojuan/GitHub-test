@@ -1,5 +1,6 @@
 package com.phb.puhuibao.web.controller;
 
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -107,7 +108,8 @@ public class UserInvestmentController extends BaseController<UserInvestment, Str
 						double amount = investment.getInvestmentAmount();
 						//double everyIncome = Functions.calEveryIncome(amount, investment.getAnnualizedRate());
 						long days = (currentTime - incomeTime) / (24 * 3600 * 1000)+1 ;
-						investment.setLastIncome(investment.getDailyIncome() * days); // 累计收益
+					    BigDecimal lastIncome=new BigDecimal(investment.getInvestmentAmount()).multiply(new BigDecimal(investment.getAnnualizedRate())).multiply(new BigDecimal(days)).divide(new BigDecimal(365), 2, BigDecimal.ROUND_DOWN);
+						investment.setLastIncome(lastIncome.doubleValue()); // 累计收益
 					}
 					cal = Calendar.getInstance();
 					cal.setTime(incomeDate);
