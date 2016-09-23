@@ -108,13 +108,7 @@ public class UserInvestmentController extends BaseController<UserInvestment, Str
 						double amount = investment.getInvestmentAmount();
 						//double everyIncome = Functions.calEveryIncome(amount, investment.getAnnualizedRate());
 						
-						long days = 0;
-						if(getMsFromZeoroClockCha(new Date(), incomeDate)>=0){
-							days=(currentTime - incomeTime) / (24 * 3600 * 1000);
-						}else{
-							days=(currentTime - incomeTime) / (24 * 3600 * 1000)+1;
-						}
-						
+						long days = (currentTime - incomeTime) / (24 * 3600 * 1000)+1;												
 					    BigDecimal lastIncome=new BigDecimal(investment.getInvestmentAmount()).multiply(new BigDecimal(investment.getAnnualizedRate())).multiply(new BigDecimal(days)).divide(new BigDecimal(365), 2, BigDecimal.ROUND_DOWN);
 						investment.setLastIncome(lastIncome.doubleValue()); // 累计收益
 					}
@@ -705,9 +699,10 @@ public class UserInvestmentController extends BaseController<UserInvestment, Str
 	}
 	public  int setAllDate(AssetProduct product,UserInvestment entity,Map result){
 		Calendar cal = Calendar.getInstance();	//得到投资当天时间
+		cal.add(Calendar.DATE, 1);
 		//------计算并set起息日期-------
 		int waitDay=0;
-		int w = cal.get(Calendar.DAY_OF_WEEK)+1;
+		int w = cal.get(Calendar.DAY_OF_WEEK);
 		if (w == 1) {
 			waitDay=1;
 			cal.add(Calendar.DATE, 1);
@@ -723,15 +718,11 @@ public class UserInvestmentController extends BaseController<UserInvestment, Str
 				break;
 			}
 			waitDay+=1;
-			cal.add(Calendar.DATE, 1);
+			
 		}
-		if(waitDay==0){
-			cal.add(Calendar.DATE, 1);
+
 			entity.setIncomeDate(cal.getTime());	
-		}
-		else{
-			entity.setIncomeDate(cal.getTime());
-		}			
+		
 	
 		//---------设置截止日期&最后一天-------------
 		int period=0;	
@@ -753,19 +744,5 @@ public class UserInvestmentController extends BaseController<UserInvestment, Str
         
 		entity.setExpireDate(cal.getTime());// 到期日	
 		return period;
-	}
-	public static long getMsFromZeoroClockCha(Date nowDate,Date incomeDate){
-		long nowMs=nowDate.getTime();
-		long incomeMs=incomeDate.getTime();
-		nowDate.setHours(0);
-		nowDate.setMinutes(0);
-		nowDate.setSeconds(0);
-		long nowMs2=nowDate.getTime();
-		incomeDate.setHours(0);
-		incomeDate.setMinutes(0);
-		incomeDate.setSeconds(0);
-		long incomeMs2=incomeDate.getTime();
-		long Ms=(nowMs-nowMs2)-(incomeMs-incomeMs2);
-		return Ms;
 	}
 }
