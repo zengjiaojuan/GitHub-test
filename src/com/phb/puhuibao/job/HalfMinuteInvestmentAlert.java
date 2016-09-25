@@ -11,7 +11,6 @@ import javax.annotation.Resource;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.scheduling.annotation.Scheduled;
 
 import com.idp.pub.service.IBaseService;
 import com.phb.puhuibao.entity.InvestmentAlert;
@@ -29,7 +28,7 @@ public class HalfMinuteInvestmentAlert {
 	private JdbcTemplate jdbcTemplate;
  
 
-	@Scheduled(cron="0/30 * * * * ?") // 每30秒
+	//@Scheduled(cron="0/30 * * * * ?") // 每30秒
     public void process() throws Exception {
 		
 

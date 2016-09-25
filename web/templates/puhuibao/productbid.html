@@ -118,7 +118,7 @@
 					                 <label class="col-lg-2 control-label">身份证照片</label>
 					                <div class="col-lg-4">
 										<img id="id_upload" class="img-thumbnail" ng-src="{{keye.idPic}}" style="width: 150px; height:149px;"/>
-					                    <div uploader  thumb ng-model="idImage"
+					                    <div uploader multiple thumb ng-model="idImage"
 					                         server="zhaiquanImageUpload.shtml"
 					                         extensions="jpg,gif,png,jpeg"
 					                         files="files" onchange="document.getElementById('id_upload').style.display='none';">
