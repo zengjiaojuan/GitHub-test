@@ -135,6 +135,7 @@
     a.bid_contract,
     a.bid_important,
     a.recommend_status,
+    a.contract_pic,
     CASE
                 WHEN alert.alert_deviceid IS NOT  NULL THEN  6
                 ELSE a.status
