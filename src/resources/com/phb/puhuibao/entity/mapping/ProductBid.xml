@@ -16,7 +16,6 @@
      <result property="bidImportant" column="bid_important" jdbcType="INTEGER"/>
      <result property="status" column="status" jdbcType="INTEGER"/>
      <result property="recommendStatus" column="recommend_status" jdbcType="INTEGER"/>
-     <result property="idPic" column="id_pic" jdbcType="VARCHAR"/>
      <result property="contractPic" column="contract_pic" jdbcType="VARCHAR"/>
      <result property="type" column="type" jdbcType="INTEGER"/>
   </resultMap>
@@ -57,9 +56,7 @@
 			<if test="recommendStatus != null">
 				  ,recommend_status=#{recommendStatus,jdbcType=INTEGER}
 			</if>
-			<if test="idPic != null">
-				  ,id_pic=#{idPic,jdbcType=VARCHAR}
-			</if>
+ 
 			<if test="contractPic != null">
 				  ,contract_pic=#{contractPic,jdbcType=VARCHAR}
 			</if>			
@@ -123,7 +120,6 @@
     a.bid_contract,
     a.bid_important,
     a.bid_name,
-    a.id_pic,
     a.contract_pic,
     b.type
   </sql>
