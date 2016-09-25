@@ -37,7 +37,7 @@
             <td>{{item.currentAmount}}</td>
             <td>{{item.totalAmount}}</td>
             <td>{{item.bidImportant}}</td>
-            <td>{{item.type | PHB_PRODUCTTYPE }}{{item.contractPic.length}}</td>
+            <td>{{item.type | PHB_PRODUCTTYPE }}</td>
              <td ng-if="item.contractPic.length == 0 && item.type==5"> <font color="ff0000"><red>待上传图片</red></font> </td><td ng-if="item.type!=5"></td><td ng-if="item.contractPic.length>0 && item.type==5">已上传图片</td>
             <td ng-if="item.status==0">未开标</td><td ng-if="item.status==1">抢购中</td><td ng-if="item.status==2">收益中</td><td ng-if="item.status==3">到期结清</td>
             <td>
