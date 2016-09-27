@@ -121,7 +121,12 @@ public class UserInvestmentController extends BaseController<UserInvestment, Str
 					} else {
 						cal.add(Calendar.DATE, investment.getPeriod());
 					}
-					int leftDays = (int) ((cal.getTimeInMillis() - currentTime) / (24 * 3600 * 1000))+1;
+					int leftDays=0;
+					if(incomeDate.after(new Date())){
+						leftDays = (int) ((cal.getTimeInMillis() -currentTime) / (24 * 3600 * 1000));
+					}else{
+						leftDays = (int) ((cal.getTimeInMillis() -currentTime) / (24 * 3600 * 1000))+1;
+					}					
 					investment.setLeftDays(leftDays);    //剩余利息日
 				}
 				investment.setTotalIncomeString(investment.getTotalIncome()+"");
