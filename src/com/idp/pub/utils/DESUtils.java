@@ -55,14 +55,15 @@ public class DESUtils {
 	        cipher.init(Cipher.DECRYPT_MODE, PUBLIC_KEY, zeroIv);
 	        data = new String(cipher.doFinal(Base64.getDecoder().decode(data)), "utf-8");
 		} catch (Exception e) {
+			data="";
 			e.printStackTrace();
 		}
 		return data.trim();
 	}
 
     public static void main(String[] args) throws Exception {
-		String data = "国立门诊";
-        System.err.println(encrypt(data));
+		String data = "zhu5886";
+        System.err.println(decrypt(data));
         System.err.println(decrypt(encrypt(data)));
         String clinicName = "D3IZpQhAR5PkVksv41SQBA==";
         System.err.println(decrypt(clinicName));
