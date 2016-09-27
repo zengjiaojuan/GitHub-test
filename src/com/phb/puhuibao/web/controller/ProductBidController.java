@@ -213,7 +213,7 @@ public class ProductBidController extends BaseController<ProductBid, String> {
 		List <Map<String, Object>> list = null;
 		List <Map<String, Object>> list1 = null;
 		String sql="";
-		/*if(StringUtil.isEmpty(muid)){// 用户未登陆
+		if(StringUtil.isEmpty(muid)){// 用户未登陆
 			    //sql查出的是新手标
 				sql = "SELECT b.bid_id, b.bid_sn,b.status, a.product_name, a.annualized_rate, a.period, a.unit,CASE WHEN b.status = 3 THEN  b.total_amount ELSE b.current_amount END as currentAmount,b.total_amount totalAmount FROM phb_product_bid b LEFT JOIN phb_asset_product a ON b.product_sn = a.product_sn WHERE b. STATUS = 1 AND a.product_sn = 'P888'";
 				list = this.jdbcTemplate.queryForList(sql);
@@ -248,24 +248,9 @@ public class ProductBidController extends BaseController<ProductBid, String> {
 				data.put("result", retobj);
 				data.put("status", 1);
 			}
-			*/
 			
-		
-		
-			sql = " SELECT b.bid_id, b.bid_sn,b.status, a.product_name, a.annualized_rate, a.period, a.unit  ,CASE WHEN b.status = 3 THEN  b.total_amount ELSE b.current_amount END as currentAmount,b.total_amount totalAmount  FROM phb_product_bid b LEFT JOIN phb_asset_product a ON b.product_sn = a.product_sn where b. STATUS = 1 order by a.important desc";
 			
-		
-		list = this.jdbcTemplate.queryForList(sql);
-		if(list.isEmpty()){//没有可以推荐的
-			data.put("result", retobj);
-			data.put("status", 0);
 			
-		}else{
-			retobj=list.get(0);
-			data.put("result", retobj);
-			data.put("status", 1);
-		}
-		
 //			sql = " SELECT b.bid_id, b.bid_sn, a.product_name, a.annualized_rate, a.period, a.unit  ,CASE WHEN b.status = 3 THEN  b.total_amount ELSE b.current_amount END as currentAmount,b.total_amount totalAmount  FROM phb_product_bid b LEFT JOIN phb_asset_product a ON b.product_sn = a.product_sn where b. STATUS = 1 order by a.important desc";
 //			list = this.jdbcTemplate.queryForList(sql);
 //			if (list.isEmpty()) {// 没有可以投资的了
@@ -277,6 +262,7 @@ public class ProductBidController extends BaseController<ProductBid, String> {
 //				data.put("status", 1);
 //			}
 			
+		}
 
 		return data;
  
@@ -307,7 +293,7 @@ public class ProductBidController extends BaseController<ProductBid, String> {
 				//borrower_job=null, money_useage=null, warrant_status=null}]
 //				data.put("result", list);
 //				data.put("status", 1);
-				Object bid_id = list.get(0).get("bid_id");						//标id
+				//Object bid_id = list.get(0).get("bid_id");						//标id
 				Object period = list.get(0).get("period");						//投资期限
 				Object unit = list.get(0).get("unit");      					//还款期限单位
 				Object payment_method = list.get(0).get("payment_method");      //还款方法
@@ -347,19 +333,22 @@ public class ProductBidController extends BaseController<ProductBid, String> {
 				Object money_useage = list.get(0).get("money_useage");          //借款用途
 				Object warrant_status = list.get(0).get("warrant_status");      //担保状态
 				String contract_pic = (String) list.get(0).get("contract_pic"); //合同图片
-//				String[] contractPic1 = new String[2]; 
-//				if (contract_pic!=null&&!contract_pic.equals("")) {
-//					contractPic1 = contract_pic.split(",");
-//				}else {
-//					contractPic1[0] ="noImage_long.png";
-//					contractPic1[1]="noImage_short.png";
-//				}
+				String[] contractPic1 = new String[2]; 
+				if (contract_pic!=null&&!contract_pic.equals("")) {
+					contractPic1 = contract_pic.split(",");
+					contractPic1[0] ="../media/lcb/upload/"+contractPic1[0];
+					contractPic1[1]="../media/lcb/upload/"+contractPic1[1];
+				}else {
+					contractPic1 = new String[]{"../media/lcb/upload/noImage_long.png","../media/lcb/upload/noImage_short.png"}; 
+					contractPic1[0] ="../media/lcb/upload/noImage_long.png";
+					contractPic1[1]="../media/lcb/upload/noImage_short.png";
+				}
 											
-//				for (Map<String, Object> map : list) {
-//					for (Object All : map.values()) {
-//						System.out.println(All);	
-//					}
-//				}
+				for (Map<String, Object> map : list) {
+					for (Object All : map.values()) {
+						System.out.println(All);	
+					}
+				}
 				
 				// 应该在service做同步块
 				File cache = null;
@@ -405,19 +394,19 @@ public class ProductBidController extends BaseController<ProductBid, String> {
 					content = content.replaceFirst("\\$borrower_job\\$", ""+borrowerJob);	
 					content = content.replaceFirst("\\$money_useage\\$", ""+money_useage);	
 					content = content.replaceFirst("\\$warrant_status\\$", ""+warrant_status);
-					content = content.replaceFirst("\\$contractPic\\$", contract_pic);					
-//					if (contractPic1.length<=0) {
-//						for (int i = 0; i < contractPic1.length; i++) {
-//							String contractPhto = contractPic1[i];
-//							content = content.replaceFirst("\\$contractPic\\$", contractPhto);
-//						}
-//					}else {
-//						for (int i = 0; i < contractPic1.length; i++) {
-//							String contractPhto = contractPic1[i];
-//							content = content.replaceFirst("\\$contractPic\\$", contractPhto);
-//						}
-//						
-//					}
+//					content = content.replaceFirst("\\$contractPic\\$", contract_pic);					
+					if (contractPic1.length<=0) {
+						for (int i = 0; i < contractPic1.length; i++) {
+							String contractPhto = contractPic1[i];
+							content = content.replaceFirst("\\$contractPic"+i+"\\$", contractPhto);
+						}
+					}else {
+						for (int i = 0; i < contractPic1.length; i++) {
+							String contractPhto = contractPic1[i];
+							content = content.replaceFirst("\\$contractPic"+i+"\\$", contractPhto);
+						}
+						
+					}
 				
 
 					OutputStream fis = null;

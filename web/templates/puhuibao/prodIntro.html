@@ -65,7 +65,8 @@
 					<table id="table">
 						<tr>
 							<td class="li-item">基本信息</td>
-							<td class="item" id="item-nameAndAge">$borrower_name$ $borrower_age$岁</td>
+							<td class="item" id="item-nameAndAge">$borrower_name$
+								$borrower_age$岁</td>
 						</tr>
 						<tr>
 							<td class="li-item">单位信息</td>
@@ -94,48 +95,15 @@
 		<div class="part-item">
 			<ul>
 
-					<li class="li-title">资料图片</li>
-					<li class="li4-item"><img id="img-idcard" src=""/></li>
-					<li class="li4-item">借款人身份证</li>
-					<li class="li4-item"><img id="img-loanContract" src=""/></li>
-					<li class="li4-item">借款合同</li>
-					<li id="jjj"></li>
-		
-					
+				<li class="li-title">资料图片</li>
+				<li class="li4-item"><img id="img-idcard" src="$contractPic0$" /></li>
+				<li class="li4-item">借款人身份证</li>
+				<li class="li4-item"><img id="img-loanContract" src="$contractPic1$" /></li>
+				<li class="li4-item">借款合同</li>
 			</ul>
 		</div>
 	</div>
-	 <script>
-          function getPicture(){
-          	var idcard = document.getElementById("img-idcard");
-          	var loanContract = document.getElementById("img-loanContract");
-        	var aaa = document.getElementById("jjj"); 
-          	var strcontractPic = $contractPic$;
-          	console.log(strcontractPic);    
-          	var arrcontract = strcontractPic.split("3");
-			aaa.text(arrcontract[0]);	
-          	console.log(contractPic1);
-          	alert(contractPic1);
-          	idcard.src="../media/lcb/upload/"+arrcontract[0];
-          	<!--
-          	var img=[idcard,loanContract];
-          	if (contract_pic!=null&&!contract_pic.equals("")) {
-				contractPic1 = contract_pic.split(",");
-				for (var i = 0; i < contractPic1.length; i++) {
-					var img1 = img[i];
-					img1.src="../media/lcb/upload/"+contractPic1[i];
-				}
-			}else {
-				var contractPic1=[noImage_long.png,noImage_short.png];
-				for (var i = 0; i < contractPic1.length; i++) {
-					var img1 = img[i];
-					img1.src="../media/lcb/upload/"+contractPic1[i];
-				}
-			}
-          	-->
-          }
-          getPicture();
-	 </script>
+	
 	<script type="text/javascript" src="js/jquery-2.1.4.min.js"></script>
 	<script type="text/javascript" src="../register/js/prodIntro.js"></script>
 </body>
