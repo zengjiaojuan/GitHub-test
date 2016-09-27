@@ -213,7 +213,7 @@ public class RedeemJob {
 
 		
 	}
-	@Scheduled(cron="0 0 0 * * *") // 理财金
+	@Scheduled(cron="0 0 1 * * *") // 理财金
 	public void paymentExperience() {
 
 		Calendar cal = Calendar.getInstance();
