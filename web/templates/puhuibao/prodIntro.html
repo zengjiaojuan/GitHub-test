@@ -1,75 +1,77 @@
 <!DOCTYPE html>
 <html>
-	<head>
-		<meta charset="UTF-8">
-		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
-        <meta name="viewport" content="initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
-        <meta name="apple-mobile-web-app-title" content="金朗理财">
-        <meta name="apple-mobile-web-app-capable" content="yes"/>
-        <meta name="format-detection" content="telphone=no,email=no,address=no"/>
-        <meta name="renderer" content="webkit">
-        <meta http-equiv="Cache-Control" content="no-siteapp"/>
-        <meta http-equiv="Cache-Control" content="no-transform"/>
-        <meta name="full-screen" content="yes">
-        <meta name="x5-fullscreen" content="true">
-        <meta name="browsermode" content="application">
-        <meta name="x5-page-mode" content="app">
-        <meta http-equiv="pragma" content="no-cache">
-        <meta http-equiv="Cache-Control" content="no-store, must-revalidate">
-        <meta http-equiv="expires" content="Wed, 26 Feb 1997 08:21:57 GMT">
-        <meta http-equiv="expires" content="0">
-        <meta name="keywords" content="金朗理财">
-        <meta name="description" content="金朗理财">
-        <title>项目介绍</title>
-        <link href="../register/css/base.css" rel="stylesheet" />
-        <link rel="stylesheet" type="text/css" href="../register/css/prodIntro.css"/>
-	</head>
-	<body>
-		<script type="text/javascript" src="../register/js/setFont.js"></script>
-		
-		<div id="index-page">
-			<!--投资期限、年化收益率、还款方式-->
-			<div class="part-item">
-				<table id="table">
-					<tr>
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport"
+	content="initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
+<meta name="apple-mobile-web-app-title" content="金朗理财">
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="format-detection" content="telphone=no,email=no,address=no" />
+<meta name="renderer" content="webkit">
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta name="full-screen" content="yes">
+<meta name="x5-fullscreen" content="true">
+<meta name="browsermode" content="application">
+<meta name="x5-page-mode" content="app">
+<meta http-equiv="pragma" content="no-cache">
+<meta http-equiv="Cache-Control" content="no-store, must-revalidate">
+<meta http-equiv="expires" content="Wed, 26 Feb 1997 08:21:57 GMT">
+<meta http-equiv="expires" content="0">
+<meta name="keywords" content="金朗理财">
+<meta name="description" content="金朗理财">
+<title>项目介绍</title>
+<link href="../register/css/base.css" rel="stylesheet" />
+<link rel="stylesheet" type="text/css"
+	href="../register/css/prodIntro.css" />
+</head>
+<body>
+	<script type="text/javascript" src="../register/js/setFont.js"></script>
+
+	<div id="index-page">
+		<!--投资期限、年化收益率、还款方式-->
+		<div class="part-item">
+			<table id="table">
+				<tr>
 					<td class="li-item">投资期限</td>
 					<td class="item" id="item-date">$period$ $unit$</td>
-					</tr>
-					<tr>
+				</tr>
+				<tr>
 					<td class="li-item">年化收益率</td>
 					<td class="item" id="item-rate">$annualized_rate$%</td>
-					</tr>
-					<tr>
+				</tr>
+				<tr>
 					<td class="li-item">还款方式</td>
 					<td class="item" id="item-backWay">$payment_method$</td>
-					</tr>
-				</table>
-				
-			</div>
-			
-			<!--借款描述-->
-			<div class="part-item">
-				<ul>
-					<li class="li-title">借款描述</li>
-					<li class="li-item2" id="item-desc">$product_desc$</li>
-				</ul>
-			</div>
-			
-			<!--借款人信息-->
-			<div class="part-item">
-				<ul> 
+				</tr>
+			</table>
+
+		</div>
+
+		<!--借款描述-->
+		<div class="part-item">
+			<ul>
+				<li class="li-title">借款描述</li>
+				<li class="li-item2" id="item-desc">$product_desc$</li>
+			</ul>
+		</div>
+
+		<!--借款人信息-->
+		<div class="part-item">
+			<ul>
 				<li class="li-title">借款人信息</li>
 				<li>
-				<table id="table">
-					<tr>
-					<td class="li-item">基本信息</td>
-					<td class="item" id="item-nameAndAge">$borrower_name$  $borrower_age$岁</td>
-					</tr>
-					<tr>
-					<td class="li-item">单位信息</td>
-					<td class="item" id="item-workInfo">$borrower_job$</td>
-					</tr>
-					<!-- 
+					<table id="table">
+						<tr>
+							<td class="li-item">基本信息</td>
+							<td class="item" id="item-nameAndAge">$borrower_name$ $borrower_age$岁</td>
+						</tr>
+						<tr>
+							<td class="li-item">单位信息</td>
+							<td class="item" id="item-workInfo">$borrower_job$</td>
+						</tr>
+						<!-- 
 					<tr>
 					<td class="li-item">借款用途</td>
 					<td class="item" id="item-monthlyIncome">$money_useage$</td>
@@ -79,28 +81,62 @@
 					<td class="item" id="item-marriage">$warrant_status$</td>
 					</tr>
 					 -->
-					<tr>
-					<td class="li-item">户籍地</td>
-					<td class="item" id="item-homeAddress">$borrower_province$</td>
-					</tr>
-				</table>
+						<tr>
+							<td class="li-item">户籍地</td>
+							<td class="item" id="item-homeAddress">$borrower_province$</td>
+						</tr>
+					</table>
 				</li>
-			 </ul>	
-			</div>
-			
-			<!--资料图片-->
-            <div class="part-item">
-				<ul>
-					<li class="li-title">资料图片</li>
-				    <li class="li4-item"><img id="img-idcard" src="../img/noImage_short.png"/></li>
-				    <li class="li4-item">借款人身份证</li>
-				    <li class="li4-item"><img id="img-loanContract" src="../img/noImage_long.png"/></li>
-				    <li class="li4-item">借款合同</li>
-				    
-				</ul>
-			</div>
+			</ul>
 		</div>
-		<script type="text/javascript" src="js/jquery-2.1.4.min.js" ></script>
-	    <script type="text/javascript" src="../register/js/prodIntro.js"></script>
-	</body>
+
+		<!--资料图片-->
+		<div class="part-item">
+			<ul>
+
+					<li class="li-title">资料图片</li>
+					<li class="li4-item"><img id="img-idcard" src=""/></li>
+					<li class="li4-item">借款人身份证</li>
+					<li class="li4-item"><img id="img-loanContract" src=""/></li>
+					<li class="li4-item">借款合同</li>
+					<li id="jjj"></li>
+		
+					
+			</ul>
+		</div>
+	</div>
+	 <script>
+          function getPicture(){
+          	var idcard = document.getElementById("img-idcard");
+          	var loanContract = document.getElementById("img-loanContract");
+        	var aaa = document.getElementById("jjj"); 
+          	var strcontractPic = $contractPic$;
+          	console.log(strcontractPic);    
+          	var arrcontract = strcontractPic.split("3");
+			aaa.text(arrcontract[0]);	
+          	console.log(contractPic1);
+          	alert(contractPic1);
+          	idcard.src="../media/lcb/upload/"+arrcontract[0];
+          	<!--
+          	var img=[idcard,loanContract];
+          	if (contract_pic!=null&&!contract_pic.equals("")) {
+				contractPic1 = contract_pic.split(",");
+				for (var i = 0; i < contractPic1.length; i++) {
+					var img1 = img[i];
+					img1.src="../media/lcb/upload/"+contractPic1[i];
+				}
+			}else {
+				var contractPic1=[noImage_long.png,noImage_short.png];
+				for (var i = 0; i < contractPic1.length; i++) {
+					var img1 = img[i];
+					img1.src="../media/lcb/upload/"+contractPic1[i];
+				}
+			}
+          	-->
+          }
+          getPicture();
+	 </script>
+	<script type="text/javascript" src="js/jquery-2.1.4.min.js"></script>
+	<script type="text/javascript" src="../register/js/prodIntro.js"></script>
+</body>
 </html>
