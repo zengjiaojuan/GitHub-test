@@ -86,7 +86,7 @@
 		<property name="parentCommissionRate" value="${parent.commission.rate}"></property>
 		<property name="grandparentCommissionRate" value="${grandparent.commission.rate}"></property>
 		<property name="upMoney" value="${scratch.up.money}"></property>
-		<property name="userIP" value="${user.ip}"></property>
+		<property name="userIP" value="101.200.82.182"></property>
 		<property name="levelMap">
 			<map>
 				<entry key="1"><value>500</value></entry>

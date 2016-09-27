@@ -27,7 +27,7 @@
 	<logger name="org.mybatis" level="OFF" additivity="true" />
 	<!--log4jdbc -->
 	<logger name="jdbc.sqltiming" level="OFF" additivity="true" />
-	<logger name="org.springframework" level="DEBUG" additivity="true" />
+	<logger name="org.springframework" level="info" additivity="true" />
 	<root level="ERROR">
 		<appender-ref ref="console" />
 		<appender-ref ref="rollingFile" />
