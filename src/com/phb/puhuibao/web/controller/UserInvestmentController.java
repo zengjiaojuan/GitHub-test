@@ -104,7 +104,7 @@ public class UserInvestmentController extends BaseController<UserInvestment, Str
 				} else {
 					Date incomeDate = investment.getIncomeDate();// 起息日
 					Long incomeTime = incomeDate.getTime();
-					if (currentTime > incomeTime) {   // 当前日大于起息日
+					if (incomeDate.before(new Date())) {   // 当前日大于起息日
 						double amount = investment.getInvestmentAmount();
 						//double everyIncome = Functions.calEveryIncome(amount, investment.getAnnualizedRate());
 						
