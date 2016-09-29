@@ -197,9 +197,11 @@ public class MobileUserController extends BaseController<MobileUser, String> {
 		if (u == null) {
 			data.put("message", "该手机号没注册！");
 			data.put("status", 0);
-		} else if (!DESUtils.decrypt(mUserPwd).equals(u.getmUserPwd())) {
-			data.put("message", "密码错误！");
-			data.put("status", 0);			
+		} else if (DESUtils.decrypt(mUserPwd).length()<=0&&!DESUtils.decrypt(mUserPwd).equals(u.getmUserPwd())) {
+			
+				data.put("message", "密码错误！");
+				data.put("status", 0);			
+			
 		} else {
 			if (u.getmUserName() != null) {
 				u.setmUserName(DESUtils.encrypt(u.getmUserName()));

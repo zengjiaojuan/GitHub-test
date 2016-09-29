@@ -70,7 +70,36 @@ public class ExperienceInvestmentController extends BaseController<ExperienceInv
 			if (investment.getStatus() >= 2) {
 				investment.setLeftDays(0);
 			} else {
-				 
+				Calendar cal = Calendar.getInstance();
+				long currentTime = new Date().getTime();
+				Date incomeDate = investment.getIncomeDate();// 起息日
+				Long incomeTime = incomeDate.getTime();
+				int days=0;
+				if (incomeDate.before(new Date())) {   // 当前日大于起息日
+					double amount = investment.getInvestmentAmount();
+					//double everyIncome = Functions.calEveryIncome(amount, investment.getAnnualizedRate());
+					
+					 days =(int) (currentTime - incomeTime) / (24 * 3600 * 1000)+1;												
+				    BigDecimal lastIncome=new BigDecimal(investment.getInvestmentAmount()).multiply(new BigDecimal(investment.getAnnualizedRate())).multiply(new BigDecimal(days)).divide(new BigDecimal(365), 2, BigDecimal.ROUND_DOWN);
+					investment.setLastIncome(lastIncome.doubleValue()); // 累计收益
+				}
+				cal = Calendar.getInstance();
+				cal.setTime(incomeDate);
+				if (investment.getUnit().equals("年")) {
+					cal.add(Calendar.YEAR, investment.getPeriod());
+				} else if (investment.getUnit().indexOf("月") > 0) {
+					cal.add(Calendar.MONTH, investment.getPeriod());
+				} else {
+					cal.add(Calendar.DATE, investment.getPeriod());
+				}
+				int leftDays=0;
+				if(incomeDate.after(new Date())){
+					leftDays = investment.getPeriod();
+				}else{
+					leftDays =investment.getPeriod()-days+1;
+				}					
+				investment.setLeftDays(leftDays);    //剩余利息日
+				/* 
 				  Date startday = investment.getIncomeDate();// 起息日
 				  Date nowday =  new Date() ;                // 当前时间
 				  long diff = nowday.getTime() - startday.getTime();//这样得到的差值是微秒级别(当前时间-起息时间)
@@ -100,7 +129,7 @@ public class ExperienceInvestmentController extends BaseController<ExperienceInv
 						investment.setLastIncome(LastIncome);
 //						investment.setLastIncome(everyIncome * currentTime_income);
 
-				 /* Date startday = investment.getIncomeDate();// 起息日
+				  Date startday = investment.getIncomeDate();// 起息日
 				  Date nowday =  new Date() ;
 				  long diff = nowday.getTime() - startday.getTime();//这样得到的差值是微秒级别
 				 
@@ -117,21 +146,22 @@ public class ExperienceInvestmentController extends BaseController<ExperienceInv
 						investment.setLastIncome(everyIncome * investment.getPeriod());
 					} else {
 						investment.setLeftDays(appContext.getExperiencePeriod() -  currentTime_income);
-						investment.setLastIncome(everyIncome * currentTime_income);*/
+						investment.setLastIncome(everyIncome * currentTime_income);
 						
 					}
 					
-				}
+				}*/
  
 				//获得截止日期
 				Calendar calendar = Calendar.getInstance();
-				calendar.setTime(startday);  // 起息开始时间
+				calendar.setTime(incomeDate);  // 起息开始时间
 				calendar.add(Calendar.DAY_OF_MONTH, appContext.getExperiencePeriod()-1);
 				Date expiredDate = calendar.getTime();
 				investment.setExpireDate(expiredDate); //结束时间
 				
 				//总的收益变为BigDecimal 类型 并且结果 取小数点后俩位
-			    BigDecimal total = new BigDecimal(everyIncome * investment.getPeriod()).setScale(2, BigDecimal.ROUND_DOWN);
+				BigDecimal total=new BigDecimal(investment.getInvestmentAmount()).multiply(new BigDecimal(investment.getAnnualizedRate())).multiply(new BigDecimal(investment.getPeriod())).divide(new BigDecimal(365), 2, BigDecimal.ROUND_DOWN);
+			   // BigDecimal total = new BigDecimal(everyIncome * investment.getPeriod()).setScale(2, BigDecimal.ROUND_DOWN);
 				double totals = total.doubleValue(); //将total变为double类型
 				investment.setTotalIncome(totals);// 总收益
 			   // investment.setTotalIncome(everyIncome * investment.getPeriod());// 总收益

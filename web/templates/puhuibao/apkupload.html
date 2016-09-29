@@ -1,0 +1,123 @@
+ <div class="col-sm-12 col-md-12"><!-- 把整个可用部分划分为12格 -->
+    <div class="row">
+     	<div class="col-sm-12 col-md-12">
+			<form class="form-custom clearfix">
+	        <div class="col-sm-2 col-md-2">
+	            <input class="form-control"  type="text" placeholder="是否有效：1-有效，0-无效" ng-model="params.querykeyword"/>       
+	        </div>   
+	        <div class="col-sm-4 col-md-4">                 
+	            <button class="btn btn-custom" type="submit" ng-click="refresh('first',true)">查询</button>            
+	            <button class="btn btn-custom" type="button" data-toggle="modal" data-target="#addDialog" upload-refresh="true" ng-click="clearForm()">新增</button> 
+	        </div>
+            </form>
+        </div> 
+        
+          <table class="table table-striped table-bordered table-condensed index-center table-costom">
+        <thead>
+        <tr>
+            <th class="col-sm-1">序号</th>
+            <th class="col-sm-2">apk</th>
+            <th class="col-sm-3">描述</th>
+            <th class="col-sm-2">是否有效</th> 
+            <th class="col-sm-4">操作</th>        
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="rowlink" ng-repeat="item in limitArr">
+        
+            <td>{{current*limit+$index+1}}</td>
+            <td>{{item.apk}}</td>
+            <td>{{item.describe}}</td>        
+            <td ng-if="item.type==0">无效</td><td ng-if="item.type==1">有效</td>
+            <td>
+                <a href="javascript:" data-toggle="modal" data-target="#" upload-refresh="true" ng-click="edit(item)">修改</a> 
+                <a href="javascript:" data-toggle="modal" data-target="" ng-click="todelete(item)">删除</a>
+            </td>
+        </tr>
+        </tbody>
+    </table> 
+     <div data-remote-paging="pager" data-refresh="refresh" data-current="current" data-total="total" data-data="limitArr" data-limit="limit" data-params="params"></div>
+<!--     新增会话框     -->
+    <div class="modal fade" id="addDialog" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" style="width: 800px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+
+                <h4 style="color: blue;font-weight: bold">新增</h4>
+
+            </div>            
+   <form name="upload" class="form-horizontal" ng-submit="preUpload(keye)" novalidate="novalidate">
+	
+	<div class="modal-body">
+	 <div class="row">
+	           <div class="col-sm-12 col-md-12">
+                    <div class="form-group">
+					<label for="describe" style="font-weight: bold">&nbsp;&nbsp;&nbsp;&nbsp;apk描述：</label>
+					<input type="text" class="form-control" id="describe-Content" 
+						   placeholder="请输入描述">
+	               
+					<label for="inputfile" style="font-weight: bold">&nbsp;&nbsp;&nbsp;&nbsp;apk文件上传:</label>
+					<input type="file" id="apk-content" required>
+					 </div>
+	            <div class="modal-footer">
+	              <button type="reset" class="btn btn-default">重置</button>
+	              <input type="submit" class="btn btn-primary" ng-disabled="upload.$invalid" name="saveButton" >保存</input>
+	              <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+	            </div>
+    </form>
+         </div>
+    </div>
+</div>     
+<!-- 删除对话框 -->
+<div class="modal fade" id="removeDialog" tabindex="-1"  ng-submit="remove(keye)" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">删除</h4>
+            </div>
+            <div class="modal-body">
+                                                     确认要删除么？
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" ng-click="comfirmDelete()" data-dismiss="modal">确认删除</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+            </div>
+        </div>
+      
+    </div>
+   
+</div>
+<!-- 修改  -->
+<div class="modal fade" id="editDialog" tabindex="-1" role="dialog"  ng-submit="edit(keye)" aria-hidden="true">
+    <div class="modal-dialog" style="width: 850px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">修改</h4>
+            </div>   
+             <form name="upload" class="form-horizontal" ng-submit="create(keye)" novalidate="novalidate">
+	
+	<div class="modal-body">
+	 <div class="row">
+	           <div class="col-sm-12 col-md-12">
+                    <div class="form-group">
+					<label for="describe" style="font-weight: bold">&nbsp;&nbsp;&nbsp;&nbsp;apk描述：</label>
+					<input type="text" class="form-control" id="name" 
+						   placeholder="请输入描述">
+	               
+					<label for="inputfile" style="font-weight: bold">&nbsp;&nbsp;&nbsp;&nbsp;apk文件上传:</label>
+					<input type="file" id="inputfile" required>
+					 </div>
+	            <div class="modal-footer">
+	              <button type="reset" class="btn btn-default">重置</button>
+	              <button type="submit" class="btn btn-primary" ng-disabled="upload.$invalid">保存</button>
+	              <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+	            </div>
+    </form>
+        </div>
+    </div>
+</div>
+                     
+</div><!-- 把整个可用部分划分为12格  结束 -->

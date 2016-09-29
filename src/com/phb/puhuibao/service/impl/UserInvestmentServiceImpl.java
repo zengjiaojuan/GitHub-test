@@ -204,6 +204,7 @@ public class UserInvestmentServiceImpl extends DefaultBaseService<UserInvestment
 	public UserInvestment update(UserInvestment entity) {
 		String sql = "select 1 from phb_mobile_user where m_user_id=" + entity.getmUserId() + " for update";
 		this.jdbcTemplate.execute(sql);
+		System.out.println(entity.getmUserId());
 		MobileUser u = mobileUserDao.get("" + entity.getmUserId());
 		MobileUser user = new MobileUser();
 		user.setmUserId(entity.getmUserId());

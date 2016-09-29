@@ -165,7 +165,7 @@ public class MobileUserServiceImpl extends DefaultBaseService<MobileUser, String
 				double amount = investment.getInvestmentAmount();		// 投资金额 
 				double everyIncome =  investment.getDailyIncome();		//
 				//Functions.calEveryIncome(amount, rate);
-				if (currentTime >= investment.getIncomeDate().getTime()) {
+				if (new Date().after(investment.getIncomeDate()) ) {
 					todayIncome += everyIncome;
 				}
 				investmentAmount += amount;
@@ -212,7 +212,7 @@ public class MobileUserServiceImpl extends DefaultBaseService<MobileUser, String
 				double rate = investment.getAnnualizedRate();
 				double amount = investment.getInvestmentAmount();
 				double everyIncome = Functions.calEveryIncome(amount, rate);
-				if (currentTime >= investment.getIncomeDate().getTime()) {
+				if (new Date().after(investment.getIncomeDate()) ){
 					todayIncome += everyIncome;
 				}
 				//totalIncome += amount * rate * product.getPeriod() / 365;

@@ -595,7 +595,10 @@ define(function() {
 	app.factory('ProductBid2', ['$resource', function($resource) {
 		return $resource('productBid.shtml');
 	}]);
-	
+	//apk上传
+	app.factory('ApkUpload', ['$resource', function($resource) {
+		return $resource('uploadAPK.shtml');
+	}]);
 	
 	
 	

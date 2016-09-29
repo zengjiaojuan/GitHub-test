@@ -30,6 +30,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.idap.clinic.entity.UploadFile;
 import com.idp.pub.context.AppContext;
 import com.idp.pub.entity.Pager;
 import com.idp.pub.service.IBaseService;
@@ -59,6 +60,9 @@ public class ProductBidController extends BaseController<ProductBid, String> {
 
 	@Resource(name = "assetProductService")
 	private IBaseService<AssetProduct, String> assetProductService;
+	
+	@Resource(name = "uploadFileService")
+	private IBaseService<UploadFile, String> uploadFileService;
 
 	@Resource(name = "jdbcTemplate")
 	private JdbcTemplate jdbcTemplate;
@@ -196,6 +200,7 @@ public class ProductBidController extends BaseController<ProductBid, String> {
 	}
 	
 	
+
 	/**
 	 * 推荐
 	 * @param muid 用户id 
@@ -209,7 +214,7 @@ public class ProductBidController extends BaseController<ProductBid, String> {
 		List <Map<String, Object>> list = null;
 		List <Map<String, Object>> list1 = null;
 		String sql="";
-		if(StringUtil.isEmpty(muid)){// 用户未登陆
+		/*if(StringUtil.isEmpty(muid)){// 用户未登陆
 			    //sql查出的是新手标
 				sql = "SELECT b.bid_id, b.bid_sn,b.status, a.product_name, a.annualized_rate, a.period, a.unit,CASE WHEN b.status = 3 THEN  b.total_amount ELSE b.current_amount END as currentAmount,b.total_amount totalAmount FROM phb_product_bid b LEFT JOIN phb_asset_product a ON b.product_sn = a.product_sn WHERE b. STATUS = 1 AND a.product_sn = 'P888'";
 				list = this.jdbcTemplate.queryForList(sql);
@@ -244,9 +249,24 @@ public class ProductBidController extends BaseController<ProductBid, String> {
 				data.put("result", retobj);
 				data.put("status", 1);
 			}
+			*/
 			
+		
+		
+			sql = " SELECT b.bid_id, b.bid_sn,b.status, a.product_name, a.annualized_rate, a.period, a.unit  ,CASE WHEN b.status = 3 THEN  b.total_amount ELSE b.current_amount END as currentAmount,b.total_amount totalAmount  FROM phb_product_bid b LEFT JOIN phb_asset_product a ON b.product_sn = a.product_sn where b. STATUS = 1 order by a.important desc";
 			
+		
+		list = this.jdbcTemplate.queryForList(sql);
+		if(list.isEmpty()){//没有可以推荐的
+			data.put("result", retobj);
+			data.put("status", 0);
 			
+		}else{
+			retobj=list.get(0);
+			data.put("result", retobj);
+			data.put("status", 1);
+		}
+		
 //			sql = " SELECT b.bid_id, b.bid_sn, a.product_name, a.annualized_rate, a.period, a.unit  ,CASE WHEN b.status = 3 THEN  b.total_amount ELSE b.current_amount END as currentAmount,b.total_amount totalAmount  FROM phb_product_bid b LEFT JOIN phb_asset_product a ON b.product_sn = a.product_sn where b. STATUS = 1 order by a.important desc";
 //			list = this.jdbcTemplate.queryForList(sql);
 //			if (list.isEmpty()) {// 没有可以投资的了
@@ -258,12 +278,10 @@ public class ProductBidController extends BaseController<ProductBid, String> {
 //				data.put("status", 1);
 //			}
 			
-		}
 
 		return data;
  
 	}
-	
 	
 	
 	
@@ -281,7 +299,7 @@ public class ProductBidController extends BaseController<ProductBid, String> {
 		List <Map<String, Object>> list = null;
 		String sql="";
 		if(!StringUtil.isEmpty(bidsn)){    //当bidsn标的编号不为空时 通过sql查询债权信息			     
-				sql = "SELECT a.period,a.unit,a.annualized_rate, a.payment_method, a.product_desc, c.borrower_name, case left(c.borrower_id,2)  when '11' then '北京市' when '12' then '天津市' when '13' then '河北省' when '14' then '山西省' when '15' then '内蒙古自治区' when '21' then '辽宁省' when '22' then '吉林省' when '23' then '黑龙江省' when '31' then '上海市' when '32' then '江苏省' when '33' then '浙江省' when '34' then '安徽省' when '35' then '福建省' when '36' then '江西省' when '37' then '山东省' when '41' then '河南省' when '42' then '湖北省' when '43' then '湖南省' when '44' then '广东省' when '45' then '广西壮族自治区' when '46' then '海南省' when '50' then '重庆市' when '51' then '四川省' when '52' then '贵州省' when '53' then '云南省' when '54' then '西藏自治区' when '61' then '陕西省' when '62' then '甘肃省' when '63' then '青海省' when '64' then '宁夏回族自治区' when '65' then '新疆维吾尔自治区' when '71' then '台湾省' when '81' then '香港特别行政区' when '82' then '澳门特别行政区' else '未知'      end   as borrower_province , year(curdate())-if(length(c.borrower_id)=18,substring(c.borrower_id,7,4),if(length(c.borrower_id)=15,concat('19',substring(c.borrower_id,7,2)),null)) as borrower_age,  case if(length(c.borrower_id)=18, cast(substring(c.borrower_id,17,1) as UNSIGNED)%2, if(length(c.borrower_id)=15,cast(substring(c.borrower_id,15,1) as UNSIGNED)%2,3))  when 1 then '男'	 when 0 then '女' else '未知' end as borrower_gender, case c.borrower_job when 1 then '私营业主' when 2 then '工薪' when 3 then '企业高管' end as borrower_job, case c.money_useage when 1 then '扩大经营' when 2 then '资金周转' when 3 then '个人消费' end as money_useage, case c.warrant_status when 1 then '质押担保' end as warrant_status  FROM phb_product_bid b LEFT JOIN phb_asset_product a ON b.product_sn = a.product_sn LEFT JOIN crm_borrower c ON b.bid_contract = c.borrower_contract where b.bid_sn =  '"+ bidsn +"'";
+				sql = "SELECT b.bid_id,a.period,a.unit,a.annualized_rate, a.payment_method, a.product_desc, c.borrower_name,b.contract_pic, case left(c.borrower_id,2)  when '11' then '北京市' when '12' then '天津市' when '13' then '河北省' when '14' then '山西省' when '15' then '内蒙古自治区' when '21' then '辽宁省' when '22' then '吉林省' when '23' then '黑龙江省' when '31' then '上海市' when '32' then '江苏省' when '33' then '浙江省' when '34' then '安徽省' when '35' then '福建省' when '36' then '江西省' when '37' then '山东省' when '41' then '河南省' when '42' then '湖北省' when '43' then '湖南省' when '44' then '广东省' when '45' then '广西壮族自治区' when '46' then '海南省' when '50' then '重庆市' when '51' then '四川省' when '52' then '贵州省' when '53' then '云南省' when '54' then '西藏自治区' when '61' then '陕西省' when '62' then '甘肃省' when '63' then '青海省' when '64' then '宁夏回族自治区' when '65' then '新疆维吾尔自治区' when '71' then '台湾省' when '81' then '香港特别行政区' when '82' then '澳门特别行政区' else '未知'      end   as borrower_province , year(curdate())-if(length(c.borrower_id)=18,substring(c.borrower_id,7,4),if(length(c.borrower_id)=15,concat('19',substring(c.borrower_id,7,2)),null)) as borrower_age,  case if(length(c.borrower_id)=18, cast(substring(c.borrower_id,17,1) as UNSIGNED)%2, if(length(c.borrower_id)=15,cast(substring(c.borrower_id,15,1) as UNSIGNED)%2,3))  when 1 then '男'	 when 0 then '女' else '未知' end as borrower_gender, case c.borrower_job when 1 then '私营业主' when 2 then '工薪' when 3 then '企业高管' end as borrower_job, case c.money_useage when 1 then '扩大经营' when 2 then '资金周转' when 3 then '个人消费' end as money_useage, case c.warrant_status when 1 then '质押担保' end as warrant_status  FROM phb_product_bid b LEFT JOIN phb_asset_product a ON b.product_sn = a.product_sn LEFT JOIN crm_borrower c ON b.bid_contract = c.borrower_contract where b.bid_sn =  '"+ bidsn +"'";
 				list = this.jdbcTemplate.queryForList(sql);
 				//[{period=12, annualized_rate=0.100, payment_method=到期还本付息，月复利计息, 
 				//product_desc=“年年红”是金朗理财平台推出的具有较高资金流动性的理财模式，固定十二个月出借。到期后本金利息自动收回，省时省心轻松理财。, 
@@ -289,6 +307,7 @@ public class ProductBidController extends BaseController<ProductBid, String> {
 				//borrower_job=null, money_useage=null, warrant_status=null}]
 //				data.put("result", list);
 //				data.put("status", 1);
+				//Object bid_id = list.get(0).get("bid_id");						//标id
 				Object period = list.get(0).get("period");						//投资期限
 				Object unit = list.get(0).get("unit");      					//还款期限单位
 				Object payment_method = list.get(0).get("payment_method");      //还款方法
@@ -303,17 +322,47 @@ public class ProductBidController extends BaseController<ProductBid, String> {
 //				Object rate = Integer.parseInt((String) annualized_rate)*100);
 				Object product_desc = list.get(0).get("product_desc");          //产品描述(借款描述)
 				Object borrower_name = list.get(0).get("borrower_name");        //借债人姓名
+				String borrowerName="";
+				if (borrower_name!=null&&!borrower_name.equals("")) {
+					borrowerName=(String)borrower_name;
+				}else {
+					borrowerName="未知";
+				}
 				Object borrower_province = list.get(0).get("borrower_province");//借债人户籍
-				Object borrower_age = list.get(0).get("borrower_age");          //借债人年龄
+				Double borrower_age = (Double) list.get(0).get("borrower_age");          //借债人年龄
+				int borrowerAge=0;
+				if (borrower_age!=null&&!borrower_age.equals("")) {
+					borrowerAge = Integer.parseInt(borrower_age.intValue()+"");
+				}else {
+					borrowerAge=0;
+				}
 				Object borrower_gender = list.get(0).get("borrower_gender");    //借债人性别
 				Object borrower_job = list.get(0).get("borrower_job");          //借款人身份（单位信息）
+				String borrowerJob="";
+				if (borrower_job!=null&&!borrower_job.equals("")) {
+					borrowerJob=(String)borrower_job;
+				}else {
+					borrowerJob="未知";
+				}
 				Object money_useage = list.get(0).get("money_useage");          //借款用途
 				Object warrant_status = list.get(0).get("warrant_status");      //担保状态
-//				for (Map<String, Object> map : list) {
-//					for (Object All : map.values()) {
-//						System.out.println(All);	
-//					}
-//				}
+				String contract_pic = (String) list.get(0).get("contract_pic"); //合同图片
+				String[] contractPic1 = new String[2]; 
+				if (contract_pic!=null&&!contract_pic.equals("")) {
+					contractPic1 = contract_pic.split(",");
+					contractPic1[0] ="../media/lcb/upload/"+contractPic1[0];
+					contractPic1[1]="../media/lcb/upload/"+contractPic1[1];
+				}else {
+					contractPic1 = new String[]{"../media/lcb/upload/noImage_long.png","../media/lcb/upload/noImage_short.png"}; 
+					contractPic1[0] ="../media/lcb/upload/noImage_long.png";
+					contractPic1[1]="../media/lcb/upload/noImage_short.png";
+				}
+											
+				for (Map<String, Object> map : list) {
+					for (Object All : map.values()) {
+						System.out.println(All);	
+					}
+				}
 				
 				// 应该在service做同步块
 				File cache = null;
@@ -352,13 +401,27 @@ public class ProductBidController extends BaseController<ProductBid, String> {
 					content = content.replaceFirst("\\$annualized_rate\\$", ""+annualized_rate);	
 					content = content.replaceFirst("\\$payment_method\\$", ""+payment_method);	
 					content = content.replaceFirst("\\$product_desc\\$", ""+product_desc);	
-					content = content.replaceFirst("\\$borrower_name\\$", ""+borrower_name);	
+					content = content.replaceFirst("\\$borrower_name\\$", ""+borrowerName);	
 					content = content.replaceFirst("\\$borrower_province\\$", ""+borrower_province);	
-					content = content.replaceFirst("\\$borrower_age\\$", ""+borrower_age);	
+					content = content.replaceFirst("\\$borrower_age\\$", ""+borrowerAge);	
 					content = content.replaceFirst("\\$borrower_gender\\$", ""+borrower_gender);	
-					content = content.replaceFirst("\\$borrower_job\\$", ""+borrower_job);	
+					content = content.replaceFirst("\\$borrower_job\\$", ""+borrowerJob);	
 					content = content.replaceFirst("\\$money_useage\\$", ""+money_useage);	
-					content = content.replaceFirst("\\$warrant_status\\$", ""+warrant_status);	
+					content = content.replaceFirst("\\$warrant_status\\$", ""+warrant_status);
+//					content = content.replaceFirst("\\$contractPic\\$", contract_pic);					
+					if (contractPic1.length<=0) {
+						for (int i = 0; i < contractPic1.length; i++) {
+							String contractPhto = contractPic1[i];
+							content = content.replaceFirst("\\$contractPic"+i+"\\$", contractPhto);
+						}
+					}else {
+						for (int i = 0; i < contractPic1.length; i++) {
+							String contractPhto = contractPic1[i];
+							content = content.replaceFirst("\\$contractPic"+i+"\\$", contractPhto);
+						}
+						
+					}
+				
 
 					OutputStream fis = null;
 					OutputStreamWriter osw = null;
