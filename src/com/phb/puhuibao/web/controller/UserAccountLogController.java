@@ -45,7 +45,7 @@ public class UserAccountLogController extends BaseController<UserAccountLog, Str
 		pager.setLimit(30);
 		Map<String,Object> map=new HashMap<String,Object>();
 		map.put("mUserId", muid);
-		map.put("orderBy", "create_time");
+		map.put("orderBy", "log_id");
 		map.put("order", "desc");
 		
 		if(!StringUtil.isBlank(type)&&type.length()==3){
