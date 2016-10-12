@@ -115,15 +115,15 @@ public class UserAccountController extends BaseController<UserAccount, String> {
 	@RequestMapping(value="query")
 	@ResponseBody
 	public Map<String, Object> query(@RequestParam int pageno, @RequestParam String muid) {
-		Pager<UserAccount> pager = new Pager<UserAccount>();
+		Pager<UserAccount> pager = new Pager<>();
 		pager.setReload(true);
 		pager.setCurrent(pageno);
-		Map<String, Object> map = new HashMap<String, Object>();
+		Map<String, Object> map = new HashMap<>();
 		map.put("mUserId", muid);
 		map.put("orderBy", "create_time");
 		map.put("order", "desc");
 		Pager<UserAccount> p = this.getBaseService().findByPager(pager, map);
-		Map<String, Object> data = new HashMap<String, Object>();
+		Map<String, Object> data = new HashMap<>();
 		data.put("result", p.getData());
 		data.put("count", p.getTotal());
 		data.put("message", "");
@@ -138,8 +138,8 @@ public class UserAccountController extends BaseController<UserAccount, String> {
 			@RequestParam String payPassword,
 			@RequestParam double amount
 			  ) {
-		Map<String, Object> data = new HashMap<String, Object>();
-		Map<String, Object> params = new HashMap<String, Object>();
+		Map<String, Object> data = new HashMap<>();
+		Map<String, Object> params = new HashMap<>();
 		params.put("mUserId", muid);
 		UserCard card = baseUserCardService.unique(params);
 		if (card == null) {
@@ -201,7 +201,7 @@ public class UserAccountController extends BaseController<UserAccount, String> {
 	@RequestMapping(value="cancel")
 	@ResponseBody
 	public Map<String, Object> cancel(@RequestParam int accountId) {
-		Map<String, Object> data = new HashMap<String, Object>();
+		Map<String, Object> data = new HashMap<>();
 		int count = userAccountService.processDelete(accountId);
 		if (count == 0) {
 			data.put("message", "取消失败！");
@@ -269,7 +269,7 @@ public class UserAccountController extends BaseController<UserAccount, String> {
 //	@RequestMapping(value="withdraw")
 //	@ResponseBody
 	public Map<String, Object> withdraw(@RequestParam String phone, @RequestParam double amount, @RequestParam String cardTop, @RequestParam String cardLast) {
-		Map<String, String> params 	= new HashMap<String, String>();
+		Map<String, String> params 	= new HashMap<>();
 		String uuid = UUID.randomUUID().toString().replace("-", "");
 		params.put("requestid", 		uuid);
 		params.put("identityid", 		phone);
@@ -296,7 +296,7 @@ public class UserAccountController extends BaseController<UserAccount, String> {
 	    String error_msg	   				= StringUtils.trimToEmpty(result.get("error_msg")); 
 	    String customError	   				= StringUtils.trimToEmpty(result.get("customError")); 
 
-	    Map<String, Object> data = new HashMap<String, Object>();
+	    Map<String, Object> data = new HashMap<>();
 		if(!"".equals(error_code)) {
 			data.put("message", error_code + ": " + error_msg);
 			data.put("status", 0);
@@ -343,11 +343,11 @@ public class UserAccountController extends BaseController<UserAccount, String> {
 		
 		if(!"".equals(error_code)) {
 			LOG.error(error_code + ": " + error);
-			return new ResponseEntity<byte[]>((error_code + ": " + error).getBytes("utf-8"), headers, HttpStatus.OK);
+			return new ResponseEntity<>((error_code + ": " + error).getBytes("utf-8"), headers, HttpStatus.OK);
 			//throw new Exception(error_code + ": " + error);
 		} else if(!"".equals(customError)) {
 			LOG.error(customError);
-			return new ResponseEntity<byte[]>(customError.getBytes("utf-8"), headers, HttpStatus.OK);
+			return new ResponseEntity<>(customError.getBytes("utf-8"), headers, HttpStatus.OK);
 			//throw new Exception(customError);
 		}
 		
@@ -404,7 +404,7 @@ public class UserAccountController extends BaseController<UserAccount, String> {
             }
 		}
 		        
-		return new ResponseEntity<byte[]>(baos.toByteArray(), headers, HttpStatus.OK);
+		return new ResponseEntity<>(baos.toByteArray(), headers, HttpStatus.OK);
 	}
 	
 	@RequestMapping(value="checkAccountRefund")
@@ -423,11 +423,11 @@ public class UserAccountController extends BaseController<UserAccount, String> {
 		
 		if(!"".equals(error_code)) {
 			LOG.error(error_code + ": " + error);
-			return new ResponseEntity<byte[]>((error_code + ": " + error).getBytes("utf-8"), headers, HttpStatus.OK);
+			return new ResponseEntity<>((error_code + ": " + error).getBytes("utf-8"), headers, HttpStatus.OK);
 			//throw new Exception(error_code + ": " + error);
 		} else if(!"".equals(customError)) {
 			LOG.error(customError);
-			return new ResponseEntity<byte[]>(customError.getBytes("utf-8"), headers, HttpStatus.OK);
+			return new ResponseEntity<>(customError.getBytes("utf-8"), headers, HttpStatus.OK);
 			//throw new Exception(customError);
 		}
 		
@@ -484,7 +484,7 @@ public class UserAccountController extends BaseController<UserAccount, String> {
             }
 		}
 		        
-		return new ResponseEntity<byte[]>(baos.toByteArray(), headers, HttpStatus.OK);
+		return new ResponseEntity<>(baos.toByteArray(), headers, HttpStatus.OK);
 	}
 //	
 	/**
@@ -495,7 +495,7 @@ public class UserAccountController extends BaseController<UserAccount, String> {
 	@RequestMapping(params = "method=queryTransaction", method = RequestMethod.GET)
 	@ResponseBody
 	public ThirdPayLog queryPay(@RequestParam String orderId) {
-		Map<String, Object> params 	= new HashMap<String, Object>();
+		Map<String, Object> params 	= new HashMap<>();
 		params.put("orderId", 		orderId);
 		ThirdPayLog thirdPayLog =  thirdPayLogService.unique(params);
 		return thirdPayLog;
@@ -570,7 +570,7 @@ public class UserAccountController extends BaseController<UserAccount, String> {
         }
         
         String oid_paybill = payDataBean.getOid_paybill();
-		Map<String,Object> params = new HashMap<String,Object>();
+		Map<String,Object> params = new HashMap<>();
 		params.put("orderId", oid_paybill);
 		UserAccount entity = baseUserAccountService.unique(params);
 		if (entity != null) {// 如果这个订单已经插进来了
@@ -625,7 +625,7 @@ public class UserAccountController extends BaseController<UserAccount, String> {
 	@RequestMapping(value="withdraw")
 	@ResponseBody
 	public Map<String, Object> withdraw(@RequestParam int muid, @RequestParam double amount) {
-		Map<String, Object> params = new HashMap<String, Object>();
+		Map<String, Object> params = new HashMap<>();
 		params.put("mUserId", muid);
 		UserCard card = baseUserCardService.unique(params);
 
@@ -654,7 +654,7 @@ public class UserAccountController extends BaseController<UserAccount, String> {
         String reqJson = JSON.toJSONString(reqBean);
         String resJson = HttpRequestSimple.getInstance().postSendHttp(ServerURLConfig.WITHDRAW_URL, reqJson);
         RetBean retBean = JSON.parseObject(resJson, RetBean.class);
-		Map<String, Object> data = new HashMap<String, Object>();
+		Map<String, Object> data = new HashMap<>();
 		data.put("result", uuid);
 		data.put("message", retBean.getRet_msg());
 		if ("0000".endsWith(retBean.getRet_code())) {
@@ -713,7 +713,7 @@ public class UserAccountController extends BaseController<UserAccount, String> {
         }
 
 		String no_order = object.getString("no_order");
-		Map<String,Object> params = new HashMap<String,Object>();
+		Map<String,Object> params = new HashMap<>();
 		params.put("orderId", no_order);
 		UserAccount entity = baseUserAccountService.unique(params);
 		if (entity.getIsPaid() == 1) {
@@ -762,7 +762,7 @@ public class UserAccountController extends BaseController<UserAccount, String> {
         String reqJSON = reqObj.toString();
         String resJSON = HttpRequestSimple.getInstance().postSendHttp(ServerURLConfig.REFUND_URL, reqJSON);
 
-        Map<String, String> data = new HashMap<String, String>();
+        Map<String, String> data = new HashMap<>();
 		try {
 			// 使用        RetBean retBean = JSON.parseObject(resJson, RetBean.class);即可。虽然支付、退款、提现有（同步）返回参数，但由于存在回调的原因，只需考虑返回的2个参数即可
 			org.json.JSONObject object = new org.json.JSONObject(resJSON);
@@ -857,7 +857,7 @@ public class UserAccountController extends BaseController<UserAccount, String> {
 				LOG.error(reqStr);
 			} else {
 				String oid_paybill = log.getParams();
-				Map<String, Object> p = new HashMap<String, Object>();
+				Map<String, Object> p = new HashMap<>();
 				p.put("orderId", oid_paybill);
 				UserAccount entity = this.getBaseService().unique(p);
 				if (entity.getIsPaid() == 2) {
@@ -881,7 +881,7 @@ public class UserAccountController extends BaseController<UserAccount, String> {
    
 	
 	private void paySuccess(HttpServletResponse response) {
-        SortedMap<String, String> resMap = new TreeMap<String, String>();
+        SortedMap<String, String> resMap = new TreeMap<>();
         resMap.put("return_code", "SUCCESS");
         resMap.put("return_msg", "OK");
 
