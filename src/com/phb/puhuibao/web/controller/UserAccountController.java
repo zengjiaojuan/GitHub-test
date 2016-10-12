@@ -57,6 +57,8 @@ import com.phb.puhuibao.entity.UserAccount;
 import com.phb.puhuibao.entity.UserCard;
 import com.phb.puhuibao.entity.UserInvestment;
 import com.phb.puhuibao.entity.UserLoan;
+import com.phb.puhuibao.entity.WithdrawExceptionLog;
+import com.phb.puhuibao.service.UserAccountLogService;
 import com.phb.puhuibao.service.UserAccountService;
 import com.yeepay.TZTService;
 
@@ -81,10 +83,12 @@ public class UserAccountController extends BaseController<UserAccount, String> {
 
 	@javax.annotation.Resource(name = "thirdPayAccountService")
 	private IBaseService<ThirdPayAccount, String> thirdPayAccountService;
-
+	@javax.annotation.Resource(name = "withdrawExceptionLogService")
+	private IBaseService<WithdrawExceptionLog, String> withdrawExceptionLogService;
 	@javax.annotation.Resource(name = "userAccountService")
 	private UserAccountService userAccountService;
-
+	@javax.annotation.Resource(name = "userAccountLogService")
+	private UserAccountLogService userAccountLogService;
 	@javax.annotation.Resource(name = "userAccountService")
 	private IBaseService<UserAccount, String> baseUserAccountService;
 
@@ -217,43 +221,61 @@ public class UserAccountController extends BaseController<UserAccount, String> {
 	@RequestMapping(params = "method=update", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, Object> update(UserAccount entity) {
+		WithdrawExceptionLog withdraw=new WithdrawExceptionLog();
+		//balanceAmount----得到用户所有资金流水汇总后的钱
+		int muserId=entity.getmUserId();
+		double balanceAmount=userAccountLogService.getBalanceMoney(muserId).doubleValue();
 		Map<String, Object> results = Constants.MAP();
-		if (entity.getProcessType() == 1 && entity.getIsPaid() == 1) {
-//			Map<String, Object> params = new HashMap<String, Object>();
-//			params.put("mUserId", entity.getmUserId());
-//			UserCard card = baseUserCardService.unique(params);
-//
-			//Map<String, Object> data = withdraw(card.getBankPhone(), entity.getAmount(), card.getBankAccount().substring(0, 6), card.getBankAccount().substring(card.getBankAccount().length() - 4));
-			Map<String, Object> data = withdraw(entity.getmUserId(), entity.getAmount());
-			if ((int) data.get("status") == 1) {
-				String orderId = (String) data.get("result");
-				UserAccount userAccount = new UserAccount();
-				userAccount.setAccountId(entity.getAccountId());
-				userAccount.setOrderId(orderId);
-				try {
-					baseUserAccountService.update(userAccount);
-				} catch (Exception e) {
+		MobileUser user=this.mobileUserService.getById(muserId+"");	
+		//当计算出的用户可用余额与数据库可用余额相同  且  提现的余额不大于可用余额  时，方可通过。
+		if(balanceAmount==user.getmUserMoney()&&(balanceAmount>=entity.getAmount())){
+			if (entity.getProcessType() == 1 && entity.getIsPaid() == 1) {
+//				Map<String, Object> params = new HashMap<String, Object>();
+//				params.put("mUserId", entity.getmUserId());
+//				UserCard card = baseUserCardService.unique(params);
+	//
+				//Map<String, Object> data = withdraw(card.getBankPhone(), entity.getAmount(), card.getBankAccount().substring(0, 6), card.getBankAccount().substring(card.getBankAccount().length() - 4));
+				
+				Map<String, Object> data = withdraw(entity.getmUserId(), entity.getAmount());
+				if ((int) data.get("status") == 1) {
+					String orderId = (String) data.get("result");
+					UserAccount userAccount = new UserAccount();
+					userAccount.setAccountId(entity.getAccountId());
+					userAccount.setOrderId(orderId);
+					try {
+						baseUserAccountService.update(userAccount);
+					} catch (Exception e) {
+						results.put(Constants.SUCCESS, Constants.FALSE);
+						results.put(Constants.MESSAGE, e.getMessage());
+						return results;
+					}
+					entity.setIsPaid(3); // 银行处理中
+				} else {
 					results.put(Constants.SUCCESS, Constants.FALSE);
-					results.put(Constants.MESSAGE, e.getMessage());
+					results.put(Constants.MESSAGE, data.get("message"));
 					return results;
 				}
-				entity.setIsPaid(3); // 银行处理中
-			} else {
-				results.put(Constants.SUCCESS, Constants.FALSE);
-				results.put(Constants.MESSAGE, data.get("message"));
-				return results;
 			}
-		}
-		try {
-			userAccountService.confirm(entity);
-			results.put(Constants.SUCCESS, Constants.TRUE);
-		} catch (Exception e) {
+			try {
+				userAccountService.confirm(entity);
+				results.put(Constants.SUCCESS, Constants.TRUE);
+			} catch (Exception e) {
+				results.put(Constants.SUCCESS, Constants.FALSE);
+				results.put(Constants.MESSAGE, e.getMessage());
+			}
+			
+				
+			
+		}else{
+			withdraw.setmUserId(entity.getmUserId());
+			withdraw.setWithdrawAmount(entity.getAmount());
+			withdraw.setExceptinoType(1);
+			withdrawExceptionLogService.save(withdraw);
 			results.put(Constants.SUCCESS, Constants.FALSE);
-			results.put(Constants.MESSAGE, e.getMessage());
+			results.put(Constants.MESSAGE, "该账户资金异常，请联系系统管理员进行核验！");			
 		}
 		return results;
 	}
-	
  
  
 	
