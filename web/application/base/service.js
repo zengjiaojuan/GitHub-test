@@ -599,7 +599,10 @@ define(function() {
 	app.factory('ApkUpload', ['$resource', function($resource) {
 		return $resource('uploadAPK.shtml');
 	}]);
-	
-	
+	//
+	//资金账目查询
+	app.factory('AccountQuery', ['$resource', function($resource) {
+		return $resource('accountQuery.shtml');
+	}]);
 	
 });

@@ -1,0 +1,59 @@
+ <div class="col-sm-12 col-md-12">
+    <div class="row">
+     	<div class="col-sm-12 col-md-12">
+			<form class="form-custom clearfix">
+	        <div class="col-sm-2 col-md-2">
+	            <input class="form-control"  type="text" placeholder="用户手机号" ng-model="mUserTel"/>       
+	        </div>   
+	        <div class="col-sm-4 col-md-4">                 
+	            <button class="btn btn-custom" type="submit" ng-click="select(mUserTel)">查询</button>             
+	        </div>
+            </form>
+        </div> 
+    </div>
+    <table class="table table-striped table-bordered table-condensed index-center table-costom">
+        <thead>
+        <tr>
+            <th>序号</th>
+            <th>用户姓名</th>
+            <th>用户电话</th>
+            <th>用户身份证</th>
+            <th>数据库冻结金额</th>
+            <th>数据库可用金额</th>
+            <th>计算真实可用金额</th>   
+            <th>手机实际显示可用金额</th>
+            <th>红包抵资金额</th>
+            <th>充值金额</th>
+			<th>投资金额</th>          
+            <th>提现金额</th>   
+            <th>累计收益</th>            
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="rowlink" ng-repeat="item in limitArr">
+            <td>{{current*limit+$index+1}}</td>
+            <td>{{item.m_user_name}}</td>
+            <td>{{item.m_user_tel}}</td>
+            <td>{{item.id_number}}</td>
+            <td>{{item.frozen_money}}</td>
+            <td>{{item.m_user_money}}</td>
+            <td>{{item.show_money}}</td>
+            <td>{{item.real_money}}</td>
+            <td>{{item.redpacket_money}}</td>
+            <td>{{item.recharge}}</td>
+            <td>{{item.investment_money}}</td>
+            <td>{{item.withdraw_deposit_money}}</td>
+            <td>{{item.accumulated_income}}</td>
+        </tr>
+        </tbody>
+    </table>
+            <div    data-remote-paging="pager" 
+					data-refresh="refresh" 
+					data-current="current" 
+					data-total="total" 
+					data-data="limitArr"
+					data-limit="limit"
+					data-params="params"
+			></div>
+
+</div>
