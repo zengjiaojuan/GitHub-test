@@ -925,17 +925,29 @@ public class UserAccountController extends BaseController<UserAccount, String> {
         }
 	}
 	
- /**
+	/**
 	 * 提现说明
 	 */
 	@RequestMapping(value="getZfu")
 	@ResponseBody
 	public Map<String , Object> getZfu() {
 		Map<String , Object> data =new HashMap<String , Object>();
-		String list="提现说明 \n \n 1.为保障您的账户资金安全，申请提现时，您选择的银行卡开户名必须与您金朗理财账户实名认证一致，否则提现申请将不予受理;\n \n 2.提现时您的资金将会打到原充值卡，保证您的资金安全做到同卡进出\n \n 3.提现到帐时间通常需要1-15个工作日，依不同银行而定。如个别用户遇到债权需要重新匹配时提现时间需要1-90个工作日。\n \n 4.严禁利用金朗理财进行套现、洗钱、匿名转账，对于频繁的非正常投资为目的的资金充提行为，一经发现，金朗理财将通过原充值渠道进行资金清退，已收取手续费将不予返还;\n \n 5.下列情况下，已收取手续费将不予返还：用户提供的银行卡非本人银行卡，被银行退回;用户申请提现的银行卡非借记卡，与银行名称不符，或卡号明显异常，被银行退回;用户没有提供提现操作必要的支行信息，且金朗理财无法与之取得联系的。";
-		data.put("result", list);
+		Map<String , Object> Param =new HashMap<String , Object>();
+		try {
+			String list="提现说明 \n \n 1.为保障您的账户资金安全，申请提现时，您选择的银行卡开户名必须与您金朗理财账户实名认证一致，否则提现申请将不予受理;\n \n 2.提现时您的资金将会打到原充值卡，保证您的资金安全做到同卡进出\n \n 3.提现到帐时间通常需要1-15个工作日，依不同银行而定。如个别用户遇到债权需要重新匹配时提现时间需要1-90个工作日。\n \n 4.严禁利用金朗理财进行套现、洗钱、匿名转账，对于频繁的非正常投资为目的的资金充提行为，一经发现，金朗理财将通过原充值渠道进行资金清退，已收取手续费将不予返还;\n \n 5.下列情况下，已收取手续费将不予返还：用户提供的银行卡非本人银行卡，被银行退回;用户申请提现的银行卡非借记卡，与银行名称不符，或卡号明显异常，被银行退回;用户没有提供提现操作必要的支行信息，且金朗理财无法与之取得联系的。";
+			String tel="400-900-1055";
+			Param.put("list",list); 
+			Param.put("tel",tel);
+			data.put("result", Param);
+			data.put("message", "成功");
+			data.put("status", 1);
+		} catch (Exception e) {
+			data.put("message", "失败");
+			data.put("status", 0);
+		}
 		return data;
 	}
+
 
 	
   
